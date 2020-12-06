@@ -6,7 +6,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-#include "funciones_auxiliares.h"
+#include "../../utils/utils.h"
 #include "XTEA.h"
 
 /**
@@ -16,16 +16,12 @@
  * @param key (uint32_t *) Llave del algoritmo, consistente en 128 bits(4 entero de 32 bits). Debe coincidir con la clave de descifrado.
  * @return (void) 
 */
-void XTEA_encipher(uint32_t *in, uint32_t *out, uint32_t *key )
-{
+void XTEA_encipher(uint32_t *in, uint32_t *out, uint32_t *key ) {
 	uint32_t v0, v1, x, y, sum = 0;
 	int8_t n = XTEA_ITERATIONS;
 	uint8_t  i;
-
 	v0 = in[0];  v1 = in[1];
-
-	while(n != 0)
-	{ 
+	while(n != 0) { 
 		x = v1 << 4;
 		y = v1 >> 5;
 		x ^= y;
@@ -35,9 +31,7 @@ void XTEA_encipher(uint32_t *in, uint32_t *out, uint32_t *key )
 		y = sum + key[i];
 		x ^= y;
 		v0 += x;
-
 		sum += XTEA_DELTA;
-
 		x = v0 << 4;
 		y = v0 >> 5;
 		x ^= y;
@@ -48,7 +42,6 @@ void XTEA_encipher(uint32_t *in, uint32_t *out, uint32_t *key )
 		y = sum + key[i];
 		x ^= y;
 		v1 += x;
-
 		n--;
 	}
 	out[0] = v0;
@@ -62,16 +55,12 @@ void XTEA_encipher(uint32_t *in, uint32_t *out, uint32_t *key )
  * @param key (uint32_t *) Llave del algoritmo, consistente en 128 bits(4 entero de 32 bits). Debe coincidir con la clave de cifrado.
  * @return (void) 
 */
-void XTEA_decipher(uint32_t * in,uint32_t * out,uint32_t * key)
-{
+void XTEA_decipher(uint32_t * in,uint32_t * out,uint32_t * key) {
 	uint32_t  v0, v1, x, y, sum = XTEA_DEC_SUM;
 	int8_t n = XTEA_ITERATIONS;
 	uint8_t   i;
-
 	v0 = in[0];  v1 = in[1];
-
-	while(n > 0) 
-	{
+	while(n > 0) {
 		x = v0 << 4;
 		y = v0 >> 5;
 		x ^= y;
@@ -82,9 +71,7 @@ void XTEA_decipher(uint32_t * in,uint32_t * out,uint32_t * key)
 		y = sum + key[i];
 		x ^= y;
 		v1 -= x;
-
 		sum -= XTEA_DELTA;
-
 		x = v1 << 4;
 		y = v1 >> 5;
 		x ^= y;
@@ -94,7 +81,6 @@ void XTEA_decipher(uint32_t * in,uint32_t * out,uint32_t * key)
 		y = sum + key[i];
 		x ^= y;
 		v0 -= x;
-
 		n--;
 	}
 	out[0] = v0;
