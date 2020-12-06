@@ -2,6 +2,7 @@
  * @file XTEA.h
  * @brief Librería de implementación de funciones para encriptación de datos mediante el algoritmo XTEA (Extended Tiny Encryption Algorithm)
  * @author Ing. José Roberto Parra Trewartha
+ * @version 1.0
 */
 
 #ifndef XTEA_H

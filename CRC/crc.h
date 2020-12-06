@@ -2,6 +2,7 @@
  * @file crc.h
  * @brief Librería de implementación de funciones de verificación de redundancia cíclica (CRC o Cyclic Redundancy Check)
  * @author Ing. José Roberto Parra Trewartha
+ * @version 1.0
 */
 
 #ifndef CRC_H

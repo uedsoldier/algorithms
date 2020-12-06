@@ -2,6 +2,7 @@
  * @file checksum.c
  * @brief Librería de implementación de funciones de suma de verificación de 8 bits
  * @author Ing. José Roberto Parra Trewartha
+ * @version 1.0
 */
 
 #include <stdint.h>
