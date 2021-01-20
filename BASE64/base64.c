@@ -66,7 +66,6 @@ char *bin_to_base64(char* dest, const void *src, size_t size){
         uint8_t a; uint8_t b; uint8_t c;
     } block_t;
     uint8_t block_size = sizeof( block_t );
-    printf("Block size: %u\r\n",block_size);
     block_t *block = (block_t*)src;
 	for( ; size >= block_size; size -= block_size, ++block ) {
         *dest++ = get0( block->a );
@@ -93,5 +92,36 @@ char *bin_to_base64(char* dest, const void *src, size_t size){
 
 //
 void *base64_to_bin(char* dest, const char *src, size_t size){
-	return 0;////
+	uint8_t const* s = (uint8_t*)src;
+    char* p = dest;
+    for(;;) {
+
+        int const a = digit2bin[ *s ];
+        if ( a == notabase64 ) return p;
+        if ( a == terminator ) return p;
+
+        int const b = digit2bin[ *++s ];
+        if ( b == notabase64 ) return 0;
+        if ( b == terminator ) return 0;
+
+        *p++ = ( a << 2 ) | ( b >> 4 );
+
+        int const c = digit2bin[ *++s ];
+        if ( c == notabase64 ) return 0;
+
+        int const d = digit2bin[ *++s ];
+        if ( d == notabase64 ) return 0;
+        if ( c == terminator ) {
+            if ( d != terminator ) return 0;
+            return p;
+        }
+
+        *p++ = ( b << 4 ) | ( c >> 2 );
+
+        if ( d == terminator ) return p;
+
+        *p++ = ( c << 6 ) | ( d >> 0 );
+        ++s;
+    }
+    return p;
 }
