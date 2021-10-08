@@ -5,8 +5,10 @@
  * @version 1.0
 */
 #ifndef CHECKSUM_H
-
 #define CHECKSUM_H
+
+// Dependencias
+#include <stdint.h>
 
 uint8_t checksum8_XOR(void *datos, uint16_t len);			// Función para cálculo de checksum de 8 bits mediante OR exclusiva (XOR)
 uint8_t checksum8_modulo256(void *datos, uint16_t len);		// Función para cálculo de checksum de 8 bits mediante módulo 256
