@@ -7,6 +7,10 @@
 #ifndef BASE64_H
 #define BASE64_H
 
+// Dependencias
+#include <stdint.h>
+#include <stddef.h>
+
 /**
  */
 enum special_e {
@@ -35,16 +39,13 @@ static const char digit2bin[] = {
 };
 
 /** Lookup table that converts a integer to base64 digit. */
-static const char bin2digit[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    "abcdefghijklmnopqrstuvwxyz"
-    "0123456789"
-    "+/";
+static const char bin2digit[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 // Prototipos de funciones
-static uint8_t get0( uint8_t a );
-static uint8_t get1( uint8_t a, uint8_t b );
-static uint8_t get2( uint8_t b, uint8_t c );
-static uint8_t get3( uint8_t c );
+static char get0( char a );
+static char get1( char a, char b );
+static char get2( char b, char c );
+static char get3( char c );
 
 
 

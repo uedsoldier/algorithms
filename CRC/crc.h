@@ -8,6 +8,11 @@
 #ifndef CRC_H
 #define CRC_H
 
+// Dependencias
+#include <stdint.h>
+#include <stdbool.h>
+#include "../../utils/utils.h"
+
 /**
  * @brief Definición de enumeración de tipo CRC, con los nombres de los algoritmos CRC implementados de 8, 16 y 32 bits
 */
@@ -23,7 +28,6 @@ typedef enum crc_t {
    CRC32_D, CRC32_Q, CRC32_C, CRC32_ISO, CRC32_BZIP2, CRC32_MPEG_2, CRC32_POSIX, CRC32_JAMCRC, CRC32_XFER, CRC32_K1, CRC32_K2
 
 } crc_t;
-
 
 /**
  * @brief Macro para implementación de tablas previamente generadas para CRC8 con base en su polinomio generador.

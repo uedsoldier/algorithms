@@ -5,10 +5,8 @@
  * @version 1.0
 */
 
-#include <stdint.h>
-#include <stdbool.h>
 #include "crc.h"
-#include "../../utils/utils.h"
+
 
 /**
  * @brief Función para obtención de polinomio generador de CRC de 8 bits. 
@@ -242,16 +240,16 @@ uint8_t CRC8(void *data, uint16_t data_len, crc_t crc_type) {
    bool output_reflected = CRC_getOutputReflected(crc_type);
    while(data_len-- != 0 ) {
       uint8_t b = *_buf++;
-      b = input_reflected? invierte_bitsByte(b) : b;
+      b = input_reflected? bit_invert_Byte(b) : b;
       #ifndef CRC8_USE_LOOKUP_TABLE
-      crc = crc ^ (((uint16_t)(b)) << 8);
+      crc = crc ^ (uint8_t)(((uint16_t)(b)) << 8);
       for(uint8_t i = 0; i != 8; i++)
-         crc = (crc & 0x80)? (crc << 1) ^ poly: (crc << 1);
+         crc = (crc & 0x80)? (uint8_t)((crc << 1) ^ poly): (uint8_t)(crc << 1);
       #else
          crc = p_tabla[b ^ crc];
       #endif
    }
-   crc = output_reflected? invierte_bitsByte(crc) : crc;
+   crc = output_reflected? bit_invert_Byte(crc) : crc;
 
    return crc ^ CRC8_getFinalXOR(crc_type);
 }
@@ -299,7 +297,7 @@ uint16_t CRC16(void *data, uint16_t data_len, crc_t crc_type) {
    bool output_reflected = CRC_getOutputReflected(crc_type);
    while(data_len-- != 0 ) {
       uint8_t b = *_buf++;
-      b = input_reflected? invierte_bitsByte(b) : b;
+      b = input_reflected? bit_invert_Byte(b) : b;
       #ifndef CRC16_USE_LOOKUP_TABLE
       crc = crc ^ (((uint16_t)(b)) << 8);
       for(uint8_t i = 0; i != 8; i++)
@@ -308,7 +306,7 @@ uint16_t CRC16(void *data, uint16_t data_len, crc_t crc_type) {
          crc = (crc << 8) ^ p_tabla[(crc>>8) ^ b];
       #endif
    }
-   crc = output_reflected? invierte_bitsInt16(crc) : crc;
+   crc = output_reflected? bit_invert_Int16(crc) : crc;
    return crc ^ CRC16_getFinalXOR(crc_type);
 }
 
@@ -353,7 +351,7 @@ uint32_t CRC32(void *data, uint16_t data_len, crc_t crc_type) {
    bool output_reflected = CRC_getOutputReflected(crc_type);
    while(data_len-- != 0 ) {
       uint8_t b = *_buf++;
-      b = input_reflected? invierte_bitsByte(b) : b;
+      b = input_reflected? bit_invert_Byte(b) : b;
       #ifndef CRC32_USE_LOOKUP_TABLE
       crc = crc ^ (((uint32_t)(b)) << 24);
       for(uint8_t i = 0; i != 8; i++)
@@ -362,7 +360,7 @@ uint32_t CRC32(void *data, uint16_t data_len, crc_t crc_type) {
          crc = (uint32_t)((crc << 8) ^ p_tabla[(uint8_t)((crc ^ ((uint32_t)(b)<<24)) >> 24)]);
       #endif
    }
-   crc = output_reflected? invierte_bitsInt32(crc) : crc;
+   crc = output_reflected? bit_invert_Int32(crc) : crc;
 
    return crc ^ CRC32_getFinalXOR(crc_type);
 }

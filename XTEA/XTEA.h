@@ -8,6 +8,11 @@
 #ifndef XTEA_H
 #define XTEA_H
 
+// Dependencias
+#include <stdbool.h>
+#include <stdint.h>
+#include "../../utils/utils.h"
+
 /**
  * @brief  Número de interaciones para la ejecución del algoritmo. 32 es bastante, 16 son suficientes, y alrededor de 8 serviría para muchas aplicaciones.
 */
