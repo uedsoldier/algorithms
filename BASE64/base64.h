@@ -19,7 +19,7 @@ enum special_e {
 };
 
 /** Lookup table that converts a base64 digit to integer. */
-static const char digit2bin[] = {
+static const uint8_t digit2bin[] = {
     64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
     64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
     64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 62, 64, 64, 64, 63,
@@ -39,18 +39,16 @@ static const char digit2bin[] = {
 };
 
 /** Lookup table that converts a integer to base64 digit. */
-static const char bin2digit[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+static const uint8_t bin2digit[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 // Prototipos de funciones
-static char get0( char a );
-static char get1( char a, char b );
-static char get2( char b, char c );
-static char get3( char c );
+static uint8_t get0( uint8_t a );
+static uint8_t get1( uint8_t a, uint8_t b );
+static uint8_t get2( uint8_t b, uint8_t c );
+static uint8_t get3( uint8_t c );
 
-
-
-char *bin_to_base64(char* dest, const void *src, size_t size);
-void *base64_to_bin(char* dest, const char *src, size_t size);
+uint8_t *bin_to_base64(uint8_t* dest, const void *src, size_t size);
+void *base64_to_bin(uint8_t* dest, const uint8_t *src, size_t size);
 
 
 #endif /*BASE64_H*/
