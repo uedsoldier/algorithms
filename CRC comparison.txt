@@ -1,13 +1,20 @@
 CRC16 - CRC64 test results on 18.2M dataset, w/program source
 Program & Test Run by Matt Dillon
 18.2M message-id dataset supplied by Joe Greco
-I would like to thank everyone who offered their history files and/or message-id logs to run this test. I wound up using most of them for smaller runs during my construction of the CRC test program, and used an 18.2 million message-id data set supplied by Joe Greco for the final test runs shown below.
+I would like to thank everyone who offered their history files and/or message-id logs to run this test. I wound up using most of them for smaller runs during my construction
+of the CRC test program, and used an 18.2 million message-id data set supplied by Joe Greco for the final test runs shown below.
 
-Using the program I posted earlier with one minor bug in the placement of ++total corrected, I ran the 18.2 million message-id data set with CRC's ranging from 16 to 64 bits. The number of collisions are shown below. The program is included at the bottom.
+Using the program I posted earlier with one minor bug in the placement of ++total corrected, I ran the 18.2 million message-id data set with CRC's ranging from 16 to 64 bits.
+The number of collisions are shown below. The program is included at the bottom.
 
-The lower numbered CRC's tended on collision rates nearing 100% after a certain number of samples, which is as expected. Once the test got beyond the noise floor, each additional bit of CRC cut the number of collisions down by approximately half. No collisions occured with the 18.2 million message-id's dataset once we got beyond CRC48, but one can extrapolate a collision rate of one message-id per 2.3 Trillion message-id's with a CRC64 from empirical data. The theoretical collision rate for CRC64 and 18.2 million mesage-id's is one collision every 2 trillion message-id's so we have good correspondance to theory.
+The lower numbered CRC's tended on collision rates nearing 100% after a certain number of samples, which is as expected. Once the test got beyond the noise floor, each
+additional bit of CRC cut the number of collisions down by approximately half. No collisions occured with the 18.2 million message-id's dataset once we got beyond CRC48,
+but one can extrapolate a collision rate of one message-id per 2.3 Trillion message-id's with a CRC64 from empirical data. The theoretical collision rate for CRC64 and 18.2
+million mesage-id's is one collision every 2 trillion message-id's so we have good correspondance to theory.
 
-I should have used a real CRC long ago rather then try to do something fancy with prime numbers. The 1.14 diablo release is going to use the CRC64 algorithm included at the end (well, actually CRC63 as I want to reserve one bit for future use). Besides, it's a good deal faster then the old prime-mod algorithm anyway as it only requires shift and xor ops to implement.
+I should have used a real CRC long ago rather then try to do something fancy with prime numbers. The 1.14 diablo release is going to use the CRC64 algorithm included at the
+end (well, actually CRC63 as I want to reserve one bit for future use). Besides, it's a good deal faster then the old prime-mod algorithm anyway as it only requires shift
+and xor ops to implement.
 
 			-Matt (dillon@backplane.com)
 Summary, 18.2 million sample test dataset, number of collisions.

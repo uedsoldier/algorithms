@@ -199,7 +199,8 @@ static uint8_t CRC8_getSeed(crc_t crc_type)
 	case CRC8_ROHC:
 	case CRC8_EBU:
 	case CRC8_CDMA2000:
-	case CRC8_SAE_J1850: case CRC8_8H2F:
+	case CRC8_SAE_J1850:
+	case CRC8_8H2F:
 		retVal = 0xFF;
 		break;
 	default:
@@ -405,16 +406,19 @@ static uint8_t CRC8_getFinalXOR(crc_t crc_type)
 	switch (crc_type)
 	{
 	case CRC8_ITU:
-		retVal = 0x55; break;
+		retVal = 0x55;
+		break;
 	case CRC8_SAE_J1850:
 	case CRC8_8H2F:
-		retVal = 0xFF; break;
+		retVal = 0xFF;
+		break;
 	default:
-		retVal = 0x00; break; // Posibles casos restantes...
+		retVal = 0x00;
+		break; // Posibles casos restantes...
 	}
-	#if defined CRC_LOG && CRC_LOG == 1
+#if defined CRC_LOG && CRC_LOG == 1
 	printf("\tFinal XOR : 0x%02X\n", retVal);
-	#endif
+#endif
 	return retVal;
 }
 
@@ -437,18 +441,26 @@ static uint16_t CRC16_getFinalXOR(crc_t crc_type)
 	case CRC16_T10_DIF:
 	case CRC16_TELEDISK:
 	case CRC16_CDMA2000:
-		retVal = 0x0000; break;
+		retVal = 0x0000;
+		break;
 	case CRC16_GENIBUS:
-	case CRC16_EN13757: case CRC16_X25: case CRC16_MAXIM: case CRC16_USB: case CRC16_DNP:
-		retVal = 0xFFFF; break;
+	case CRC16_EN13757:
+	case CRC16_X25:
+	case CRC16_MAXIM:
+	case CRC16_USB:
+	case CRC16_DNP:
+		retVal = 0xFFFF;
+		break;
 	case CRC16_DECT_R:
-		retVal = 0x0001; break;
+		retVal = 0x0001;
+		break;
 	default:
-		retVal = 0; break; // Posibles casos restantes...
+		retVal = 0;
+		break; // Posibles casos restantes...
 	}
-	#if defined CRC_LOG && CRC_LOG == 1
+#if defined CRC_LOG && CRC_LOG == 1
 	printf("\tFinal XOR : 0x%04X\n", retVal);
-	#endif
+#endif
 	return retVal;
 }
 
@@ -467,13 +479,15 @@ static uint32_t CRC32_getFinalXOR(crc_t crc_type)
 	case CRC32_D:
 	case CRC32_C:
 	case CRC32_ISO:
-		retVal = 0xFFFFFFFFUL; break;
+		retVal = 0xFFFFFFFFUL;
+		break;
 	default:
-		retVal = 0UL; break; // Posibles casos restantes...
+		retVal = 0UL;
+		break; // Posibles casos restantes...
 	}
-	#if defined CRC_LOG && CRC_LOG == 1
+#if defined CRC_LOG && CRC_LOG == 1
 	printf("\tFinal XOR : 0x%08lX\n", retVal);
-	#endif
+#endif
 	return retVal;
 }
 
@@ -561,7 +575,7 @@ uint8_t CRC8(void *data, uint16_t data_len, crc_t crc_type)
 		crc = p_tabla[b ^ crc];
 		// crc = (crc << 8) ^ p_tabla[(crc >> 8) ^ b];
 		// crc = (uint32_t)((crc << 8) ^ p_tabla[(uint8_t)((crc ^ ((uint32_t)(b) << 24)) >> 24)]);
-		
+
 #endif
 	}
 	crc = output_reflected ? bit_invert_Byte(crc) : crc;

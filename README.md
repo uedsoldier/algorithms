@@ -1,4 +1,6 @@
-Funciones y macros correspondientes a algoritmos de comprobación de errores, sumas de verificación, cifrado y codificación para aplicaciones en microcontroladores de 8 bits.
+Funciones y macros correspondientes a algoritmos de comprobación de errores, sumas de verificación, cifrado y codificación para aplicaciones orientadas a microcontroladores.
+
+# Módulos
 
 * checksum_8: Sumas de verificación de 8 bits.
 * CRC: Implementación de verificación de redundancia cíclica (CRC) de 8, 16 y 32 bits, con distintos polinomios generadores e implementaciones.

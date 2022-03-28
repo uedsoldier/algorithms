@@ -1,43 +1,54 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
+#include <stdlib.h>
 #include "crc.h"
-
-const char texto[] = "0";
-
+#include "../../utilities/utils.h"
 char cadena[16];
 uint8_t cnt = 0;
 
-// #define TEST_CRC8
-// #define TEST_CRC16
-#define TEST_CRC32
+#define TEST_CRC8 0
+#define TEST_CRC16 0
+#define TEST_CRC32 1
 
-int main(){
-    memset(cadena,0,sizeof(cadena));
-    uint16_t str_len = sizeof(texto);
-    memcpy(cadena,texto,str_len);
-    
-    printf("Tamano cadena entrada: %u\r\n",str_len);
-    printf("Entrada: %s\r\n",cadena);
-    #ifdef TEST_CRC8
-    for(crc_t i=CRC8_CCITT; i != CRC16_XMODEM; i++){
-        printf("%s:\n",get_crc8_implementation(cnt++));
-        printf("\tResult: 0x%02X\n",CRC8(cadena,str_len-1,i));
+#define DEBUG 1
+
+int main(int argc, char *argv[])
+{
+
+    if (argc != 2)
+    {
+        printf("Se debe mandar un argumento ");
+        return EXIT_FAILURE;
     }
-    #endif
-    #ifdef TEST_CRC16
+    memset(cadena, 0, sizeof(cadena));
+    uint16_t str_len = strlen(argv[1]);
+    memcpy(cadena, argv[1], str_len);
+
+    printf("Tamano cadena entrada: %u\r\n", str_len);
+    printf("Entrada: %s\r\n", cadena);
+#if TEST_CRC8 == 1
+    for (crc_t i = CRC8_CCITT; i != CRC16_XMODEM; i++)
+    {
+        printf("Algorithm: %s:\t", get_crc8_implementation(cnt++));
+        printf("0x%02X\n", CRC8(cadena, str_len, i));
+    }
+#endif
+#if TEST_CRC16 == 1
     cnt = 0;
-    for(uint8_t i=CRC16_XMODEM; i != CRC32_D; i++){
-        printf("%s:\n",get_crc16_implementation(cnt++));
-        printf("\tResult: 0x%04X\n",CRC16(cadena,str_len-1,i));
+    for (uint8_t i = CRC16_XMODEM; i != CRC32_D; i++)
+    {
+        printf("Algorithm: %s:\t", get_crc16_implementation(cnt++));
+        printf("0x%04X\n", CRC16(cadena, str_len, i));
     }
-    #endif
-    #ifdef TEST_CRC32
+#endif
+#if TEST_CRC32 == 1
     cnt = 0;
-    for(uint8_t i=CRC32_D; i <= CRC32_XFER; i++){
-        printf("%s:\n",get_crc32_implementation(cnt++));
-        printf("\tResult: 0x%08X\n",CRC32(cadena,str_len-1,i));
+    for (uint8_t i = CRC32_D; i <= CRC32_XFER; i++)
+    {
+        printf("Algorithm: %s:\t", get_crc32_implementation(cnt++));
+        printf("0x%08X\n", CRC32(cadena, str_len, i));
     }
-    return 0;
-    #endif
+    return EXIT_SUCCESS;
+#endif
 }
