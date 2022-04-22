@@ -3,5 +3,6 @@
         "stdint.h": "c",
         "stdbool.h": "c",
         "xtea.h": "c"
-    }
+    },
+    "cmake.configureOnOpen": false
 }
