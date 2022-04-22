@@ -11,12 +11,20 @@
 // Dependencias
 #include <stdbool.h>
 #include <stdint.h>
-#include "../../utils/utils.h"
+#include "../../utilities/utils.h"
+
+/**
+ * @brief 
+ * 
+ */
+#ifndef XTEA_LOG
+#define XTEA_LOG 1
+#endif
 
 /**
  * @brief  Número de interaciones para la ejecución del algoritmo. 32 es bastante, 16 son suficientes, y alrededor de 8 serviría para muchas aplicaciones.
 */
-#define XTEA_ITERATIONS 8
+#define XTEA_ITERATIONS 16
 
 
 /**
@@ -32,12 +40,28 @@
  * 0xF1BBCDC8 para 8
  * 
 */
-uint32_t XTEA_DEC_SUM = XTEA_DELTA * XTEA_ITERATIONS;
+static uint32_t XTEA_DEC_SUM = XTEA_DELTA * XTEA_ITERATIONS;
+
+/**
+ * @brief 
+ * 
+ */
+typedef struct xtea_key{
+    union {
+        uint32_t key_dwords[4];
+        uint8_t key_bytes[16];
+    };
+} xtea_key_t;
+
 
 /**
  * Prototipos de funciones
 */
-void XTEA_encipher(uint32_t *in, uint32_t *out,uint32_t *key );      // Función de cifrado
-void XTEA_decipher (uint32_t * in,uint32_t * out,uint32_t * key);    // Función de descrifrado
+static void XTEA_encrypt_chunk(uint32_t *in, uint32_t *out, xtea_key_t *key );  // Función de cifrado de trozo de 8 bytes
+static void XTEA_decrypt_chunk(uint32_t * in,uint32_t * out, xtea_key_t *key);  // Función de descrifrado de trozo de 8 bytes
+
+int32_t XTEA_encrypt(void *in, void *out, int32_t size, xtea_key_t *key);
+int32_t XTEA_decrypt(void *in, void *out, int32_t size, xtea_key_t *key);
+
 
 #endif /*XTEA_H*/
