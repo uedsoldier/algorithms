@@ -6,5 +6,5 @@ set( CMAKE_C_COMPILER "gcc")
 # set the project name
 project(CRC_testing VERSION 0.1.0)
 
-add_executable(testCRC test.c crc.c ../../utilities/utils.c)
+add_executable(test test.c crc.c ../../utilities/utils.c)
 
