@@ -28,7 +28,7 @@
  * los compiladores soportan tales funcionalidades (malloc(), calloc(), realloc(), etc.)
  */
 #ifndef XTEA_DYNAMIC_MEMORY
-#define XTEA_DYNAMIC_MEMORY 0
+#define XTEA_DYNAMIC_MEMORY 1
 #endif
 
 /**
@@ -51,7 +51,6 @@
 #ifdef XTEA_USE_BUFFERS
 #define XTEA_MAX_BUFFER_SIZE 128
 #endif
-
 
 /**
  * @brief Constante δ derivada de la razón áurea. Utilizada en las funciones de cifrado y 
