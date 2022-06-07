@@ -21,7 +21,7 @@ int main(int argc, char *argv[]){
     clock_t begin = clock();
     memset(cadena,0,sizeof(cadena));
     sprintf(cadena,"%s",argv[1]);
-    uint16_t str_len = sizeof(argv[1]);
+    uint16_t str_len = strlen(argv[1]);
     printf("Tamano cadena entrada: %u\r\n",str_len);
     printf("Entrada ASCII: %s\r\n",argv[1]);
     bin_to_base64(buffer1,cadena,str_len);
