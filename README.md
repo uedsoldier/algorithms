@@ -10,5 +10,9 @@ Funciones y macros correspondientes a algoritmos de comprobación de errores, su
 # Uso de CMake
 * Para Windows:
 ``` cmake -S . -B build/ -G "MinGW Makefiles"```
-Desde la carpeta build/: ``` mingw32-make ```
- 
+Desde la carpeta build/: 
+``` mingw32-make ```
+* Para Linux:
+``` cmake -S . -B build/ -G "MinGW Makefiles"```
+Desde la carpeta build/: 
+``` make ```

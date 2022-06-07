@@ -8,8 +8,8 @@
 char cadena[16];
 uint8_t cnt = 0;
 
-#define TEST_CRC8 0
-#define TEST_CRC16 0
+#define TEST_CRC8 1
+#define TEST_CRC16 1
 #define TEST_CRC32 1
 
 #define DEBUG 1
@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
 #if TEST_CRC8 == 1
     for (crc_t i = CRC8_CCITT; i != CRC16_XMODEM; i++)
     {
-        printf("Algorithm: %s:\t", get_crc8_implementation(cnt++));
+        printf("Algorithm: %-22s: ", get_crc8_implementation(cnt++));
         printf("0x%02X\n", CRC8(cadena, str_len, i));
     }
 #endif
@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
     cnt = 0;
     for (uint8_t i = CRC16_XMODEM; i != CRC32_D; i++)
     {
-        printf("Algorithm: %s:\t", get_crc16_implementation(cnt++));
+        printf("Algorithm: %-22s: ", get_crc16_implementation(cnt++));
         printf("0x%04X\n", CRC16(cadena, str_len, i));
     }
 #endif
@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
     cnt = 0;
     for (uint8_t i = CRC32_D; i <= CRC32_XFER; i++)
     {
-        printf("Algorithm: %s:\t", get_crc32_implementation(cnt++));
+        printf("Algorithm: %-22s: ", get_crc32_implementation(cnt++));
         printf("0x%08X\n", CRC32(cadena, str_len, i));
     }
 #endif

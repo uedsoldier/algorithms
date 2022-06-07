@@ -22,7 +22,7 @@ int main(int argc, char *argv[]){
     uint8_t check8_mod256 = checksum8_modulo256(cadena,str_len);
     printf("checksum 8 modulo 256: 0x%02X\r\n",check8_mod256);
     uint8_t check8_2complement = checksum8_2complement(cadena,str_len);
-    printf("checksum 82 complement: 0x%02X\r\n",check8_2complement);
+    printf("checksum 8 2-complement: 0x%02X\r\n",check8_2complement);
 
     return 0;
 }
