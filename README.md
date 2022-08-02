@@ -1,4 +1,5 @@
 Funciones y macros correspondientes a algoritmos de comprobación de errores, sumas de verificación, cifrado y codificación para aplicaciones orientadas a microcontroladores.
+En caso de que este código sea necesitado, se debe hacer una copia de los archovos requeridos en vez de modificar el repositorio orginal.
 
 # Módulos
 

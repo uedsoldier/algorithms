@@ -24,10 +24,15 @@ int main(int argc, char *argv[]){
     uint16_t input_len_normalized = ((input_len + 7) & (-8));
     uint16_t key_len =  strlen(argv[2]);
     uint32_t output_len;
+    #if defined(XTEA_DYNAMIC_MEMORY)
     char *cadena = (char *) malloc(input_len_normalized);
     char *buffer1 = (char *) malloc(input_len_normalized);
     char *buffer2 = (char *) malloc(input_len_normalized);
-
+    #else
+    char cadena[256]
+    char buffer1[256] 
+    char buffer2[256]
+    #endif
     if( cadena == NULL || buffer1 == NULL || buffer2 == NULL ){
         printf("NULL pointer\n");
         return EXIT_FAILURE;
