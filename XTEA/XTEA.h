@@ -8,12 +8,14 @@
 #ifndef XTEA_H
 #define XTEA_H
 
-// Dependencias
+#pragma region Dependencies
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include "../../utilities/utils.h"
+#pragma endregion
 
+#pragma region Useful macros
 /**
  * @brief Macro para depuración mediante la función printf(). Se recomienda usar únicamente
  * para fines de desarrollo y pruebas.
@@ -28,7 +30,7 @@
  * los compiladores soportan tales funcionalidades (malloc(), calloc(), realloc(), etc.)
  */
 #ifndef XTEA_DYNAMIC_MEMORY
-#define XTEA_DYNAMIC_MEMORY 0
+#define XTEA_DYNAMIC_MEMORY 1
 #endif
 
 /**
@@ -39,7 +41,7 @@
  */
 #if !defined(XTEA_DYNAMIC_MEMORY) || (XTEA_DYNAMIC_MEMORY == 0)
 #ifndef XTEA_USE_BUFFERS
-#define XTEA_USE_BUFFERS 0
+#define XTEA_USE_BUFFERS 1
 #endif
 #endif
 
@@ -58,6 +60,21 @@
 */
 #define XTEA_DELTA 0x9E3779B9UL
 
+/**
+ * @brief Macro de tamaño de clave fija en bytes
+ * 
+ */
+#define XTEA_FIXED_KEY_SIZE 16
+
+/**
+ * @brief Macro de tamaño de vector de inicialización en bytes
+ * 
+ */
+#define XTEA_INIT_VECTOR_SIZE 8
+
+#pragma endregion
+
+#pragma region Custom types
 /**
  * @brief Enumeración de códigos de error para funciones XTEA
  * 
@@ -91,9 +108,9 @@ typedef struct XTEA{
      * 0xE3779B90 para 16 iteraciones
      * 0xF1BBCDC8 para 8 iteraciones
      */   
-    uint32_t iterations;    // Número de iteraciones para la ejecución del algoritmo. 32 es bastante, 16 son suficientes, y alrededor de 8 serviría para muchas aplicaciones. 
-    xtea_key_t key;         // Llave del algoritmo, consistente en 128 bits(4 enteros de 32 bits).
-    uint8_t iv[8];          // Vector de inicialización para modalidad CBC
+    uint32_t iterations;                    // Número de iteraciones para la ejecución del algoritmo. 32 es bastante, 16 son suficientes, y alrededor de 8 serviría para muchas aplicaciones. 
+    xtea_key_t key;                         // Llave del algoritmo, consistente en 128 bits(4 enteros de 32 bits).
+    uint8_t iv[XTEA_INIT_VECTOR_SIZE];      // Vector de inicialización para modalidad CBC
 } XTEA_t;
 
 /**
@@ -112,19 +129,17 @@ typedef struct {
      */   
     xtea_key_t key;         // Llave del algoritmo, consistente en 128 bits(4 enteros de 32 bits).
 } XXTEA_t;
+#pragma endregion
 
-/**
- * Prototipos de funciones
-*/
+#pragma region Function prototypes
 void XTEA_init(XTEA_t *xtea, uint16_t rounds, xtea_key_t *key, uint8_t *iv);
-static void XTEA_fixed_key(XTEA_t *xtea);                                            // Función para recorte de clave a 16 bytes
+static void XTEA_set_fixedKey(XTEA_t *xtea);                                            // Función para recorte de clave a 16 bytes
 static void XTEA_encrypt_chunk(XTEA_t *xtea, uint32_t *in, uint32_t *out);      // Función de cifrado de trozo de 8 bytes
 static void XTEA_decrypt_chunk(XTEA_t *xtea, uint32_t * in,uint32_t * out);     // Función de descrifrado de trozo de 8 bytes
-
 XTEA_code_t XTEA_encrypt(XTEA_t *xtea, void *in, void *out, int32_t input_len, bool ecb, uint32_t *output_len);
 XTEA_code_t XTEA_decrypt(XTEA_t *xtea, void *in, void *out, int32_t input_len, bool ecb, uint32_t *output_len);
-
 XTEA_code_t XXTEA_encrypt(XXTEA_t *xxtea, void *in, void *out, int32_t input_len);
 XTEA_code_t XXTEA_decrypt(XXTEA_t *xxtea, void *in, void *out, int32_t input_len);
+#pragma endregion
 
 #endif /*XTEA_H*/

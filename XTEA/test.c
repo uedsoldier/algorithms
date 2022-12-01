@@ -5,7 +5,7 @@
 #include <time.h>
 #include "XTEA.h"
 
-uint8_t *iv = "init vector";
+uint8_t *iv = "vector";
 
 
 xtea_key_t xtea_test_key;

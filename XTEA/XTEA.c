@@ -43,17 +43,17 @@ void XTEA_init(XTEA_t *xtea, uint16_t rounds, xtea_key_t *key, uint8_t *iv){
 	}
 	
 	xtea->dec_sum = XTEA_DELTA * (xtea->iterations);
-	memcpy( xtea->key.key_bytes, key, sizeof( xtea_key_t));
-	memcpy( xtea->iv, iv, sizeof( xtea->iv));
-	XTEA_fixed_key(xtea);
+	memcpy( xtea->key.key_bytes, key, XTEA_FIXED_KEY_SIZE);
+	memcpy( xtea->iv, iv, XTEA_INIT_VECTOR_SIZE);
+	XTEA_set_fixedKey(xtea);
 	#if defined(XTEA_LOG) && XTEA_LOG == 1
 	uint8_t i;
 	printf("\t* Iterations: %u\n\t* Dec sum: 0x%08lX\n\t* Key (hex bytes): [",xtea->iterations,xtea->dec_sum);
-	for (i = 0; i != sizeof(xtea_key_t); i++){
+	for (i = 0; i != XTEA_FIXED_KEY_SIZE; i++){
 		printf("%02x ",xtea->key.key_bytes[i]);
 	}
 	printf("]\n\t* Initializating vector (hex bytes): [");
-	for (i = 0; i != sizeof(xtea->iv); i++){
+	for (i = 0; i != XTEA_INIT_VECTOR_SIZE; i++){
 		printf("%02x ",xtea->iv[i]);
 	}
 	printf("]\n");
@@ -65,12 +65,12 @@ void XTEA_init(XTEA_t *xtea, uint16_t rounds, xtea_key_t *key, uint8_t *iv){
  * 
  * @param xtea 
  */
-static void XTEA_fixed_key(XTEA_t *xtea){
+static void XTEA_set_fixedKey(XTEA_t *xtea){
 	size_t i;
-    uint8_t fixed_key[16];
-    memcpy(fixed_key, xtea->key.key_bytes, sizeof(fixed_key));
-    for (i = 0; (i < 16) && (fixed_key[i] != 0); ++i);
-	for (++i; i < 16; ++i) {
+    uint8_t fixed_key[XTEA_FIXED_KEY_SIZE];
+    memcpy(fixed_key, xtea->key.key_bytes, XTEA_FIXED_KEY_SIZE);
+    for (i = 0; (i < XTEA_FIXED_KEY_SIZE) && (fixed_key[i] != 0); ++i);
+	for (++i; i < XTEA_FIXED_KEY_SIZE; ++i) {
 		fixed_key[i] = 0;
 		}
 }
@@ -243,7 +243,7 @@ XTEA_code_t XTEA_encrypt(XTEA_t *xtea, void *in, void *out, int32_t input_len, b
 	
 	uint8_t *_out = (uint8_t *)out; 
 	uint8_t temp_iv[8];
-	memcpy(temp_iv, xtea->iv, sizeof(temp_iv));
+	memcpy(temp_iv, xtea->iv, XTEA_INIT_VECTOR_SIZE);
 	memset(_out, 0 , input_len);
 	#if defined(XTEA_LOG) && XTEA_LOG == 1
 	uint32_t i;
@@ -267,12 +267,12 @@ XTEA_code_t XTEA_encrypt(XTEA_t *xtea, void *in, void *out, int32_t input_len, b
 		printf("\tChunk %u: ",encrypted_chunks);
 		#endif
 		if(!ecb){
-			for(uint8_t j=0; j != sizeof(temp_iv); j++){
+			for(uint8_t j=0; j != XTEA_INIT_VECTOR_SIZE; j++){
 				uint8_t prev = _in[j];
 				_in[j] = (uint8_t)(prev ^ temp_iv[j]);
 			} 
 			XTEA_encrypt_chunk(xtea,(uint32_t *)_in, (uint32_t *)_out);
-			memcpy(temp_iv, _out, sizeof(temp_iv));
+			memcpy(temp_iv, _out, XTEA_INIT_VECTOR_SIZE);
 
 		} else{
 			XTEA_encrypt_chunk(xtea,(uint32_t *)_in, (uint32_t *)_out);
@@ -341,9 +341,9 @@ XTEA_code_t XTEA_decrypt(XTEA_t *xtea, void *in, void *out, int32_t input_len, b
 	#endif
 	
 	uint8_t *_out = (uint8_t *)out; 
-	uint8_t temp[8];
-	uint8_t temp_iv[8];
-	memcpy(temp_iv, xtea->iv, sizeof(temp_iv));
+	uint8_t temp[XTEA_INIT_VECTOR_SIZE];
+	uint8_t temp_iv[XTEA_INIT_VECTOR_SIZE];
+	memcpy(temp_iv, xtea->iv, XTEA_INIT_VECTOR_SIZE);
 	#if defined(XTEA_LOG) && XTEA_LOG == 1
 	printf("\tInput buffer: ");
 	for(uint32_t i=0 ; i!=input_len_normalized; i++){
@@ -353,7 +353,7 @@ XTEA_code_t XTEA_decrypt(XTEA_t *xtea, void *in, void *out, int32_t input_len, b
 	#endif
 	
 	while(input_len_normalized> 0) {
-		memcpy(temp, _in, sizeof(temp));
+		memcpy(temp, _in, XTEA_INIT_VECTOR_SIZE);
 
 		#if defined(XTEA_LOG) && XTEA_LOG == 1
 		printf("\tChunk %u: ",decrypted_chunks);
@@ -361,11 +361,11 @@ XTEA_code_t XTEA_decrypt(XTEA_t *xtea, void *in, void *out, int32_t input_len, b
 		
 		XTEA_decrypt_chunk(xtea, (uint32_t *)_in, (uint32_t *)_out);
 		if(!ecb){
-			for(uint8_t j=0; j != sizeof(temp); j++){
+			for(uint8_t j=0; j != XTEA_INIT_VECTOR_SIZE; j++){
 				uint8_t prev = _out[j];
 				_out[j] = (uint8_t)( prev ^ temp_iv[j]);
 			}
-			memcpy(temp_iv, temp, sizeof(temp));	
+			memcpy(temp_iv, temp, XTEA_INIT_VECTOR_SIZE);	
 		}
 		_in += 8; _out += 8; input_len_normalized-= 8; decrypted_chunks++;
 	}

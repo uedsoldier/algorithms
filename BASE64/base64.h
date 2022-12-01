@@ -7,10 +7,12 @@
 #ifndef BASE64_H
 #define BASE64_H
 
-// Dependencias
+#pragma region Dependencies
 #include <stdint.h>
 #include <stddef.h>
+#pragma endregion
 
+#pragma region Constants and utilities
 /**
  */
 enum special_e {
@@ -40,15 +42,15 @@ static const uint8_t digit2bin[] = {
 
 /** Lookup table that converts a integer to base64 digit. */
 static const uint8_t bin2digit[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+#pragma endregion
 
-// Prototipos de funciones
+#pragma region Function prototypes
 static uint8_t get0( uint8_t a );
 static uint8_t get1( uint8_t a, uint8_t b );
 static uint8_t get2( uint8_t b, uint8_t c );
 static uint8_t get3( uint8_t c );
-
 uint8_t *bin_to_base64(uint8_t* dest, const void *src, size_t size);
 void *base64_to_bin(uint8_t* dest, const uint8_t *src, size_t size);
-
+#pragma endregion
 
 #endif /*BASE64_H*/

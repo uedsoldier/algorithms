@@ -14,7 +14,6 @@
  * @param tipo (CHECKSUM8_t) Tipo de CRC8
  * @return Checksum de 8 bits mediante XOR
 */
-
 uint8_t checksum8(void *datos, uint16_t len, CHECKSUM8_t tipo) {
 	uint8_t retval = 0;						//Valor de retorno
 	uint8_t *_buf = (uint8_t*)datos;		//Asignacion de datos con apuntador a uint8_t
