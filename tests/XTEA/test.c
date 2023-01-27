@@ -220,25 +220,26 @@ static char *all_tests()
 
 int main(int argc, char *argv[])
 {
+    printf("XTEA testing\n");
+    test_string_len = strlen(TEST_STRING);
+    printf("Test string length: %u",test_string_len);
+    test_string_len_normalized = ((test_string_len + 7) & (-8));
+    printf("Test string length (normalized): %u",test_string_len_normalized);
+    key_len = strlen(TEST_KEY);
+    memcpy(&xtea_test_key, TEST_KEY, key_len);
 
-#if defined(XTEA_DYNAMIC_MEMORY) && (XTEA_DYNAMIC_MEMORY == 1)
-    *input_string = (uint8_t *)malloc(test_string_len_normalized);
-    *XTEA_encrypt_buffer = (uint8_t *)malloc(test_string_len_normalized);
-    *XTEA_decrypt_buffer = (uint8_t *)malloc(test_string_len_normalized);
-#endif
+    #if defined(XTEA_DYNAMIC_MEMORY) && (XTEA_DYNAMIC_MEMORY == 1)
+    input_string = (uint8_t *)malloc(test_string_len_normalized);
+    XTEA_encrypt_buffer = (uint8_t *)malloc(test_string_len_normalized);
+    XTEA_decrypt_buffer = (uint8_t *)malloc(test_string_len_normalized);
     if (input_string == NULL || XTEA_encrypt_buffer == NULL || XTEA_decrypt_buffer == NULL)
     {
         printf("NULL pointer\n");
         return EXIT_FAILURE;
     }
-
+    #endif
+    
     reset_data();
-
-    test_string_len = strlen(TEST_STRING);
-    test_string_len_normalized = ((test_string_len + 7) & (-8));
-    key_len = strlen(TEST_KEY);
-    memcpy(&xtea_test_key, TEST_KEY, key_len);
-
     fill_input_data();
 
     char *result = all_tests();

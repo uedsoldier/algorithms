@@ -31,7 +31,7 @@
  * los compiladores soportan tales funcionalidades (malloc(), calloc(), realloc(), etc.)
  */
 #ifndef XTEA_DYNAMIC_MEMORY
-#define XTEA_DYNAMIC_MEMORY 0
+#define XTEA_DYNAMIC_MEMORY 1
 #endif
 
 /**
