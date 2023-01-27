@@ -508,7 +508,7 @@ uint8_t CRC8(void *data, uint16_t data_len, crc_t crc_type)
 	uint8_t crc = CRC8_getSeed(crc_type);  // Inicialización de valor "semilla"
 	uint8_t poly = CRC8_getPoly(crc_type); // Obtención de polinomio
 
-#ifdef CRC8_USE_LOOKUP_TABLE
+#if defined(CRC8_USE_LOOKUP_TABLE) && (CRC8_USE_LOOKUP_TABLE == 1)
 	const uint8_t *p_tabla;
 	switch (poly)
 	{
@@ -551,7 +551,7 @@ uint8_t CRC8(void *data, uint16_t data_len, crc_t crc_type)
 		p_tabla = CRC8_0x07_table;
 		break; // Caso sin sentido
 	}
-#if defined CRC_LOG && CRC_LOG == 2
+#if defined CRC_LOG && CRC_LOG == 1
 	printf("\tTable: ");
 	for (uint16_t i = 0; i != 256; i++)
 	{
@@ -559,6 +559,7 @@ uint8_t CRC8(void *data, uint16_t data_len, crc_t crc_type)
 	}
 	printf("\n");
 #endif
+
 #endif
 	uint8_t *_buf = (uint8_t *)data; // Apuntador tipo uint8_t con dirección a los datos a verificar
 	bool input_reflected = CRC_getInputReflected(crc_type);
@@ -567,15 +568,14 @@ uint8_t CRC8(void *data, uint16_t data_len, crc_t crc_type)
 	{
 		uint8_t b = *_buf++;
 		b = input_reflected ? bit_invert_Byte(b) : b;
-#ifndef CRC8_USE_LOOKUP_TABLE
-		crc = crc ^ (uint8_t)(((uint16_t)(b)) << 8);
+#if !defined(CRC8_USE_LOOKUP_TABLE) || (CRC8_USE_LOOKUP_TABLE != 1)
+		crc = crc ^ b;
 		for (uint8_t i = 0; i != 8; i++)
 			crc = (crc & 0x80) ? (uint8_t)((crc << 1) ^ poly) : (uint8_t)(crc << 1);
 #else
 		crc = p_tabla[b ^ crc];
 		// crc = (crc << 8) ^ p_tabla[(crc >> 8) ^ b];
 		// crc = (uint32_t)((crc << 8) ^ p_tabla[(uint8_t)((crc ^ ((uint32_t)(b) << 24)) >> 24)]);
-
 #endif
 	}
 	crc = output_reflected ? bit_invert_Byte(crc) : crc;
@@ -599,7 +599,7 @@ uint16_t CRC16(void *data, uint16_t data_len, crc_t crc_type)
 	uint16_t crc = CRC16_getSeed(crc_type);	 // Inicialización de valor "semilla"
 	uint16_t poly = CRC16_getPoly(crc_type); // Obtención de polinomio
 
-#ifdef CRC16_USE_LOOKUP_TABLE
+#if defined(CRC16_USE_LOOKUP_TABLE) && (CRC16_USE_LOOKUP_TABLE == 1)
 	const uint16_t *p_tabla;
 	switch (poly)
 	{
@@ -642,6 +642,15 @@ uint16_t CRC16(void *data, uint16_t data_len, crc_t crc_type)
 		p_tabla = CRC16_0x1021_table;
 		break; // Caso sin sentido
 	}
+
+#if defined CRC_LOG && CRC_LOG == 1
+	printf("\tTable: ");
+	for (uint16_t i = 0; i != 256; i++)
+	{
+		printf("0x%02X ", p_tabla[i]);
+	}
+	printf("\n");
+#endif
 #endif
 	uint8_t *_buf = (uint8_t *)data; // Apuntador tipo uint8_t con dirección a los datos a verificar
 	bool input_reflected = CRC_getInputReflected(crc_type);
@@ -650,8 +659,8 @@ uint16_t CRC16(void *data, uint16_t data_len, crc_t crc_type)
 	{
 		uint8_t b = *_buf++;
 		b = input_reflected ? bit_invert_Byte(b) : b;
-#ifndef CRC16_USE_LOOKUP_TABLE
-		crc = crc ^ (((uint16_t)(b)) << 8);
+#if !defined(CRC16_USE_LOOKUP_TABLE) || (CRC16_USE_LOOKUP_TABLE != 1)
+		crc = crc ^ (uint16_t)((uint16_t)b << 8);
 		for (uint8_t i = 0; i != 8; i++)
 			crc = (crc & 0x8000) ? (crc << 1) ^ poly : (crc << 1);
 #else
@@ -678,7 +687,7 @@ uint32_t CRC32(void *data, uint16_t data_len, crc_t crc_type)
 	uint32_t crc = CRC32_getSeed(crc_type);	 // Inicialización de valor "semilla"
 	uint32_t poly = CRC32_getPoly(crc_type); // Obtención de polinomio
 
-#ifdef CRC32_USE_LOOKUP_TABLE
+#if defined(CRC32_USE_LOOKUP_TABLE) && (CRC32_USE_LOOKUP_TABLE == 1)
 	const uint32_t *p_tabla;
 
 	switch (poly)
@@ -713,6 +722,14 @@ uint32_t CRC32(void *data, uint16_t data_len, crc_t crc_type)
 		// default:       p_tabla = CRC32_0xA833982B_table; break;      //Caso sin sentido
 	}
 
+#if defined CRC_LOG && CRC_LOG == 1
+	printf("\tTable: ");
+	for (uint16_t i = 0; i != 256; i++)
+	{
+		printf("0x%02X ", p_tabla[i]);
+	}
+	printf("\n");
+#endif
 #endif
 	uint8_t *_buf = (uint8_t *)data; // Apuntador tipo uint8_t con dirección a los datos a verificar
 	bool input_reflected = CRC_getInputReflected(crc_type);
@@ -721,7 +738,7 @@ uint32_t CRC32(void *data, uint16_t data_len, crc_t crc_type)
 	{
 		uint8_t b = *_buf++;
 		b = input_reflected ? bit_invert_Byte(b) : b;
-#ifndef CRC32_USE_LOOKUP_TABLE
+#if !defined(CRC32_USE_LOOKUP_TABLE) || (CRC32_USE_LOOKUP_TABLE != 1)
 		crc = crc ^ (((uint32_t)(b)) << 24);
 		for (uint8_t i = 0; i != 8; i++)
 			crc = (crc & 0x80000000UL) ? (crc << 1) ^ poly : (crc << 1);

@@ -1,9 +1,14 @@
 /**
  * @file base64.h
- * @brief Librería de implementación de codificación base 64
- * @author Ing. José Roberto Parra Trewartha
- * @version 1.0
-*/
+ * @author your name (you@domain.com)
+ * @brief 
+ * @version 0.1
+ * @date 2023-01-26
+ * 
+ * @copyright Copyright (c) 2023
+ * 
+ */
+
 #ifndef BASE64_H
 #define BASE64_H
 
@@ -13,14 +18,19 @@
 #pragma endregion
 
 #pragma region Constants and utilities
+
 /**
+ * @brief 
+ * 
  */
 enum special_e {
-    notabase64 = 64, /**< Value to return when a non base64 digit is found. */
-    terminator = 65, /**< Value to return when the character '=' is found.  */
+    notabase64 = 64, // Value to return when a non base64 digit is found.
+    terminator = 65, // Value to return when the character '=' is found.
 };
 
-/** Lookup table that converts a base64 digit to integer. */
+/**
+ * @brief Lookup table that converts a base64 digit to integer.
+ */
 static const uint8_t digit2bin[] = {
     64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
     64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
@@ -40,8 +50,11 @@ static const uint8_t digit2bin[] = {
     64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64
 };
 
-/** Lookup table that converts a integer to base64 digit. */
+/**
+ * @brief Lookup table that converts a integer to base64 digit.
+ */
 static const uint8_t bin2digit[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
 #pragma endregion
 
 #pragma region Function prototypes

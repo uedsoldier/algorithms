@@ -4,7 +4,7 @@ set( CMAKE_CXX_COMPILER "g++")
 set( CMAKE_C_COMPILER "gcc")
 
 # set the project name
-project(XTEA_testing VERSION 0.1.0)
+project(CRC_testing VERSION 0.1.0)
 
-add_executable(test test.c XTEA.c ../../utilities/utils.c)
+add_executable(test test.c "../../src/CRC/crc.c" "../../../utilities/utils.c")
 

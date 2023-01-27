@@ -50,11 +50,11 @@ void XTEA_init(XTEA_t *xtea, uint16_t rounds, xtea_key_t *key, uint8_t *iv){
 	uint8_t i;
 	printf("\t* Iterations: %u\n\t* Dec sum: 0x%08lX\n\t* Key (hex bytes): [",xtea->iterations,xtea->dec_sum);
 	for (i = 0; i != XTEA_FIXED_KEY_SIZE; i++){
-		printf("%02x ",xtea->key.key_bytes[i]);
+		printf("%02x (%c)",xtea->key.key_bytes[i],xtea->key.key_bytes[i]);
 	}
 	printf("]\n\t* Initializating vector (hex bytes): [");
 	for (i = 0; i != XTEA_INIT_VECTOR_SIZE; i++){
-		printf("%02x ",xtea->iv[i]);
+		printf("%02x (%c)",xtea->iv[i],xtea->iv[i]);
 	}
 	printf("]\n");
 	#endif
@@ -244,7 +244,7 @@ XTEA_code_t XTEA_encrypt(XTEA_t *xtea, void *in, void *out, int32_t input_len, b
 	uint8_t *_out = (uint8_t *)out; 
 	uint8_t temp_iv[8];
 	memcpy(temp_iv, xtea->iv, XTEA_INIT_VECTOR_SIZE);
-	memset(_out, 0 , input_len);
+	memset(_out, 0 , input_len_normalized);
 	#if defined(XTEA_LOG) && XTEA_LOG == 1
 	uint32_t i;
 	printf("\tInput buffer:\t");

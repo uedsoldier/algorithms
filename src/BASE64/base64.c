@@ -1,28 +1,34 @@
 /**
  * @file base64.c
- * @brief Librería de implementación de codificación base 64
- * @author Ing. José Roberto Parra Trewartha
- * @version 1.0
-*/
+ * @author your name (you@domain.com)
+ * @brief 
+ * @version 0.1
+ * @date 2023-01-26
+ * 
+ * @copyright Copyright (c) 2023
+ * 
+ */
 
 #include "base64.h"
 
 /**
- * @brief Función para obtener el primer dígito (base 64) de un bloque de 4
- * @param a (char) Primer byte (de tres) del bloque de datos fuente
- *@return (char) Dígito en base 64
-*/
+ * @brief 
+ * Function to obtain the first base64 digit from a block of 4
+ * @param a First byte (of 3) from the source data block
+ * @return uint8_t Base64 digit
+ */
 static uint8_t get0( uint8_t a ) {
     uint8_t index = (a >> 2);
     return bin2digit[ index ];
 }
 
-/** 
- * @brief Función para obtener el segundo dígito (base 64) de un bloque de 4
- * @param a (char) Primer byte (de tres) del bloque de datos fuente
- * @param b (char) Segundo byte (de tres) del bloque de datos fuente
- * @return (char) Dígito en base 64
-*/
+/**
+ * @brief 
+ * Function to obtain the second base64 digit from a block of 4
+ * @param a First byte (of 3) from the source data block
+ * @param b Second byte (of 3) from the source data block
+ * @return uint8_t Base64 digit
+ */
 static uint8_t get1( uint8_t a, uint8_t b ) {
     uint8_t indexA = ( a & 3 ) << 4;
     uint8_t indexB = b >> 4;
@@ -31,11 +37,12 @@ static uint8_t get1( uint8_t a, uint8_t b ) {
 }
 
 /**
- * @brief Función para obtener el tercer dígito (base 64) de un bloque de 4
- * @param b (char) Segundo byte (de tres) del bloque de datos fuente
- * @param c (char) Tercer byte (de tres) del bloque de datos fuente
- * @return (char) Dígito en base 64
-*/
+ * @brief 
+ * Function to obtain the third base64 digit from a block of 4
+ * @param b Second byte (of 3) from the source data block
+ * @param c Third byte (of 3) from the source data block
+ * @return uint8_t  Base64 digit
+ */
 static uint8_t get2( uint8_t b, uint8_t c ) {
     uint8_t indexB = ( b & 15 ) << 2;
     uint8_t indexC = c >> 6;
@@ -43,11 +50,12 @@ static uint8_t get2( uint8_t b, uint8_t c ) {
     return bin2digit[ index ];
 }
 
-/** 
- * @brief Función para obtener el cuarto dígito (base 64) de un bloque de 4
- * @param c (char) Tercer byte (de tres) del bloque de datos fuente
- * @return (char) Dígito en base 64
-*/
+/**
+ * @brief 
+ * Function to obtain the fourth base64 digit from a block of 4
+ * @param c Third byte (of 3) from the source data block
+ * @return uint8_t Base64 digit
+ */
 static uint8_t get3( uint8_t c ) {
     uint8_t index = c & 0x3F;
     return bin2digit[ index ];

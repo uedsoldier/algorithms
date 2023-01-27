@@ -44,4 +44,4 @@ Dentro de la carpeta ```build/``` de cada módulo, se genera un ejecutable con n
         * Bandera CBC/EBC (0 o 1)
         * Número de rondas (1,2,4,8,16,32 o 64)
     * Salida:
-        * Diversas salidas de CRC de 8, 16 y 32 bits
+        * Texto cifrado y descifrado bajo los parámetros indicados

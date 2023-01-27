@@ -12,7 +12,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include "../../utilities/utils.h"
+#include <string.h>
+#include <stdio.h>
 #pragma endregion
 
 #pragma region Useful macros
@@ -21,7 +22,7 @@
  * para fines de desarrollo y pruebas.
  */
 #ifndef XTEA_LOG
-#define XTEA_LOG 1
+#define XTEA_LOG 0
 #endif
 
 /**
@@ -30,7 +31,7 @@
  * los compiladores soportan tales funcionalidades (malloc(), calloc(), realloc(), etc.)
  */
 #ifndef XTEA_DYNAMIC_MEMORY
-#define XTEA_DYNAMIC_MEMORY 1
+#define XTEA_DYNAMIC_MEMORY 0
 #endif
 
 /**

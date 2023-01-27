@@ -28,26 +28,26 @@
  * @brief Macro para implementación de tablas previamente generadas para CRC8 con base en su polinomio generador.
  * Cada tabla utiliza 256 bytes extra de memoria de programa, pero incrementa sustancialmente la velocidad de ejecución.
  */
-#define CRC8_USE_LOOKUP_TABLE
+#define CRC8_USE_LOOKUP_TABLE 0
 
 /**
  * @brief Macro para implementación de tablas previamente generadas para CRC16 con base en su polinomio generador.
  * Cada tabla utiliza 512 bytes extra de memoria de programa, pero incrementa sustancialmente la velocidad de ejecución.
  */
-#define CRC16_USE_LOOKUP_TABLE
+#define CRC16_USE_LOOKUP_TABLE 0
 
 /**
  * @brief Macro para implementación de tablas previamente generadas para CRC32 con base en su polinomio generador.
  * Cada tabla utiliza 1024 bytes extra de memoria de programa, pero incrementa sustancialmente la velocidad de ejecución.
  */
-#define CRC32_USE_LOOKUP_TABLE
+#define CRC32_USE_LOOKUP_TABLE 0
 
 #pragma endregion
 
 #pragma region Dependencies
 #include <stdint.h>
 #include <stdbool.h>
-#include "../../utilities/utils.h"
+#include "../../../utilities/utils.h"
 #pragma endregion
 
 #pragma region Custom types
@@ -186,7 +186,7 @@ static const uint8_t crc32_implementations_size = sizeof(crc32_implementations);
 
 #pragma region Lookup tables
 
-#if defined(CRC8_USE_LOOKUP_TABLE)
+#if defined(CRC8_USE_LOOKUP_TABLE) && (CRC8_USE_LOOKUP_TABLE == 1)
 #define CRC8_0x07_LOOKUP_TABLE // 0x07 --> x^8 + x^5 + x^4 + 1
 #define CRC8_0x2F_LOOKUP_TABLE // 0x2F --> x^8 + x^5 + x^3 + x^2 + x + 1
 #define CRC8_0x1D_LOOKUP_TABLE // 0x1D --> x^8 + x^4 + x^3 + x^2 + 1
@@ -196,7 +196,7 @@ static const uint8_t crc32_implementations_size = sizeof(crc32_implementations);
 #define CRC8_0xD5_LOOKUP_TABLE // 0xD5 --> x^8 + x^7 + x^6 + x^4 + x^2 + 1
 #endif
 
-#ifdef CRC16_USE_LOOKUP_TABLE
+#if defined(CRC16_USE_LOOKUP_TABLE) && (CRC16_USE_LOOKUP_TABLE == 1)
 #define CRC16_0x1021_LOOKUP_TABLE // 0x1021 --> x^16 + x^12 + x^5 + 1
 #define CRC16_0x8005_LOOKUP_TABLE // 0x8005 --> x^16 + x^15 + x^2 + 1
 #define CRC16_0x0589_LOOKUP_TABLE // 0x0589 --> x^16 + x^10 + x^8 + x^7 + x^3 + 1
@@ -206,7 +206,7 @@ static const uint8_t crc32_implementations_size = sizeof(crc32_implementations);
 #define CRC16_0xC867_LOOKUP_TABLE // 0xC867 --> x^16 + x^15 + x^14 + x^11 + x^6 + x^5 + x^2 + x^1 + 1
 #endif
 
-#if defined(CRC32_USE_LOOKUP_TABLE)
+#if defined(CRC32_USE_LOOKUP_TABLE) && (CRC32_USE_LOOKUP_TABLE == 1)
 #define CRC32_0xA833982B_LOOKUP_TABLE // 0xA833982B --> x^32 + x^31 + x^29 + x^27 + x^21 + x^20 + x^17 + x^16 + x^15 + x^12 + x^11 + x^5 + x^3 + x + 1
 #define CRC32_0x814141AB_LOOKUP_TABLE // 0x814141AB --> x^32 + x^31 + x^24 + x^22 + x^16 + x^14 + x^8 + x^7 + x^5 + x^3 + x + 1
 #define CRC32_0x1EDC6F41_LOOKUP_TABLE // 0x1EDC6F41 --> x^32 + x^28 + x^27 + x^26 + x^25 + x^23 + x^22 + x^20 + x^19 + x^18 + x^14 + x^13 + x^11 + x^10 + x^9 + x^8 + x^6 + 1

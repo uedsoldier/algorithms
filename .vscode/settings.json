@@ -2,7 +2,12 @@
     "files.associations": {
         "stdint.h": "c",
         "stdbool.h": "c",
-        "xtea.h": "c"
+        "xtea.h": "c",
+        "base64.h": "c",
+        "minunit.h": "c",
+        "checksum8.h": "c",
+        "crc.h": "c",
+        "stdlib.h": "c"
     },
     "cmake.configureOnOpen": false
 }
