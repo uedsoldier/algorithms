@@ -1,9 +1,14 @@
 /**
  * @file XTEA.h
+ * @author José Roberto Parra Trewartha (you@domain.com)
  * @brief Librería de implementación de funciones para encriptación de datos mediante el algoritmo XTEA (Extended Tiny Encryption Algorithm)
- * @author Ing. José Roberto Parra Trewartha
- * @version 1.0
-*/
+ * Se incluye también el algoritmo XXTEA (Corrected Block TEA)
+ * @version 0.1
+ * @date 2023-01-28
+ * 
+ * @copyright Copyright (c) 2023
+ * 
+ */
 
 #ifndef XTEA_H
 #define XTEA_H
@@ -15,6 +20,10 @@
 #include <string.h>
 #include <stdio.h>
 #pragma endregion
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #pragma region Useful macros
 /**
@@ -31,7 +40,7 @@
  * los compiladores soportan tales funcionalidades (malloc(), calloc(), realloc(), etc.)
  */
 #ifndef XTEA_DYNAMIC_MEMORY
-#define XTEA_DYNAMIC_MEMORY 1
+#define XTEA_DYNAMIC_MEMORY 0
 #endif
 
 /**
@@ -42,7 +51,7 @@
  */
 #if !defined(XTEA_DYNAMIC_MEMORY) || (XTEA_DYNAMIC_MEMORY == 0)
 #ifndef XTEA_USE_BUFFERS
-#define XTEA_USE_BUFFERS 1
+#define XTEA_USE_BUFFERS 0
 #endif
 #endif
 
@@ -73,6 +82,12 @@
  */
 #define XTEA_INIT_VECTOR_SIZE 8
 
+/**
+ * @brief Macro de tamaño en bytes de bloque XTEA
+ * 
+ */
+#define XTEA_BLOCK_SIZE 8
+
 #pragma endregion
 
 #pragma region Custom types
@@ -100,7 +115,6 @@ typedef struct xtea_key{
  * 
  */
 typedef struct XTEA{
-    uint32_t dec_sum;
     /**
      * Suma inicial para descifrar
      * 0x1BBCDC80 para 128 iteraciones
@@ -108,39 +122,38 @@ typedef struct XTEA{
      * 0xC6EF3720 para 32 iteraciones
      * 0xE3779B90 para 16 iteraciones
      * 0xF1BBCDC8 para 8 iteraciones
-     */   
+     */
+    uint32_t dec_sum;   
     uint32_t iterations;                    // Número de iteraciones para la ejecución del algoritmo. 32 es bastante, 16 son suficientes, y alrededor de 8 serviría para muchas aplicaciones. 
     xtea_key_t key;                         // Llave del algoritmo, consistente en 128 bits(4 enteros de 32 bits).
     uint8_t iv[XTEA_INIT_VECTOR_SIZE];      // Vector de inicialización para modalidad CBC
+    uint32_t encrypted_chunks;
+    uint32_t decrypted_chunks;
+    uint16_t input_len_normalized;
 } XTEA_t;
 
-/**
- * @brief Estructura de datos para definición de parámetros XXTEA
- * 
- */
-typedef struct {
-    uint32_t dec_sum;
-    /**
-     * Suma inicial para descifrar
-     * 0x1BBCDC80 para 128 iteraciones
-     * 0x8DDE6E40 para 64 iteraciones
-     * 0xC6EF3720 para 32 iteraciones
-     * 0xE3779B90 para 16 iteraciones
-     * 0xF1BBCDC8 para 8 iteraciones
-     */   
-    xtea_key_t key;         // Llave del algoritmo, consistente en 128 bits(4 enteros de 32 bits).
-} XXTEA_t;
 #pragma endregion
 
 #pragma region Function prototypes
 void XTEA_init(XTEA_t *xtea, uint16_t rounds, xtea_key_t *key, uint8_t *iv);
+void XXTEA_init(XTEA_t *xtea, xtea_key_t *key, uint8_t *iv);
+
 static void XTEA_set_fixedKey(XTEA_t *xtea);                                            // Función para recorte de clave a 16 bytes
+
 static void XTEA_encrypt_chunk(XTEA_t *xtea, uint32_t *in, uint32_t *out);      // Función de cifrado de trozo de 8 bytes
 static void XTEA_decrypt_chunk(XTEA_t *xtea, uint32_t * in,uint32_t * out);     // Función de descrifrado de trozo de 8 bytes
-XTEA_code_t XTEA_encrypt(XTEA_t *xtea, void *in, void *out, int32_t input_len, bool ecb, uint32_t *output_len);
-XTEA_code_t XTEA_decrypt(XTEA_t *xtea, void *in, void *out, int32_t input_len, bool ecb, uint32_t *output_len);
-XTEA_code_t XXTEA_encrypt(XXTEA_t *xxtea, void *in, void *out, int32_t input_len);
-XTEA_code_t XXTEA_decrypt(XXTEA_t *xxtea, void *in, void *out, int32_t input_len);
+
+static void XXTEA_encrypt_chunk(XTEA_t *xxtea, uint32_t *in, uint32_t *out);      // Función de cifrado de trozo de 8 bytes
+static void XXTEA_decrypt_chunk(XTEA_t *xxtea, uint32_t * in,uint32_t * out);     // Función de descrifrado de trozo de 8 bytes
+
+XTEA_code_t XTEA_encrypt(XTEA_t *xtea, void *in, void *out, uint16_t input_len, bool ecb, uint32_t *output_len);
+XTEA_code_t XTEA_decrypt(XTEA_t *xtea, void *in, void *out, uint16_t input_len, bool ecb, uint32_t *output_len);
+XTEA_code_t XXTEA_encrypt(XTEA_t *xxtea, void *in, void *out, uint16_t input_len,  bool ecb, uint32_t *output_len);
+XTEA_code_t XXTEA_decrypt(XTEA_t *xxtea, void *in, void *out, uint16_t input_len,  bool ecb, uint32_t *output_len);
 #pragma endregion
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /*XTEA_H*/
