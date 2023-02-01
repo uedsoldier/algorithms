@@ -6,9 +6,9 @@
 #include "../minunit.h"
 
 const char *test_string = "test checksum8";
-uint8_t expected_crc8_xor = 0x03;
-uint8_t expected_crc8_modulo256 = 0x6B;
-uint8_t expected_crc8_2complement = 0x95;
+uint8_t expected_checksum8_xor = 0x03;
+uint8_t expected_checksum8_modulo256 = 0x6B;
+uint8_t expected_checksum8_2complement = 0x95;
 
 int tests_run = 0;
 int total_tests = 3;

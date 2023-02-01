@@ -170,7 +170,7 @@ static uint32_t CRC32_getPoly(crc_t crc_type)
 		break; // Caso sin sentido
 	}
 #if defined CRC_LOG && CRC_LOG == 1
-	printf("\tPoly: 0x%08X\n", retVal);
+	printf("\tPoly: 0x%08lX\n", retVal);
 #endif
 	return retVal;
 }
@@ -290,7 +290,7 @@ static uint32_t CRC32_getSeed(crc_t crc_type)
 		break; // El resto de los casos
 	}
 #if defined CRC_LOG && CRC_LOG == 1
-	printf("\tSeed: 0x%08X\n", retVal);
+	printf("\tSeed: 0x%08lX\n", retVal);
 #endif
 	return retVal;
 }

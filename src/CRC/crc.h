@@ -14,7 +14,7 @@
  *
  */
 #ifndef CRC_LOG
-#define CRC_LOG 0
+#define CRC_LOG 1
 #endif
 
 /**
