@@ -19,7 +19,7 @@ Desde la carpeta build/:
 ``` make ```
 
 # Pruebas de funcionamiento
-Dentro de la carpeta ```build/``` de cada módulo, se genera un ejecutable con nombre ```test```
+Dentro de la carpeta ```build/``` de cada módulo de pruebas, se genera un ejecutable con nombre ```test```
 * BASE64
     * Parámetros: 
         * Cadena de entrada
