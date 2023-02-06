@@ -31,19 +31,19 @@ static uint8_t perform_checksum(CHECKSUM8_t checksum8_type, void *input_data)
 
 static char *test_checksum8_xor()
 {
-    mu_assert("Incorrect checksum8 result\r\n", perform_checksum(CHECKSUM8_XOR, test_string) == expected_crc8_xor);
+    mu_assert("Incorrect checksum8 result\r\n", perform_checksum(CHECKSUM8_XOR, test_string) == expected_checksum8_xor);
     return 0;
 }
 
 static char *test_checksum8_2complement()
 {
-    mu_assert("Incorrect checksum8 result\r\n", perform_checksum(CHECKSUM8_2complement, test_string) == expected_crc8_2complement);
+    mu_assert("Incorrect checksum8 result\r\n", perform_checksum(CHECKSUM8_2complement, test_string) == expected_checksum8_2complement);
     return 0;
 }
 
 static char *test_checksum8_modulo256()
 {
-    mu_assert("Incorrect checksum8 result\r\n", perform_checksum(CHECKSUM8_modulo256, test_string) == expected_crc8_modulo256);
+    mu_assert("Incorrect checksum8 result\r\n", perform_checksum(CHECKSUM8_modulo256, test_string) == expected_checksum8_modulo256);
     return 0;
 }
 
@@ -51,17 +51,17 @@ static char *all_tests()
 {
     printf("-------------------------------------------\r\n");
     printf("Test %u/%u\r\n", tests_run + 1, total_tests);
-    printf("Expected checksum value: 0x%02X\r\n", expected_crc8_xor);
+    printf("Expected checksum value: 0x%02X\r\n", expected_checksum8_xor);
     mu_run_test(test_checksum8_xor);
     printf("Test passed\r\n");
     printf("-------------------------------------------\r\n");
     printf("Test %u/%u\r\n", tests_run + 1, total_tests);
-    printf("Expected checksum value: 0x%02X\r\n", expected_crc8_2complement);
+    printf("Expected checksum value: 0x%02X\r\n", expected_checksum8_2complement);
     mu_run_test(test_checksum8_2complement);
     printf("Test passed\r\n");
     printf("-------------------------------------------\r\n");
     printf("Test %u/%u\r\n", tests_run + 1, total_tests);
-    printf("Expected checksum value: 0x%02X\r\n", expected_crc8_modulo256);
+    printf("Expected checksum value: 0x%02X\r\n", expected_checksum8_modulo256);
     mu_run_test(test_checksum8_modulo256);
     printf("Test passed\r\n");
     printf("-------------------------------------------\r\n");
