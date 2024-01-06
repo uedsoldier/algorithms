@@ -2,7 +2,7 @@ from argparse import ArgumentParser
 from os import chdir,getcwd,system
 from shutil import rmtree
 
-algorithm_choices = ('BASE64','CRC','XTEA','CHECKSUM8')
+algorithm_choices = ('BASE64','CRC','XTEA','CHECKSUM8','AES')
 
 
 

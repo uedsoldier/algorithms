@@ -5,9 +5,9 @@
 #include "../../src/XTEA/XTEA.h"
 #include "../minunit.h"
 
-uint8_t IV[XTEA_INIT_VECTOR_SIZE] = "vector**";
-const uint8_t *TEST_STRING = "Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.";
-const uint8_t *TEST_KEY = "XTEAkey_0123456";
+const xtea_iv_t *IV = "vector**";
+const char *TEST_STRING = "Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.";
+const char *TEST_KEY = "XTEAkey_0123456";
 
 uint32_t test_string_len, test_string_len_normalized, key_len, comparison;
 uint32_t output_len;

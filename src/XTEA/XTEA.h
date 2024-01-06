@@ -34,6 +34,7 @@ extern "C" {
 #define XTEA_LOG 0
 #endif
 
+#pragma region Memory macros
 /**
  * @brief Macro para utilización de asignación dinámica de memoria en las funciones XTEA.
  * Usar esta característica permite ahorrar memoria RAM, pero no todos los dispositivos ni todos
@@ -63,7 +64,9 @@ extern "C" {
 #ifdef XTEA_USE_BUFFERS
 #define XTEA_MAX_BUFFER_SIZE 128
 #endif
+#pragma endregion
 
+#pragma region Consants
 /**
  * @brief Constante δ derivada de la razón áurea. Utilizada en las funciones de cifrado y 
  * descifrado de bloques. NO debe modificarse.
@@ -93,6 +96,7 @@ extern "C" {
  * 
  */
 #define XTEA_BLOCK_SIZE 8
+#pragma endregion
 
 /**
  * @brief Macro para encontrar el siguiente múltiplo de 8 más cernano a un número. NO debe modificarse.
@@ -123,6 +127,14 @@ typedef struct xtea_key{
 } xtea_key_t;
 
 /**
+ * @brief Estructura de datos para vector de inicialización
+ * 
+ */
+typedef struct xtea_iv {
+    uint8_t iv_array[XTEA_INIT_VECTOR_SIZE];
+} xtea_iv_t;
+
+/**
  * @brief Estructura de datos para definición de parámetros XTEA
  * 
  */
@@ -138,7 +150,7 @@ typedef struct XTEA{
     uint32_t dec_sum;   
     uint32_t iterations;                    // Número de iteraciones para la ejecución del algoritmo. 32 es bastante, 16 son suficientes, y alrededor de 8 serviría para muchas aplicaciones. 
     xtea_key_t key;                         // Llave del algoritmo, consistente en 128 bits(4 enteros de 32 bits).
-    uint8_t iv[XTEA_INIT_VECTOR_SIZE];      // Vector de inicialización para modalidad CBC
+    xtea_iv_t iv[XTEA_INIT_VECTOR_SIZE];      // Vector de inicialización para modalidad CBC
     uint32_t encrypted_chunks;
     uint32_t decrypted_chunks;
     size_t input_len_normalized;
@@ -147,8 +159,8 @@ typedef struct XTEA{
 #pragma endregion
 
 #pragma region Function prototypes
-void XTEA_init(XTEA_t *xtea, uint16_t rounds, xtea_key_t *key, uint8_t *iv);
-void XXTEA_init(XTEA_t *xtea, xtea_key_t *key, uint8_t *iv);
+void XTEA_init(XTEA_t *xtea, uint16_t rounds, const xtea_key_t *key, const xtea_iv_t *iv);
+void XXTEA_init(XTEA_t *xtea, const xtea_key_t *key, const xtea_iv_t *iv);
 
 static void XTEA_set_fixedKey(XTEA_t *xtea);                                            // Función para recorte de clave a 16 bytes
 

@@ -19,7 +19,7 @@
  * @param key 
  * @param iv 
  */
-void XTEA_init(XTEA_t *xtea, uint16_t rounds, xtea_key_t *key, uint8_t *iv){
+void XTEA_init(XTEA_t *xtea, uint16_t rounds, const xtea_key_t *key, const xtea_iv_t *iv){
 	#if defined(XTEA_LOG) && XTEA_LOG == 1
 	printf("XTEA init\n");
 	#endif
@@ -72,7 +72,7 @@ void XTEA_init(XTEA_t *xtea, uint16_t rounds, xtea_key_t *key, uint8_t *iv){
  * @param key 
  * @param iv 
  */
-void XXTEA_init(XTEA_t *xxtea, xtea_key_t *key, uint8_t *iv){
+void XXTEA_init(XTEA_t *xxtea, const xtea_key_t *key, const xtea_iv_t *iv){
 #if defined(XTEA_LOG) && XTEA_LOG == 1
 	printf("XXTEA init\n");
 	#endif
