@@ -236,7 +236,7 @@ static void XTEA_decrypt_chunk(XTEA_t *xtea, uint32_t * in,uint32_t * out) {
  * @param output_len 
  * @return XTEA_code_t 
  */
-XTEA_code_t XTEA_encrypt(XTEA_t *xtea, void *in, void *out, uint16_t input_len, bool ecb, uint32_t *output_len){
+XTEA_code_t XTEA_encrypt(XTEA_t *xtea, void *in, void *out, size_t input_len, bool ecb, uint32_t *output_len){
 	#if defined(XTEA_LOG) && XTEA_LOG == 1
 	printf("XTEA encrypt (%s mode)\n",ecb? "ECB":"CBC");
 	#endif
@@ -250,7 +250,7 @@ XTEA_code_t XTEA_encrypt(XTEA_t *xtea, void *in, void *out, uint16_t input_len, 
 	}
 	// Normalized length calculation
 	xtea->encrypted_chunks = 0;
-	xtea->input_len_normalized = (uint16_t)((input_len + 7) & (-8));
+	xtea->input_len_normalized = (size_t)(XTEA_ROUNDUP_TO_NEAREST_MULTIPLE_OF_8(input_len));
 
 	// Input buffer allocation, backup and initialization 
 	#if defined (XTEA_DYNAMIC_MEMORY) && (XTEA_DYNAMIC_MEMORY == 1)
@@ -341,7 +341,7 @@ XTEA_code_t XTEA_encrypt(XTEA_t *xtea, void *in, void *out, uint16_t input_len, 
  * @param output_len 
  * @return XTEA_code_t 
  */
-XTEA_code_t XTEA_decrypt(XTEA_t *xtea, void *in, void *out, uint16_t input_len, bool ecb, uint32_t *output_len){
+XTEA_code_t XTEA_decrypt(XTEA_t *xtea, void *in, void *out, size_t input_len, bool ecb, uint32_t *output_len){
 	#if defined(XTEA_LOG) && XTEA_LOG == 1
 	printf("XTEA decrypt (%s mode)\n",ecb? "ECB":"CBC");
 	#endif
@@ -354,7 +354,7 @@ XTEA_code_t XTEA_decrypt(XTEA_t *xtea, void *in, void *out, uint16_t input_len, 
 	}
 	// Normalized length calculation
 	xtea->decrypted_chunks = 0;
-	xtea->input_len_normalized = (uint16_t)((input_len + 7) & (-8));
+	xtea->input_len_normalized = (size_t)(XTEA_ROUNDUP_TO_NEAREST_MULTIPLE_OF_8(input_len));
 
 	// Input buffer allocation, backup and initialization 
 	#if defined (XTEA_DYNAMIC_MEMORY) && (XTEA_DYNAMIC_MEMORY == 1)
@@ -432,7 +432,7 @@ XTEA_code_t XTEA_decrypt(XTEA_t *xtea, void *in, void *out, uint16_t input_len, 
  * @param input_len
  * @return XTEA_code_t 
  */
-XTEA_code_t XXTEA_encrypt(XTEA_t *xxtea, void *in, void *out, uint16_t input_len, bool ecb, uint32_t *output_len){
+XTEA_code_t XXTEA_encrypt(XTEA_t *xxtea, void *in, void *out, size_t input_len, bool ecb, uint32_t *output_len){
 	#if defined(XTEA_LOG) && XTEA_LOG == 1
 	printf("XXTEA encrypt (%s mode)\n",ecb? "ECB":"CBC");
 	#endif
@@ -446,7 +446,7 @@ XTEA_code_t XXTEA_encrypt(XTEA_t *xxtea, void *in, void *out, uint16_t input_len
 	}
 	// Normalized length calculation
 	xxtea->encrypted_chunks = 0;
-	xxtea->input_len_normalized = (uint16_t)((input_len + 7) & (-8L));
+	xxtea->input_len_normalized = (size_t)(XTEA_ROUNDUP_TO_NEAREST_MULTIPLE_OF_8(input_len));
 
 	// Input buffer allocation, backup and initialization 
 	#if defined (XTEA_DYNAMIC_MEMORY) && (XTEA_DYNAMIC_MEMORY == 1)
@@ -534,7 +534,7 @@ XTEA_code_t XXTEA_encrypt(XTEA_t *xxtea, void *in, void *out, uint16_t input_len
  * @param input_len
  * @return XTEA_code_t 
  */
-XTEA_code_t XXTEA_decrypt(XTEA_t *xxtea, void *in, void *out, uint16_t input_len, bool ecb, uint32_t *output_len){
+XTEA_code_t XXTEA_decrypt(XTEA_t *xxtea, void *in, void *out, size_t input_len, bool ecb, uint32_t *output_len){
 	#if defined(XTEA_LOG) && XTEA_LOG == 1
 	printf("XXTEA decrypt (%s mode)\n",ecb? "ECB":"CBC");
 	#endif

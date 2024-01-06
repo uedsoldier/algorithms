@@ -66,27 +66,33 @@ extern "C" {
 
 /**
  * @brief Constante δ derivada de la razón áurea. Utilizada en las funciones de cifrado y 
- * descifrado de bloques.
+ * descifrado de bloques. NO debe modificarse.
 */
 #define XTEA_DELTA 0x9E3779B9UL
 
 /**
- * @brief Macro de tamaño de clave fija en bytes
+ * @brief Macro de tamaño de clave fija en bytes. NO debe modificarse.
  * 
  */
 #define XTEA_FIXED_KEY_SIZE 16
 
 /**
- * @brief Macro de tamaño de vector de inicialización en bytes
+ * @brief Macro de tamaño de vector de inicialización en bytes. NO debe modificarse.
  * 
  */
 #define XTEA_INIT_VECTOR_SIZE 8
 
 /**
- * @brief Macro de tamaño en bytes de bloque XTEA
+ * @brief Macro de tamaño en bytes de bloque XTEA. NO debe modificarse.
  * 
  */
 #define XTEA_BLOCK_SIZE 8
+
+/**
+ * @brief Macro para encontrar el siguiente múltiplo de 8 más cernano a un número. NO debe modificarse.
+ * 
+ */
+#define XTEA_ROUNDUP_TO_NEAREST_MULTIPLE_OF_8(N)    (((N+7)>>3)<<3)
 
 #pragma endregion
 
@@ -129,7 +135,7 @@ typedef struct XTEA{
     uint8_t iv[XTEA_INIT_VECTOR_SIZE];      // Vector de inicialización para modalidad CBC
     uint32_t encrypted_chunks;
     uint32_t decrypted_chunks;
-    uint16_t input_len_normalized;
+    size_t input_len_normalized;
 } XTEA_t;
 
 #pragma endregion
@@ -146,10 +152,10 @@ static void XTEA_decrypt_chunk(XTEA_t *xtea, uint32_t * in,uint32_t * out);     
 static void XXTEA_encrypt_chunk(XTEA_t *xxtea, uint32_t *in, uint32_t *out);      // Función de cifrado de trozo de 8 bytes
 static void XXTEA_decrypt_chunk(XTEA_t *xxtea, uint32_t * in,uint32_t * out);     // Función de descrifrado de trozo de 8 bytes
 
-XTEA_code_t XTEA_encrypt(XTEA_t *xtea, void *in, void *out, uint16_t input_len, bool ecb, uint32_t *output_len);
-XTEA_code_t XTEA_decrypt(XTEA_t *xtea, void *in, void *out, uint16_t input_len, bool ecb, uint32_t *output_len);
-XTEA_code_t XXTEA_encrypt(XTEA_t *xxtea, void *in, void *out, uint16_t input_len,  bool ecb, uint32_t *output_len);
-XTEA_code_t XXTEA_decrypt(XTEA_t *xxtea, void *in, void *out, uint16_t input_len,  bool ecb, uint32_t *output_len);
+XTEA_code_t XTEA_encrypt(XTEA_t *xtea, void *in, void *out, size_t input_len, bool ecb, uint32_t *output_len);
+XTEA_code_t XTEA_decrypt(XTEA_t *xtea, void *in, void *out, size_t input_len, bool ecb, uint32_t *output_len);
+XTEA_code_t XXTEA_encrypt(XTEA_t *xxtea, void *in, void *out, size_t input_len,  bool ecb, uint32_t *output_len);
+XTEA_code_t XXTEA_decrypt(XTEA_t *xxtea, void *in, void *out, size_t input_len,  bool ecb, uint32_t *output_len);
 #pragma endregion
 
 #ifdef __cplusplus
