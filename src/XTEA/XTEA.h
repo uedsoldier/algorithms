@@ -77,6 +77,12 @@ extern "C" {
 #define XTEA_FIXED_KEY_SIZE 16
 
 /**
+ * @brief Macro de tamaño de clave fija en words. NO debe modificarse.
+ * 
+ */
+#define XTEA_FIXED_KEY_SIZE_WORDS 4
+
+/**
  * @brief Macro de tamaño de vector de inicialización en bytes. NO debe modificarse.
  * 
  */
@@ -111,8 +117,8 @@ typedef enum XTEA_code {
  */
 typedef struct xtea_key{
     union {
-        uint32_t key_dwords[4];
-        uint8_t key_bytes[16];
+        uint32_t key_words[XTEA_FIXED_KEY_SIZE_WORDS];
+        uint8_t key_bytes[XTEA_FIXED_KEY_SIZE];
     };
 } xtea_key_t;
 

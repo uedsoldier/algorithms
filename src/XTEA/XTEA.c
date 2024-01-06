@@ -140,7 +140,7 @@ static void XTEA_encrypt_chunk(XTEA_t *xtea, uint32_t *in, uint32_t *out)  {
 		x += v1;
 		i = (uint8_t)(sum & 0xFF);
 		i &= 0x03;
-		y = sum + xtea->key.key_dwords[i];
+		y = sum + xtea->key.key_words[i];
 		x ^= y;
 		v0 += x;
 		sum += XTEA_DELTA;
@@ -151,7 +151,7 @@ static void XTEA_encrypt_chunk(XTEA_t *xtea, uint32_t *in, uint32_t *out)  {
 		i = (uint8_t)(( sum & 0xFF00 )>>8);
 		i >>= 3;
 		i &= 0x03;
-		y = sum + xtea->key.key_dwords[i];
+		y = sum + xtea->key.key_words[i];
 		x ^= y;
 		v1 += x;
 		n--;
@@ -198,7 +198,7 @@ static void XTEA_decrypt_chunk(XTEA_t *xtea, uint32_t * in,uint32_t * out) {
 		i = (uint8_t)((sum&0xFF00)>>8);
 		i >>= 3;
 		i &= 0x03;
-		y = sum + xtea->key.key_dwords[i];
+		y = sum + xtea->key.key_words[i];
 		x ^= y;
 		v1 -= x;
 		sum -= XTEA_DELTA;
@@ -208,7 +208,7 @@ static void XTEA_decrypt_chunk(XTEA_t *xtea, uint32_t * in,uint32_t * out) {
 		x += v1;
 		i = (uint8_t)(sum & 0xFF);
 		i &= 0x03;
-		y = sum + xtea->key.key_dwords[i];
+		y = sum + xtea->key.key_words[i];
 		x ^= y;
 		v0 -= x;
 		n--;
@@ -646,7 +646,7 @@ static void XXTEA_encrypt_chunk(XTEA_t *xxtea, uint32_t *in, uint32_t *out){
 		x += v1;
 		i = (uint8_t)(sum & 0xFF);
 		i &= 0x03;
-		y = sum + xxtea->key.key_dwords[i];
+		y = sum + xxtea->key.key_words[i];
 		x ^= y;
 		v0 += x;
 		sum += XTEA_DELTA;
@@ -657,7 +657,7 @@ static void XXTEA_encrypt_chunk(XTEA_t *xxtea, uint32_t *in, uint32_t *out){
 		i = (uint8_t)(( sum & 0xFF00 )>>8);
 		i >>= 3;
 		i &= 0x03;
-		y = sum + xxtea->key.key_dwords[i];
+		y = sum + xxtea->key.key_words[i];
 		x ^= y;
 		v1 += x;
 		n--;
@@ -705,7 +705,7 @@ static void XXTEA_decrypt_chunk(XTEA_t *xxtea, uint32_t * in,uint32_t * out){
 		i = (uint8_t)((sum&0xFF00)>>8);
 		i >>= 3;
 		i &= 0x03;
-		y = sum + xxtea->key.key_dwords[i];
+		y = sum + xxtea->key.key_words[i];
 		x ^= y;
 		v1 -= x;
 		sum -= XTEA_DELTA;
@@ -715,7 +715,7 @@ static void XXTEA_decrypt_chunk(XTEA_t *xxtea, uint32_t * in,uint32_t * out){
 		x += v1;
 		i = (uint8_t)(sum & 0xFF);
 		i &= 0x03;
-		y = sum + xxtea->key.key_dwords[i];
+		y = sum + xxtea->key.key_words[i];
 		x ^= y;
 		v0 -= x;
 		n--;
