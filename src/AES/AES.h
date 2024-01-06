@@ -159,6 +159,14 @@ extern "C"
     } AES256_key_t;
 
     /**
+     * @brief Estructura de datos para vector de inicialización
+     * 
+     */
+    typedef struct AES_iv {
+        uint8_t iv_array[AES_BLOCK_SIZE];
+    } AES_iv_t;
+
+    /**
      * @brief 
      * 
      */
@@ -167,12 +175,41 @@ extern "C"
         uint8_t roundKey[AES128_KEY_EXP_SIZE];
         uint8_t iv[AES_BLOCK_SIZE];                 // Initialization vector for CBC and CTR modes
 
-    } AES128_ctx_t
+    } AES128_ctx_t;
+
+    /**
+     * @brief 
+     * 
+     */
+    typedef struct AES192_ctx
+    {
+        uint8_t roundKey[AES192_KEY_EXP_SIZE];
+        uint8_t iv[AES_BLOCK_SIZE];                 // Initialization vector for CBC and CTR modes
+
+    } AES192_ctx_t;
+
+    /**
+     * @brief 
+     * 
+     */
+    typedef struct AES256_ctx
+    {
+        uint8_t roundKey[AES256_KEY_EXP_SIZE];
+        uint8_t iv[AES_BLOCK_SIZE];                 // Initialization vector for CBC and CTR modes
+
+    } AES256_ctx_t;
 
 #pragma endregion
 
 #pragma region Function prototypes
-void AES128_init_ctx(AES128_ctx_t *ctx, const AES128_key_t *key, const AES128i);
+void AES128_init_ctx(AES128_ctx_t *ctx, const AES128_key_t *key, const AES_iv_t *iv);
+void AES192_init_ctx(AES192_ctx_t *ctx, const AES192_key_t *key, const AES_iv_t *iv);
+void AES256_init_ctx(AES256_ctx_t *ctx, const AES256_key_t *key, const AES_iv_t *iv);
+
+static void AES128_set_fixedKey(AES128_ctx_t *ctx);
+static void AES192_set_fixedKey(AES192_ctx_t *ctx);
+static void AES256_set_fixedKey(AES256_ctx_t *ctx);
+
 #pragma endregion
 
 #ifdef __cplusplus

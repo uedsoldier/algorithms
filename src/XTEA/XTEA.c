@@ -101,14 +101,11 @@ void XXTEA_init(XTEA_t *xxtea, const xtea_key_t *key, const xtea_iv_t *iv){
  * 
  * @param xtea 
  */
-static void XTEA_set_fixedKey(XTEA_t *xtea){
-	size_t i;
-    uint8_t fixed_key[XTEA_FIXED_KEY_SIZE];
-    memcpy(fixed_key, xtea->key.key_bytes, XTEA_FIXED_KEY_SIZE);
-    for (i = 0; (i < XTEA_FIXED_KEY_SIZE) && (fixed_key[i] != 0); ++i);
-	for (++i; i < XTEA_FIXED_KEY_SIZE; ++i) {
-		fixed_key[i] = 0;
-		}
+static void XTEA_set_fixedKey(XTEA_t *xtea) {
+    uint8_t *fixed_key = xtea->key.key_bytes;
+    size_t i;
+    for (i = 0; i < XTEA_FIXED_KEY_SIZE && fixed_key[i] != 0; ++i);
+    memset(fixed_key + i, 0, XTEA_FIXED_KEY_SIZE - i);
 }
 
 /**
