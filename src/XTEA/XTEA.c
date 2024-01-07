@@ -118,7 +118,7 @@ static void XTEA_encrypt_chunk(XTEA_t *xtea, uint32_t *in, uint32_t *out)  {
 	uint8_t *_in = (uint8_t *)in;
 	uint8_t *_out = (uint8_t *)out;
 	#if defined(XTEA_LOG) && XTEA_LOG == 1
-	uint32_t index;
+	size_t index;
 	printf("IN: ");
 	for( index=0 ; index!=XTEA_BLOCK_SIZE; index++){
 		uint8_t c = _in[index];
@@ -175,7 +175,7 @@ static void XTEA_decrypt_chunk(XTEA_t *xtea, uint32_t * in,uint32_t * out) {
 	uint8_t *_in = (uint8_t *)in;
 	uint8_t *_out = (uint8_t *)out;
 	#if defined(XTEA_LOG) && XTEA_LOG == 1
-	uint32_t index;
+	size_t index;
 	printf("IN: ");
 	for( index=0 ; index!=XTEA_BLOCK_SIZE; index++){
 		uint8_t c = _in[index];
@@ -624,7 +624,7 @@ static void XXTEA_encrypt_chunk(XTEA_t *xxtea, uint32_t *in, uint32_t *out){
 	uint8_t *_in = (uint8_t *)in;
 	uint8_t *_out = (uint8_t *)out;
 	#if defined(XTEA_LOG) && XTEA_LOG == 1
-	uint32_t index;
+	size_t index;
 	printf("IN: ");
 	for( index=0 ; index!=XTEA_BLOCK_SIZE; index++){
 		uint8_t c = _in[index];
@@ -682,7 +682,7 @@ static void XXTEA_decrypt_chunk(XTEA_t *xxtea, uint32_t * in,uint32_t * out){
 	uint8_t *_in = (uint8_t *)in;
 	uint8_t *_out = (uint8_t *)out;
 	#if defined(XTEA_LOG) && XTEA_LOG == 1
-	uint32_t index;
+	size_t index;
 	printf("IN: ");
 	for( index=0 ; index!=XTEA_BLOCK_SIZE; index++){
 		uint8_t c = _in[index];
