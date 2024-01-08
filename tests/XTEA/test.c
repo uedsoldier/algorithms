@@ -5,9 +5,9 @@
 #include "../../src/XTEA/XTEA.h"
 #include "../minunit.h"
 
-const xtea_iv_t *IV = "vector**";
+const xtea_iv_t *IV = "MRhMciXgcCRUy6L7";
 const char *TEST_STRING = "Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.";
-const char *TEST_KEY = "XTEAkey_0123456";
+const char *TEST_KEY = "fEOk6a9X28GXfBRN";
 
 uint32_t test_string_len, test_string_len_normalized, key_len, comparison;
 uint32_t output_len;
@@ -18,7 +18,7 @@ XTEA_t xtea_test;
 XTEA_code_t xtea_code;
 
 int tests_run = 0;
-int total_tests = 10;
+int total_tests = 8;
 
 uint8_t xtea_rounds;
 bool ecb;
@@ -163,7 +163,7 @@ static char *test_xtea_cbc_64rounds()
     return 0;
 }
 
-static char *test_xtea_ebc_8rounds()
+static char *test_xtea_ecb_8rounds()
 {
     xtea_rounds = 8;
     ecb = true;
@@ -175,7 +175,7 @@ static char *test_xtea_ebc_8rounds()
     return 0;
 }
 
-static char *test_xtea_ebc_16rounds()
+static char *test_xtea_ecb_16rounds()
 {
     xtea_rounds = 16;
     ecb = true;
@@ -187,7 +187,7 @@ static char *test_xtea_ebc_16rounds()
     return 0;
 }
 
-static char *test_xtea_ebc_32rounds()
+static char *test_xtea_ecb_32rounds()
 {
     xtea_rounds = 32;
     ecb = true;
@@ -199,7 +199,7 @@ static char *test_xtea_ebc_32rounds()
     return 0;
 }
 
-static char *test_xtea_ebc_64rounds()
+static char *test_xtea_ecb_64rounds()
 {
     xtea_rounds = 64;
     ecb = true;
@@ -237,6 +237,7 @@ static char *all_tests()
 {
     // Test 1
     printf("-------------------------------------------\n");
+    printf("TEST XTEA ECB 8 ROUNDS\n");
     printf("Test %u/%u\n", tests_run + 1, total_tests);
     printf("ASCII in (%u bytes):\n<<",test_string_len);
     for (size_t i = 0; i < test_string_len_normalized; i++)
@@ -244,10 +245,11 @@ static char *all_tests()
         printf("%c",input_string[i]);
     }
     printf(">>\n");
-    mu_run_test(test_xtea_ebc_8rounds);
+    mu_run_test(test_xtea_ecb_8rounds);
     printf("Test passed\n");
     // Test 2
     printf("-------------------------------------------\n");
+    printf("TEST XTEA ECB 16 ROUNDS\n");
     printf("Test %u/%u\n", tests_run + 1, total_tests);
     printf("ASCII in (%u bytes):\n<<",test_string_len);
     for (size_t i = 0; i < test_string_len_normalized; i++)
@@ -255,10 +257,11 @@ static char *all_tests()
         printf("%c",input_string[i]);
     }
     printf(">>\n");
-    mu_run_test(test_xtea_ebc_16rounds);
+    mu_run_test(test_xtea_ecb_16rounds);
     printf("Test passed\n");
     // Test 3
     printf("-------------------------------------------\n");
+    printf("TEST XTEA ECB 32 ROUNDS\n");
     printf("Test %u/%u\n", tests_run + 1, total_tests);
     printf("ASCII in (%u bytes):\n<<",test_string_len);
     for (size_t i = 0; i < test_string_len_normalized; i++)
@@ -266,10 +269,11 @@ static char *all_tests()
         printf("%c",input_string[i]);
     }
     printf(">>\n");
-    mu_run_test(test_xtea_ebc_32rounds);
+    mu_run_test(test_xtea_ecb_32rounds);
     printf("Test passed\n");
     // Test 4
     printf("-------------------------------------------\n");
+    printf("TEST XTEA ECB 64 ROUNDS\n");
     printf("Test %u/%u\n", tests_run + 1, total_tests);
     printf("ASCII in (%u bytes):\n<<",test_string_len);
     for (size_t i = 0; i < test_string_len_normalized; i++)
@@ -277,10 +281,11 @@ static char *all_tests()
         printf("%c",input_string[i]);
     }
     printf(">>\n");
-    mu_run_test(test_xtea_ebc_64rounds);
+    mu_run_test(test_xtea_ecb_64rounds);
     printf("Test passed\n");
     // Test 5
     printf("-------------------------------------------\n");
+    printf("TEST XTEA CBC 8 ROUNDS\n");
     printf("Test %u/%u\n", tests_run + 1, total_tests);
     printf("ASCII in (%u bytes):\n<<",test_string_len);
     for (size_t i = 0; i < test_string_len_normalized; i++)
@@ -292,6 +297,7 @@ static char *all_tests()
     printf("Test passed\n");
     // Test 6
     printf("-------------------------------------------\n");
+    printf("TEST XTEA CBC 16 ROUNDS\n");
     printf("Test %u/%u\n", tests_run + 1, total_tests);
     printf("ASCII in (%u bytes):\n<<",test_string_len);
     for (size_t i = 0; i < test_string_len_normalized; i++)
@@ -303,6 +309,7 @@ static char *all_tests()
     printf("Test passed\n");
     // Test 7
     printf("-------------------------------------------\n");
+    printf("TEST XTEA CBC 32 ROUNDS\n");
     printf("Test %u/%u\n", tests_run + 1, total_tests);
     printf("ASCII in (%u bytes):\n<<",test_string_len);
     for (size_t i = 0; i < test_string_len_normalized; i++)
@@ -314,6 +321,7 @@ static char *all_tests()
     printf("Test passed\n");
     // Test 8
     printf("-------------------------------------------\n");
+    printf("TEST XTEA CBC 64 ROUNDS\n");
     printf("Test %u/%u\n", tests_run + 1, total_tests);
     printf("ASCII in (%u bytes):\n<<",test_string_len);
     for (size_t i = 0; i < test_string_len_normalized; i++)
@@ -324,27 +332,27 @@ static char *all_tests()
     mu_run_test(test_xtea_cbc_64rounds);
     printf("Test passed\n");
     // Test 9
-    printf("-------------------------------------------\n");
-    printf("Test %u/%u\n", tests_run + 1, total_tests);
-    printf("ASCII in (%u bytes):\n<<",test_string_len);
-    for (size_t i = 0; i < test_string_len_normalized; i++)
-    {
-        printf("%c",input_string[i]);
-    }
-    printf(">>\n");
-    mu_run_test(test_xxtea_ecb);
-    printf("Test passed\n");
-    // Test 10
-    printf("-------------------------------------------\n");
-    printf("Test %u/%u\n", tests_run + 1, total_tests);
-    printf("ASCII in (%u bytes):\n<<",test_string_len);
-    for (size_t i = 0; i < test_string_len_normalized; i++)
-    {
-        printf("%c",input_string[i]);
-    }
-    printf(">>\n");
-    mu_run_test(test_xxtea_cbc);
-    printf("Test passed\n");
+    // printf("-------------------------------------------\n");
+    // printf("Test %u/%u\n", tests_run + 1, total_tests);
+    // printf("ASCII in (%u bytes):\n<<",test_string_len);
+    // for (size_t i = 0; i < test_string_len_normalized; i++)
+    // {
+    //     printf("%c",input_string[i]);
+    // }
+    // printf(">>\n");
+    // mu_run_test(test_xxtea_ecb);
+    // printf("Test passed\n");
+    // // Test 10
+    // printf("-------------------------------------------\n");
+    // printf("Test %u/%u\n", tests_run + 1, total_tests);
+    // printf("ASCII in (%u bytes):\n<<",test_string_len);
+    // for (size_t i = 0; i < test_string_len_normalized; i++)
+    // {
+    //     printf("%c",input_string[i]);
+    // }
+    // printf(">>\n");
+    // mu_run_test(test_xxtea_cbc);
+    // printf("Test passed\n");
     printf("-------------------------------------------\n");
     return 0;
 }

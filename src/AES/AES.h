@@ -13,10 +13,12 @@
 #define AES_H
 
 #pragma region Dependencies
+#include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
+#include <stdlib.h>
 #pragma endregion
 
 #ifdef __cplusplus
@@ -44,7 +46,6 @@ static const char *AES_TAG = "AES";
 
 /**
  * Define the macros below to 1/0 to enable/disable the mode of operation.
-
  */
 #pragma region Operation modes
 /**
@@ -58,7 +59,7 @@ static const char *AES_TAG = "AES";
  * @brief CBC enables AES encryption in CBC-mode of operation.
  */
 #ifndef AES_CBC
-#define AES_CBC 1
+#define AES_CBC 0
 #endif
 
 /**
@@ -67,8 +68,6 @@ static const char *AES_TAG = "AES";
 #ifndef AES_CTR
 #define AES_CTR 0
 #endif
-
-#define MULTIPLY_AS_A_FUNCTION 1
 
 #pragma endregion
 
@@ -90,17 +89,17 @@ static const char *AES_TAG = "AES";
  */
 #if !defined(AES_DYNAMIC_MEMORY) || (AES_DYNAMIC_MEMORY == 0)
 #ifndef AES_USE_BUFFERS
-#define AES_USE_BUFFERS 0
+#define AES_USE_BUFFERS 1
 #endif
 #endif
 
 /**
  * @brief Macro para definición de máximo tamaño de buffer, para los casos en los que no se
- * requiere asignación dinámica de memoria
+ * requiere asignación dinámica de memoria. Por ejemplo: microcontroladores.
  *
  */
 #ifdef AES_USE_BUFFERS
-#define AES_MAX_BUFFER_SIZE 128
+#define AES_MAX_BUFFER_SIZE 256
 #endif
 #pragma endregion
 
@@ -111,6 +110,7 @@ static const char *AES_TAG = "AES";
  */
 #define AES_BLOCK_LEN 16
 
+
 /**
  * @brief The number of columns comprising a state in AES. This is a constant in AES. Value=4
  *
@@ -118,14 +118,14 @@ static const char *AES_TAG = "AES";
 #define Nb 4
 
 #if defined(AES256) && (AES256 == 1)
-#define Nk 8  // The number of 32 bit words in a key.
-#define Nr 14 // The number of rounds in AES Cipher.
+#define AES_Nk 8  // The number of 32 bit words in a key.
+#define AES_NUM_ROUNDS 14 // The number of rounds in AES Cipher.
 #elif defined(AES192) && (AES192 == 1)
-#define Nk 6  // The number of 32 bit words in a key.
-#define Nr 12 // The number of rounds in AES Cipher.
+#define AES_Nk 6  // The number of 32 bit words in a key.
+#define AES_NUM_ROUNDS 12 // The number of rounds in AES Cipher.
 #else
-#define Nk 4  // The number of 32 bit words in a key.
-#define Nr 10 // The number of rounds in AES Cipher.
+#define AES_Nk 4  // The number of 32 bit words in a key.
+#define AES_NUM_ROUNDS 10 // The number of rounds in AES Cipher.
 #endif
 
 /**
@@ -134,7 +134,7 @@ static const char *AES_TAG = "AES";
  */
 #define AES_ROUNDUP_TO_NEAREST_MULTIPLE_OF_16(N) (((N + 15) >> 4) << 4)
 
-    static const uint8_t sbox[256] = {
+    static const uint8_t s_box[256] = {
         // 0     1    2      3     4    5     6     7      8    9     A      B    C     D     E     F
         0X63, 0X7C, 0X77, 0X7B, 0XF2, 0X6B, 0X6F, 0XC5, 0X30, 0X01, 0X67, 0X2B, 0XFE, 0XD7, 0XAB, 0X76,
         0XCA, 0X82, 0XC9, 0X7D, 0XFA, 0X59, 0X47, 0XF0, 0XAD, 0XD4, 0XA2, 0XAF, 0X9C, 0XA4, 0X72, 0XC0,
@@ -154,7 +154,7 @@ static const char *AES_TAG = "AES";
         0X8C, 0XA1, 0X89, 0X0D, 0XBF, 0XE6, 0X42, 0X68, 0X41, 0X99, 0X2D, 0X0F, 0XB0, 0X54, 0XBB, 0X16};
 
 #if (defined(AES_CBC) && AES_CBC == 1) || (defined(AES_ECB) && AES_ECB == 1)
-    static const uint8_t rsbox[256] = {
+    static const uint8_t inv_s[256] = {
         0X52, 0X09, 0X6A, 0XD5, 0X30, 0X36, 0XA5, 0X38, 0XBF, 0X40, 0XA3, 0X9E, 0X81, 0XF3, 0XD7, 0XFB,
         0X7C, 0XE3, 0X39, 0X82, 0X9B, 0X2F, 0XFF, 0X87, 0X34, 0X8E, 0X43, 0X44, 0XC4, 0XDE, 0XE9, 0XCB,
         0X54, 0X7B, 0X94, 0X32, 0XA6, 0XC2, 0X23, 0X3D, 0XEE, 0X4C, 0X95, 0X0B, 0X42, 0XFA, 0XC3, 0X4E,
@@ -171,33 +171,26 @@ static const char *AES_TAG = "AES";
         0X60, 0X51, 0X7F, 0XA9, 0X19, 0XB5, 0X4A, 0X0D, 0X2D, 0XE5, 0X7A, 0X9F, 0X93, 0XC9, 0X9C, 0XEF,
         0XA0, 0XE0, 0X3B, 0X4D, 0XAE, 0X2A, 0XF5, 0XB0, 0XC8, 0XEB, 0XBB, 0X3C, 0X83, 0X53, 0X99, 0X61,
         0X17, 0X2B, 0X04, 0X7E, 0XBA, 0X77, 0XD6, 0X26, 0XE1, 0X69, 0X14, 0X63, 0X55, 0X21, 0X0C, 0X7D};
+
 #endif
 
     /**
      * @brief The round constant word array, Rcon[i], contains the values given by x to the power (i-1)
      * being powers of x (x is denoted as {02}) in the field GF(2^8)
      */
-    static const uint8_t Rcon[11] = {
-        0X8D, 0X01, 0X02, 0X04, 0X08, 0X10, 0X20, 0X40, 0X80, 0X1B, 0X36};
+    static const uint8_t rcon[AES_BLOCK_LEN] = {
+        0x8d, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36, 0x6c, 0xd8, 0xab, 0x4d, 0x9a};
 
-/**
- * @brief
- *
- */
-#define getSBoxValue(num) (sbox[(num)])
+
 
 #if (defined(AES_CBC) && AES_CBC == 1) || (defined(AES_ECB) && AES_ECB == 1)
-/**
- * @brief
- *
- */
-#define getSBoxInvert(num) (rsbox[(num)])
+
 #endif
 
 #pragma endregion
 
 #pragma region AES-128 specific constants
-#if defined(AES128) && AES128 > 0
+#if (defined(AES128) && AES128 == 1)
 
 /**
  * @brief Macro de tamaño de clave fija en bytes para AES-128. NO debe modificarse.
@@ -221,7 +214,7 @@ static const char *AES_TAG = "AES";
 #pragma endregion
 
 #pragma region AES-192 specific constants
-#if defined(AES192) && AES192 > 0
+#if (defined(AES192) && AES192 == 1)
 /**
  * @brief Macro de tamaño de clave fija en bytes para AES-192. NO debe modificarse.
  *
@@ -243,7 +236,7 @@ static const char *AES_TAG = "AES";
 #pragma endregion
 
 #pragma region AES-256 specific constants
-#if defined(AES256) && AES256 > 0
+#if (defined(AES256) && AES256 == 1)
 /**
  * @brief Macro de tamaño de clave fija en bytes para AES-256. NO debe modificarse.
  *
@@ -313,9 +306,9 @@ static const char *AES_TAG = "AES";
      */
     typedef struct AES_ctx
     {
-        uint8_t roundKey[AES_KEY_EXP_SIZE]; // Key
+        uint8_t key[AES_FIXED_KEY_SIZE];    // Key
         #if (defined(AES_CBC) && (AES_CBC == 1)) || (defined(AES_CTR) && (AES_CTR == 1))
-        uint8_t iv[AES_BLOCK_LEN]; // Initialization vector for CBC and CTR modes
+        uint8_t iv[AES_BLOCK_LEN];          // Initialization vector for CBC and CTR modes
         #endif
         uint32_t encrypted_chunks;
         uint32_t decrypted_chunks;
@@ -330,46 +323,27 @@ static const char *AES_TAG = "AES";
      * @brief Array holding the intermediate results during decryption.
      *
      */
-    typedef uint8_t AES_state_t[4][4];
+    typedef uint8_t AES_state_t[AES_BLOCK_LEN];
 #pragma endregion
 
 #pragma region Function prototypes
 
-    static void KeyExpansion(uint8_t *roundKey, const uint8_t *key);
-    static void AddRoundKey(uint8_t round, AES_state_t *state, const uint8_t *roundKey);
-    static void SubBytes(AES_state_t *state);
-    static void ShiftRows(AES_state_t *state);
-    static uint8_t Xtime(uint8_t x);
-    static void MixColumns(AES_state_t *state);
+    #if defined(AES_LOG) && AES_LOG == 1
+    void print_state(AES_state_t *state, const char *msg);
+    void print_buffer(uint8_t *buffer, size_t len, const char *msg);
+    #endif
 
-#if defined(MULTIPLY_AS_A_FUNCTION) && (MULTIPLY_AS_A_FUNCTION == 1)
-    static uint8_t Multiply(uint8_t x, uint8_t y);
-#else
-#define Multiply(x, y)                         \
-    (((y & 1) * x) ^                           \
-     ((y >> 1 & 1) * xtime(x)) ^               \
-     ((y >> 2 & 1) * xtime(xtime(x))) ^        \
-     ((y >> 3 & 1) * xtime(xtime(xtime(x)))) ^ \
-     ((y >> 4 & 1) * xtime(xtime(xtime(xtime(x))))))
-#endif
-    static void InvMixColumns(AES_state_t *state);
-    static void InvSubBytes(AES_state_t *state);
-    static void InvShiftRows(AES_state_t *state);
-
-#if defined(AES_CBC) && (AES_CBC == 1)
-    static void XorWithIv(uint8_t *buf, const AES_iv_t *iv);
-#endif
 
 #if (defined(AES_CBC) && AES_CBC == 1) || (defined(AES_ECB) && AES_ECB == 1)
-    static void AES_encrypt_chunk(AES_ctx_t *ctx, AES_state_t *in_state,AES_state_t *out_state);
-    static void AES_decrypt_chunk(AES_ctx_t *ctx, AES_state_t *in_state,AES_state_t *out_state);
+    static void AES_encrypt_chunk(AES_ctx_t *ctx, uint8_t *in,uint8_t *out);
+    static void AES_decrypt_chunk(AES_ctx_t *ctx, uint8_t *in,uint8_t *out);
 #endif
 
-    void AES_init_ctx(AES_ctx_t *ctx, const AES_key_t *key);
-#if (defined(AES_CBC) && (AES_CBC == 1)) || (defined(AES_CTR) && (AES_CTR == 1))
-    void AES_init_ctx_iv(AES_ctx_t *ctx, const AES_key_t *key, const AES_iv_t *iv);
-    void AES_ctx_set_iv(AES_ctx_t *ctx, const AES_iv_t *iv);
+    void AES_init_ctx(AES_ctx_t *ctx, const uint8_t *key);
     static void AES_set_fixedKey(AES_ctx_t *ctx);
+#if (defined(AES_CBC) && (AES_CBC == 1)) || (defined(AES_CTR) && (AES_CTR == 1))
+    void AES_init_ctx_iv(AES_ctx_t *ctx, const uint8_t *key, const uint8_t *iv);
+    
 #endif
 
 #if defined(AES_ECB) && (AES_ECB > 0)
@@ -388,6 +362,28 @@ static const char *AES_TAG = "AES";
 #endif
 
 #pragma endregion
+
+
+
+
+#pragma region Auxiliary functions
+// For encryption
+static void KeyExpansion(uint8_t *inputKey, uint8_t *expandedKeys);
+static void AddRoundKey(uint8_t* plain_text, uint8_t * roundKey);
+static void SubBytes(uint8_t * plain_text);
+static void ShiftRows(uint8_t * plain_text);
+static void MixColumns(uint8_t *plain_text);
+
+// For decryption
+static void ReverseSubBytes(uint8_t * state);
+static void ReverseShiftRows(uint8_t * plain_text);
+static void ReverseMixColumns(uint8_t *plain_text);
+
+static uint8_t gmul(uint8_t rhs, uint8_t lhs);
+
+#pragma endregion
+
+
 
 #ifdef __cplusplus
 }

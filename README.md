@@ -7,6 +7,7 @@ En caso de que este código sea necesitado, se debe hacer una copia de los archo
 * CRC: Implementación de verificación de redundancia cíclica (CRC) de 8, 16 y 32 bits, con distintos polinomios generadores e implementaciones.
 * XTEA: Implementación del algoritmo de cifrado Extended Tiny Encryption Algorithm, para aplicaciones embebidas de poca memoria y poder computacional.
 * BASE64: Codificación (hash) de datos binarios en base 64, para su uso en aplicaciones como correo electrónico y otras más.
+* AES:  Implementación del algoritmo de cifrado simétrico AES en sus variantes ECB y CBC, con claves de 128,192 y 256 bits.
 
 # Uso de CMake para generar binarios de pruebas
 * Para Windows:
@@ -45,3 +46,9 @@ Dentro de la carpeta ```build/``` de cada módulo de pruebas, se genera un ejecu
         * Número de rondas (1,2,4,8,16,32 o 64)
     * Salida:
         * Texto cifrado y descifrado bajo los parámetros indicados
+
+# Referencias
+E inspiración:
+* AES: 
+    * https://github.com/kellencataldo/aes_lib/tree/master
+    * https://github.com/kokke/tiny-AES-c/tree/master
