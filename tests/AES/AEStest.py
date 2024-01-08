@@ -1,15 +1,23 @@
-import pyaes, pbkdf2, binascii, os, secrets
+import pyaes, pbkdf2, binascii, os, secrets, sys
 
 # Derive a 256-bit AES encryption key from the password
-#password = "s3cr3t*c0d3"
-#passwordSalt = os.urandom(16)
-#key = pbkdf2.PBKDF2(password, passwordSalt).read(32)
-#print('AES encryption key:', binascii.hexlify(key))
+password = sys.argv[1]
+passwordSalt = os.urandom(16)
+key = pbkdf2.PBKDF2(password, passwordSalt).read(16)
+
 
 plaintext = 'HolaHolaHola\0\0\0\0'
-key = 'aesEncryptionKey'
+print('AES encryption key:', binascii.hexlify(key,sep=' '))
 
-aes = pyaes.AESModeOfOperationECB(key=bytes(key,'ascii'))
+aes = pyaes.AESModeOfOperationECB(key)
 ciphertext = aes.encrypt(plaintext)
 
-print('Encrypted:', binascii.hexlify(ciphertext,sep=' '))
+print('Encrypted:', binascii.hexlify(ciphertext))
+
+print('AES encryption key to export:')
+bytes_data = key
+
+for char_value in bytes_data:
+    print(f'0x{char_value:02x}, ',end='')
+
+

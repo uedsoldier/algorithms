@@ -7,8 +7,9 @@
 
 const char IV[AES_BLOCK_LEN] = "0123456789ABCDEF";    // 16-byte init vector  
 const char *TEST_STRING = "HolaHolaHola";
-const char TEST_KEY[AES_FIXED_KEY_SIZE] = "aesEncryptionKey";  // key
-
+const char TEST_KEY[AES_FIXED_KEY_SIZE] = {
+0xcb, 0x8a, 0xea, 0x42, 0x46, 0x04, 0xdb, 0x32, 0x3c, 0x71, 0xd1, 0x5e, 0x31, 0x9d, 0x46, 0xbe
+};  // Copy random key from AEStest.py script
 size_t test_string_len, test_string_len_normalized, key_len, comparison;
 size_t output_len;
 
