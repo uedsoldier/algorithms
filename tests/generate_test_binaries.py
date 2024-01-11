@@ -1,10 +1,10 @@
 from argparse import ArgumentParser
-from os import chdir,getcwd,system
+from os import chdir,getcwd,system,mkdir,path
 from shutil import rmtree
 
 algorithm_choices = ('BASE64','CRC','XTEA','CHECKSUM8','AES')
 
-
+build_dir = 'build/'
 
 def main():
     #Argument parsing
@@ -21,10 +21,11 @@ def main():
     algorithm = args.algorithm[0]
     print(f'Algorithm: {algorithm}')
     chdir(algorithm)
-    print(getcwd())
-    rmtree('build/',ignore_errors=True)
+    if path.exists(build_dir):    
+        rmtree(build_dir,ignore_errors=True)
+    mkdir(build_dir)
     system('cmake -S . -B build/ -G "MinGW Makefiles"')
-    chdir('build')
+    chdir(build_dir)
     system('mingw32-make')
 
 if __name__ == '__main__':
