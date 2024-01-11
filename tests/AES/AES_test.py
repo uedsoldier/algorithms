@@ -23,7 +23,7 @@ match args.AESlen:
 
 passwordSalt = os.urandom(KEY_LEN)
 key = pbkdf2.PBKDF2(args.pwd, passwordSalt).read(KEY_LEN)
-
+key = '12345678901234567890123456789012'.encode('ascii')
 # Print some information
 print('Plaintext to hex:', binascii.hexlify(str.encode(args.plaintext), sep=' '))
 print('AES encryption key:', binascii.hexlify(key, sep=' '))

@@ -382,6 +382,15 @@ static void KeyExpansion(uint8_t *inputKey, uint8_t *expandedKeys){
 			rcon_location++;
 		}
 
+		#if defined(AES256) && AES256 == 1
+		if(bytesGenerated % AES_FIXED_KEY_SIZE == AES_BLOCK_LEN){
+			for (i = 0; i != 4; i++) {
+			key_block[i] = s_box[key_block[i]];
+		}
+		}
+		
+		#endif
+
 		for (i = 0; i != 4; i++) {
 			expandedKeys[bytesGenerated] = expandedKeys[bytesGenerated - AES_FIXED_KEY_SIZE] ^ key_block[i];
 			bytesGenerated++;

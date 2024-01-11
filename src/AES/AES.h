@@ -99,7 +99,7 @@ static const char *AES_TAG = "AES";
  *
  */
 #ifdef AES_USE_BUFFERS
-#define AES_MAX_BUFFER_SIZE 256
+#define AES_MAX_BUFFER_SIZE 64
 #endif
 #pragma endregion
 
