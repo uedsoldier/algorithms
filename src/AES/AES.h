@@ -28,9 +28,9 @@ extern "C"
 
 #pragma region Useful macros
 
-#define AES128 1
+#define AES128 0
 #define AES192 0
-#define AES256 0
+#define AES256 1
 
 /**
  * @brief Macro para depuración mediante la función printf(). Se recomienda usar únicamente
@@ -389,4 +389,4 @@ static uint8_t gmul(uint8_t rhs, uint8_t lhs);
 }
 #endif
 
-#endif /*BASE64_H*/
+#endif /*AES_H*/

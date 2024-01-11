@@ -83,11 +83,11 @@ static void AES_encrypt_chunk(AES_ctx_t *ctx, uint8_t *in,uint8_t *out)
     uint8_t round = 0;
     memcpy(out,in,AES_BLOCK_LEN);
 
-    uint8_t expandedKey[AES_BLOCK_LEN * (AES_NUM_ROUNDS + 1)]; 
+    uint8_t expandedKey[AES_KEY_EXP_SIZE]; 
 	KeyExpansion(ctx->key, expandedKey);
 	AddRoundKey(out, ctx->key);
 
-	for (int i = 0; i < AES_NUM_ROUNDS - 1; i++) {
+	for (size_t i = 0; i < AES_NUM_ROUNDS - 1; i++) {
 		SubBytes(out);
 		ShiftRows(out);
 		MixColumns(out);
@@ -117,7 +117,7 @@ static void AES_decrypt_chunk(AES_ctx_t *ctx, uint8_t *in,uint8_t *out)
 {
     memcpy(out,in,AES_BLOCK_LEN);
 
-    uint8_t expandedKey[AES_BLOCK_LEN * (AES_NUM_ROUNDS + 1)];
+    uint8_t expandedKey[AES_KEY_EXP_SIZE];
 
 	KeyExpansion(ctx->key, expandedKey);
 
@@ -352,20 +352,20 @@ AES_errcode_t AES_CBC_decrypt(AES_ctx_t *ctx, void *in, void *out, size_t input_
 
 static void KeyExpansion(uint8_t *inputKey, uint8_t *expandedKeys){
     size_t i;
-    for (i = 0; i != AES_BLOCK_LEN; i++) {
+    for (i = 0; i != AES_FIXED_KEY_SIZE; i++) {
 		expandedKeys[i] = inputKey[i];
 	}
 
-	size_t bytesGenerated = AES_BLOCK_LEN;
+	size_t bytesGenerated = AES_FIXED_KEY_SIZE;
 	size_t rcon_location = 1;
 	uint8_t key_block[4];
 
 
-	while (bytesGenerated < (AES_BLOCK_LEN * (AES_NUM_ROUNDS + 1))) {
-		for (i = 0; i != ((AES_BLOCK_LEN * 8) / 32); i++) { //while is less than the number of 32 bit words in 176 bit expanded keys
-			key_block[i] = expandedKeys[i + bytesGenerated - ((AES_BLOCK_LEN * 8) / 32)];
+	while (bytesGenerated < AES_KEY_EXP_SIZE) {
+		for (i = 0; i != 4; i++) { //while is less than the number of 32 bit words in 176 bit expanded keys
+			key_block[i] = expandedKeys[i + bytesGenerated - 4];
 		}
-		if (bytesGenerated % AES_BLOCK_LEN == 0) {
+		if (bytesGenerated % AES_FIXED_KEY_SIZE == 0) {
 
 			uint8_t temp_val = key_block[0];
 			key_block[0] = key_block[1];
@@ -383,7 +383,7 @@ static void KeyExpansion(uint8_t *inputKey, uint8_t *expandedKeys){
 		}
 
 		for (i = 0; i != 4; i++) {
-			expandedKeys[bytesGenerated] = expandedKeys[bytesGenerated - AES_BLOCK_LEN] ^ key_block[i];
+			expandedKeys[bytesGenerated] = expandedKeys[bytesGenerated - AES_FIXED_KEY_SIZE] ^ key_block[i];
 			bytesGenerated++;
 		}
 	}
@@ -404,7 +404,7 @@ static void SubBytes(uint8_t * plain_text){
 static void ShiftRows(uint8_t * plain_text){
     uint8_t temp_block[AES_BLOCK_LEN];
 
-	for (size_t i = 0; i < AES_BLOCK_LEN; i += 4) {
+	for (size_t i = 0; i != AES_BLOCK_LEN; i += 4) {
 		//incrementing by 5 causes the diagonal shift effect
 		temp_block[i] = plain_text[i];
 		temp_block[i + 1] = plain_text[(i + 5) % AES_BLOCK_LEN];
@@ -412,7 +412,7 @@ static void ShiftRows(uint8_t * plain_text){
 		temp_block[i + 3] = plain_text[(i + 15) % AES_BLOCK_LEN];
 	}
 
-	for (int i = 0; i < AES_BLOCK_LEN; i++) {
+	for (int i = 0; i != AES_BLOCK_LEN; i++) {
 		plain_text[i] = temp_block[i];
 	}
 }
