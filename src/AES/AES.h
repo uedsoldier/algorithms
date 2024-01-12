@@ -257,8 +257,6 @@ static const char *AES_TAG = "AES";
 #endif
 #pragma endregion
 
-#pragma endregion
-
 #pragma region Custom types
 
     /**
@@ -363,9 +361,6 @@ static const char *AES_TAG = "AES";
 
 #pragma endregion
 
-
-
-
 #pragma region Auxiliary functions
 // For encryption
 static void KeyExpansion(uint8_t *inputKey, uint8_t *expandedKeys);
@@ -383,7 +378,7 @@ static uint8_t gmul(uint8_t rhs, uint8_t lhs);
 
 #pragma endregion
 
-
+#pragma endregion
 
 #ifdef __cplusplus
 }
