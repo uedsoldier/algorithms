@@ -23,25 +23,6 @@ extern "C"
 
 #pragma region Useful macros
 
-/**
- * @brief Macro para depuración mediante la función printf(). Se recomienda usar únicamente
- * para fines de desarrollo y pruebas.
- */
-#ifndef SHA1_LOG
-#define SHA1_LOG 1
-#endif
-
-#if defined(SHA1_LOG) && SHA1_LOG == 1
-static const char *SHA1_TAG = "SHA1";
-#endif
-
-#define LITTLE_ENDIAN
-// #define BIG_ENDIAN
-
-#pragma region Operation modes
-
-#pragma endregion
-
 #pragma region Memory macros
 /**
  * @brief Macro para utilización de asignación dinámica de memoria en las funciones SHA1.
@@ -107,8 +88,6 @@ static const char *SHA1_TAG = "SHA1";
 
 #pragma endregion
 
-
-
 #pragma region Custom types
 
 /**
@@ -121,10 +100,6 @@ typedef struct SHA1_ctx
     uint32_t hash[SHA1_DIGEST_SIZE_WORDS];
     uint32_t wbuf[16];
 } SHA1_ctx_t;
-
-#pragma endregion
-
-#pragma region variables
 
 #pragma endregion
 
