@@ -140,7 +140,7 @@ static void AES_decrypt_chunk(AES_ctx_t *ctx, uint8_t *in,uint8_t *out)
 }
 #endif
 
-#if defined(AES_ECB) && (AES_ECB > 0)
+#if defined(AES_ECB) && (AES_ECB == 1)
 /**
  * @brief 
  * 
@@ -309,7 +309,7 @@ AES_errcode_t AES_ECB_decrypt(AES_ctx_t *ctx, void *in, void *out, size_t input_
 
 #endif
 
-#if defined(AES_CBC) && (AES_CBC > 0)
+#if defined(AES_CBC) && (AES_CBC == 1)
     
 /**
  * @brief 
@@ -322,7 +322,78 @@ AES_errcode_t AES_ECB_decrypt(AES_ctx_t *ctx, void *in, void *out, size_t input_
  * @return AES_errcode_t 
  */
 AES_errcode_t AES_CBC_encrypt(AES_ctx_t *ctx, void *in, void *out, size_t input_len, uint32_t *output_len){
-    
+    #if defined(AES_LOG) && AES_LOG == 1
+    printf("AES CBC encrypt\n");
+    #endif
+    // Input buffer length verification
+    if(input_len<= 0){
+        #if defined(AES_LOG) && AES_LOG == 1
+        printf("\tEmpty input buffer\n");
+        #endif
+        
+        return AES_CODE_EMPTY_INPUT_BUFFER;
+    }
+    // Normalized length calculation
+    ctx->encrypted_chunks = 0;
+    size_t input_len_normalized = (size_t)(AES_ROUNDUP_TO_NEAREST_MULTIPLE_OF_16(input_len));
+    ctx->input_len_normalized = input_len_normalized;
+    // if(input_len == input_len_normalized){
+    //     input_len_normalized += AES_BLOCK_LEN;
+    //     ctx->input_len_normalized = input_len_normalized;
+    // }
+
+    // Input buffer allocation, backup and initialization 
+	#if defined (AES_DYNAMIC_MEMORY) && (AES_DYNAMIC_MEMORY == 1)
+	uint8_t *aux_in = (uint8_t *) malloc(input_len_normalized);
+	uint8_t *_in = (uint8_t *)aux_in;
+	if(aux_in == NULL){
+		#if defined(AES_LOG) && AES_LOG == 1
+		printf("\tDynamic memory assignment error\n");
+		#endif
+		return AES_CODE_NULL_MALLOC;
+	}
+	memset(aux_in,0,input_len_normalized);
+	memcpy(_in, in, input_len_normalized);
+	#else
+		#if defined(AES_USE_BUFFERS) && (AES_USE_BUFFERS == 1)
+	if( input_len_normalized > AES_MAX_BUFFER_SIZE){
+		#if defined(AES_LOG) && AES_LOG == 1
+		printf("ERROR: Normalized input length exceeds max buffer size\n");
+		#endif
+		return AES_CODE_INCORRECT_BUFFER_SIZE;
+	}
+	uint8_t aux_in[AES_MAX_BUFFER_SIZE];
+	uint8_t *_in = (uint8_t *)aux_in;
+	memset(_in, 0 , AES_MAX_BUFFER_SIZE);
+	memcpy(_in, in, input_len_normalized);
+		#else
+	uint8_t *_in = (uint8_t *)in;
+		#endif
+	#endif
+
+    // Initialization vector and output buffer allocation
+	uint8_t *_out = (uint8_t *)out; 
+	memset(_out, 0 , input_len_normalized);
+	uint8_t *xor_vector = ctx->iv;
+
+    // Chunk encryption
+	while( input_len_normalized > 0) {
+		#if defined(AES_LOG) && AES_LOG == 1
+		printf("Chunk %u (bytes %u to %u):\n",ctx->encrypted_chunks+1,ctx->encrypted_chunks*AES_BLOCK_LEN,(ctx->encrypted_chunks+1)*AES_BLOCK_LEN-1);
+		#endif
+
+			AddRoundKey(_in,xor_vector);
+			AES_encrypt_chunk(ctx,_in,_out);
+			xor_vector = _out;
+
+		_in += AES_BLOCK_LEN; _out += AES_BLOCK_LEN; input_len_normalized-= AES_BLOCK_LEN; ctx->encrypted_chunks++;
+		
+	}
+	*output_len = ctx->encrypted_chunks*AES_BLOCK_LEN;
+	#if defined (XTEA_DYNAMIC_MEMORY) && (XTEA_DYNAMIC_MEMORY == 1)
+	free(aux_in);
+	#endif
+	return AES_CODE_OK;
 }
 
 /**
@@ -336,12 +407,85 @@ AES_errcode_t AES_CBC_encrypt(AES_ctx_t *ctx, void *in, void *out, size_t input_
  * @return AES_errcode_t 
  */
 AES_errcode_t AES_CBC_decrypt(AES_ctx_t *ctx, void *in, void *out, size_t input_len, uint32_t *output_len){
-    
+    #if defined(AES_LOG) && AES_LOG == 1
+    printf("AES CBC decrypt\n");
+    #endif
+    // Input buffer length verification
+    if(input_len<= 0){
+        #if defined(AES_LOG) && AES_LOG == 1
+        printf("\tEmpty input buffer\n");
+        #endif
+        
+        return AES_CODE_EMPTY_INPUT_BUFFER;
+    }
+    // Normalized length calculation
+    ctx->decrypted_chunks = 0;
+    size_t input_len_normalized = (size_t)(AES_ROUNDUP_TO_NEAREST_MULTIPLE_OF_16(input_len));
+    ctx->input_len_normalized = input_len_normalized;
+    // if(input_len == input_len_normalized){
+    //     input_len_normalized += AES_BLOCK_LEN;
+    //     ctx->input_len_normalized = input_len_normalized;
+    // }
+
+    // Input buffer allocation, backup and initialization 
+	#if defined (AES_DYNAMIC_MEMORY) && (AES_DYNAMIC_MEMORY == 1)
+	uint8_t *aux_in = (uint8_t *) malloc(input_len_normalized);
+	uint8_t *_in = (uint8_t *)aux_in;
+	if(aux_in == NULL){
+		#if defined(AES_LOG) && AES_LOG == 1
+		printf("\tDynamic memory assignment error\n");
+		#endif
+		return AES_CODE_NULL_MALLOC;
+	}
+	memset(aux_in,0,input_len_normalized);
+	memcpy(_in, in, input_len_normalized);
+	#else
+		#if defined(AES_USE_BUFFERS) && (AES_USE_BUFFERS == 1)
+	if( input_len_normalized > AES_MAX_BUFFER_SIZE){
+		#if defined(AES_LOG) && AES_LOG == 1
+		printf("ERROR: Normalized input length exceeds max buffer size\n");
+		#endif
+		return AES_CODE_INCORRECT_BUFFER_SIZE;
+	}
+	uint8_t aux_in[AES_MAX_BUFFER_SIZE];
+	uint8_t *_in = (uint8_t *)aux_in;
+	memset(_in, 0 , AES_MAX_BUFFER_SIZE);
+	memcpy(_in, in, input_len_normalized);
+		#else
+	uint8_t *_in = (uint8_t *)in;
+		#endif
+	#endif
+
+    // Initialization vector and output buffer allocation
+	uint8_t *_out = (uint8_t *)out; 
+	memset(_out, 0 , input_len_normalized);
+	uint8_t *xor_vector = ctx->iv;
+	uint8_t placeholder[AES_BLOCK_LEN];
+
+
+    // Chunk decryption
+	while( input_len_normalized > 0) {
+		#if defined(AES_LOG) && AES_LOG == 1
+		printf("Chunk %u (bytes %u to %u):\n",ctx->decrypted_chunks+1,ctx->decrypted_chunks*AES_BLOCK_LEN,(ctx->decrypted_chunks+1)*AES_BLOCK_LEN-1);
+		#endif
+		memcpy(placeholder,_in,AES_BLOCK_LEN);
+		AES_decrypt_chunk(ctx,_in,_out);
+		AddRoundKey(_out, xor_vector);
+		memcpy(xor_vector,_in,AES_BLOCK_LEN);
+
+		_in += AES_BLOCK_LEN; _out += AES_BLOCK_LEN; input_len_normalized-= AES_BLOCK_LEN; ctx->decrypted_chunks++;
+		
+	}
+	*output_len = ctx->decrypted_chunks*AES_BLOCK_LEN;
+	#if defined (XTEA_DYNAMIC_MEMORY) && (XTEA_DYNAMIC_MEMORY == 1)
+	free(aux_in);
+	#endif
+	return AES_CODE_OK;
 }
 
 #endif
 
-#if defined(AES_CTR) && (AES_CTR > 0)
+#if defined(AES_CTR) && (AES_CTR == 1)
     
     AES_errcode_t AES_CTR_xcrypt(AES_ctx_t *ctx, void *in, void *out, size_t input_len, uint32_t *output_len){
         

@@ -28,9 +28,9 @@ extern "C"
 
 #pragma region Useful macros
 
-#define AES128 0
+#define AES128 1
 #define AES192 0
-#define AES256 1
+#define AES256 0
 
 /**
  * @brief Macro para depuración mediante la función printf(). Se recomienda usar únicamente
@@ -59,7 +59,7 @@ static const char *AES_TAG = "AES";
  * @brief CBC enables AES encryption in CBC-mode of operation.
  */
 #ifndef AES_CBC
-#define AES_CBC 0
+#define AES_CBC 1
 #endif
 
 /**
@@ -344,18 +344,18 @@ static const char *AES_TAG = "AES";
     
 #endif
 
-#if defined(AES_ECB) && (AES_ECB > 0)
+#if defined(AES_ECB) && (AES_ECB == 1)
     AES_errcode_t AES_ECB_encrypt(AES_ctx_t *ctx, void *in, void *out, size_t input_len, uint32_t *output_len);
     AES_errcode_t AES_ECB_decrypt(AES_ctx_t *ctx, void *in, void *out, size_t input_len, uint32_t *output_len);
 
 #endif
 
-#if defined(AES_CBC) && (AES_CBC > 0)
+#if defined(AES_CBC) && (AES_CBC == 1)
     AES_errcode_t AES_CBC_encrypt(AES_ctx_t *ctx, void *in, void *out, size_t input_len, uint32_t *output_len);
     AES_errcode_t AES_CBC_decrypt(AES_ctx_t *ctx, void *in, void *out, size_t input_len, uint32_t *output_len);
 #endif
 
-#if defined(AES_CTR) && (AES_CTR > 0)
+#if defined(AES_CTR) && (AES_CTR == 1)
     AES_errcode_t AES_CTR_xcrypt(AES_ctx_t *ctx, void *in, void *out, size_t input_len, uint32_t *output_len);
 #endif
 

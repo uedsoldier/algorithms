@@ -6,9 +6,9 @@
 #include "../minunit.h"
 
 const char IV[AES_BLOCK_LEN] = "0123456789ABCDEF";    // 16-byte init vector  
-const char *TEST_STRING = "HolaHolaHolaHola";
+const char *TEST_STRING = "0123456789ABCDEF0";
 const char TEST_KEY[AES_FIXED_KEY_SIZE] = {
-0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30, 0x31, 0x32, 
+"1234567890123456"
 };  // Copy random key from AES_test.py script
 size_t test_string_len, test_string_len_normalized, key_len, comparison;
 size_t output_len;
@@ -18,7 +18,7 @@ AES_ctx_t AES_ctx;
 AES_errcode_t AES_code;
 
 int tests_run = 0;
-int total_tests = 1;
+int total_tests = 2;
 
 #if defined(AES_DYNAMIC_MEMORY) && (AES_DYNAMIC_MEMORY == 1)
 uint8_t *input_string;
@@ -52,23 +52,23 @@ static void perform_AES_ECB()
     printf("Back to ASCII (%u bytes):\n<<%s>>\n", strlen(AES_decrypt_buffer), AES_decrypt_buffer);
 }
 
-// static void perform_AES_CBC()
-// {
-//     AES_init_ctx_iv(&AES_ctx, &AES_test_key, IV);
-//     printf("Mode: CBC.\n");
-//     AES_code = AES_CBC_encrypt(&AES_ctx, input_string, AES_encrypt_buffer, test_string_len, &output_len);
+static void perform_AES_CBC()
+{
+    AES_init_ctx_iv(&AES_ctx, TEST_KEY, IV);
+    printf("Mode: CBC.\n");
+    AES_code = AES_CBC_encrypt(&AES_ctx, input_string, AES_encrypt_buffer, test_string_len, &output_len);
 
-//     printf("AES output (block size %u bytes): [ ", output_len);
-//     for (size_t i = 0; i != output_len; i++)
-//     {
-//         printf("%02x ", AES_encrypt_buffer[i]);
-//     }
-//     printf("]\n");
+    printf("AES output (block size %u bytes): [ ", output_len);
+    for (size_t i = 0; i != output_len; i++)
+    {
+        printf("%02x ", AES_encrypt_buffer[i]);
+    }
+    printf("]\n");
 
-//     AES_code = AES_CBC_decrypt(&AES_ctx, AES_encrypt_buffer, AES_decrypt_buffer, test_string_len, &output_len);
-//     printf("Back to ASCII (%u bytes):\n<<%s>>\n", strlen(AES_decrypt_buffer), AES_decrypt_buffer);
+    AES_code = AES_CBC_decrypt(&AES_ctx, AES_encrypt_buffer, AES_decrypt_buffer, test_string_len, &output_len);
+    printf("Back to ASCII (%u bytes):\n<<%s>>\n", strlen(AES_decrypt_buffer), AES_decrypt_buffer);
 
-// }
+}
 
 void fill_input_data()
 {
@@ -100,15 +100,15 @@ static char *test_AES_ECB()
     return 0;
 }
 
-// static char *test_AES_CBC()
-// {   
-//     perform_AES_CBC();
-//     perform_comparison();
-//     mu_assert("AES not OK\n", comparison == 0);
-//     reset_data();
-//     fill_input_data();
-//     return 0;
-// }
+static char *test_AES_CBC()
+{   
+    perform_AES_CBC();
+    perform_comparison();
+    mu_assert("AES not OK\n", comparison == 0);
+    reset_data();
+    fill_input_data();
+    return 0;
+}
 
 void test_init(){
     printf("-------------------------------------------\n");
@@ -129,9 +129,9 @@ static char *all_tests()
     mu_run_test(test_AES_ECB);
     printf("Test passed\n");
     // Test 2
-    // test_init();
-    // mu_run_test(test_AES_CBC);
-    // printf("Test passed\n");
+    test_init();
+    mu_run_test(test_AES_CBC);
+    printf("Test passed\n");
     
     return 0;
 }
