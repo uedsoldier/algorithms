@@ -153,9 +153,9 @@ int main(int argc, char *argv[])
     test_string_len = strlen(TEST_STRING);
     printf("Test string length: %u\n", test_string_len);
     test_string_len_normalized = AES_ROUNDUP_TO_NEAREST_MULTIPLE_OF_16(test_string_len);
-    // if(test_string_len == test_string_len_normalized){
-    //     test_string_len_normalized += AES_BLOCK_LEN;
-    // }
+    if(test_string_len == test_string_len_normalized){
+        test_string_len_normalized += AES_BLOCK_LEN;
+    }
     printf("Test string length (normalized to nearest multiple of 16 and incremented if multiple of 16): %u\n", test_string_len_normalized);
     key_len = strlen(TEST_KEY);
 

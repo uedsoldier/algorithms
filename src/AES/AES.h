@@ -82,25 +82,11 @@ static const char *AES_TAG = "AES";
 #endif
 
 /**
- * @brief Macro para utilizacion de buffers fijos auxiliares para entrada de datos, de tal forma
- * que el buffer de entrada de datos no se modifica. Para utilizarse, la macro AES_DYNAMIC_MEMORY
- * debe estar indefinida o con valor igual a 0.
- *
- */
-#if !defined(AES_DYNAMIC_MEMORY) || (AES_DYNAMIC_MEMORY == 0)
-#ifndef AES_USE_BUFFERS
-#define AES_USE_BUFFERS 1
-#endif
-#endif
-
-/**
  * @brief Macro para definición de máximo tamaño de buffer, para los casos en los que no se
  * requiere asignación dinámica de memoria. Por ejemplo: microcontroladores.
  *
  */
-#ifdef AES_USE_BUFFERS
 #define AES_MAX_BUFFER_SIZE 64
-#endif
 
 /**
  * @brief Use PKCS7 standard syntax for storing signed and/or encrypted data
@@ -276,10 +262,10 @@ static const char *AES_TAG = "AES";
      */
     typedef enum AES_errcode
     {
-        AES_CODE_OK,
-        AES_CODE_EMPTY_INPUT_BUFFER,
-        AES_CODE_INCORRECT_BUFFER_SIZE,
-        AES_CODE_NULL_MALLOC
+        AES_CODE_OK,                    // OK
+        AES_CODE_EMPTY_INPUT_BUFFER,    // Empty input buffer
+        AES_CODE_INCORRECT_BUFFER_SIZE, // Normalized input length exceeds max buffer size
+        AES_CODE_NULL_MALLOC            // Dynamic memory assignment error
     } AES_errcode_t;
 
     /**

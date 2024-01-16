@@ -157,66 +157,47 @@ AES_errcode_t AES_ECB_encrypt(AES_ctx_t *ctx, void *in, void *out, size_t input_
     #endif
     // Input buffer length verification
     if(input_len<= 0){
-        #if defined(AES_LOG) && AES_LOG == 1
-        printf("\tEmpty input buffer\n");
-        #endif
-        
-        return AES_CODE_EMPTY_INPUT_BUFFER;
+		return AES_CODE_EMPTY_INPUT_BUFFER;
     }
     // Normalized length calculation
     ctx->encrypted_chunks = 0;
-    size_t input_len_normalized = (size_t)(AES_ROUNDUP_TO_NEAREST_MULTIPLE_OF_16(input_len));
-    ctx->input_len_normalized = input_len_normalized;
-    if(input_len == input_len_normalized){
-        input_len_normalized += AES_BLOCK_LEN;
-        ctx->input_len_normalized = input_len_normalized;
+    ctx->input_len_normalized = (size_t)(AES_ROUNDUP_TO_NEAREST_MULTIPLE_OF_16(input_len));
+    if(input_len == ctx->input_len_normalized){
+        ctx->input_len_normalized += AES_BLOCK_LEN;
     }
 
-    // Input buffer allocation, backup and initialization 
-	#if defined (AES_DYNAMIC_MEMORY) && (AES_DYNAMIC_MEMORY == 1)
-	uint8_t *aux_in = (uint8_t *) malloc(input_len_normalized);
-	uint8_t *_in = (uint8_t *)aux_in;
-	if(aux_in == NULL){
-		#if defined(AES_LOG) && AES_LOG == 1
-		printf("\tDynamic memory assignment error\n");
-		#endif
-		return AES_CODE_NULL_MALLOC;
-	}
-	memset(aux_in,0,input_len_normalized);
-	memcpy(_in, in, input_len_normalized);
-	#else
-		#if defined(AES_USE_BUFFERS) && (AES_USE_BUFFERS == 1)
-	if( input_len_normalized > AES_MAX_BUFFER_SIZE){
-		#if defined(AES_LOG) && AES_LOG == 1
-		printf("ERROR: Normalized input length exceeds max buffer size\n");
-		#endif
+	if( ctx->input_len_normalized > AES_MAX_BUFFER_SIZE){
 		return AES_CODE_INCORRECT_BUFFER_SIZE;
 	}
-	uint8_t aux_in[AES_MAX_BUFFER_SIZE];
-	uint8_t *_in = (uint8_t *)aux_in;
-	memset(_in, 0 , AES_MAX_BUFFER_SIZE);
+
+    // Input buffer allocation, backup and initialization 
+	uint8_t *_in;
+	#if defined (AES_DYNAMIC_MEMORY) && (AES_DYNAMIC_MEMORY == 1)
+	_in = (uint8_t *) malloc(ctx->input_len_normalized);
+	uint8_t *_aux_in = NULL;
+	if(_in == NULL){
+		return AES_CODE_NULL_MALLOC;
+	}
+	_aux_in = _in;	// Auxiliary input buffer pointer to free
+	memset(_in,0,ctx->input_len_normalized);
+	#else
+	_in = (uint8_t *)in;
+	#endif
 
 	#if defined(AES_USE_PKCS7) && AES_USE_PKCS7 == 1
 	PKCS7_padding_t padder;
 	PKCS7_add_padding(&padder, in, input_len, AES_BLOCK_LEN);
-	memcpy(_in, padder.data_with_padding, input_len_normalized);
+	memcpy(_in, padder.data_with_padding, ctx->input_len_normalized);
 	#else
-	memcpy(_in, in, input_len_normalized);
-	#endif
-
-	
-	
-		#else
-	uint8_t *_in = (uint8_t *)in;
-		#endif
+	memcpy(_in, in, ctx->input_len_normalized);
 	#endif
 
     // Initialization vector and output buffer allocation
 	uint8_t *_out = (uint8_t *)out; 
-	memset(_out, 0 , input_len_normalized);
+	memset(_out, 0 , ctx->input_len_normalized);
 
     // Chunk encryption
-	while( ctx->input_len_normalized > 0) {
+	while( ctx->input_len_normalized != 0) {
 		#if defined(AES_LOG) && AES_LOG == 1
 		printf("Chunk %u (bytes %u to %u):\n",ctx->encrypted_chunks+1,ctx->encrypted_chunks*AES_BLOCK_LEN,(ctx->encrypted_chunks+1)*AES_BLOCK_LEN-1);
 		#endif
@@ -228,11 +209,9 @@ AES_errcode_t AES_ECB_encrypt(AES_ctx_t *ctx, void *in, void *out, size_t input_
 	}
 	*output_len = ctx->encrypted_chunks*AES_BLOCK_LEN;
 	#if defined (AES_DYNAMIC_MEMORY) && (AES_DYNAMIC_MEMORY == 1)
-	free(aux_in);
+	free(_aux_in);
 	#endif
 	return AES_CODE_OK;
-
-
 }
 
 /**
@@ -251,77 +230,57 @@ AES_errcode_t AES_ECB_decrypt(AES_ctx_t *ctx, void *in, void *out, size_t input_
     #endif
     // Input buffer length verification
     if(input_len<= 0){
-        #if defined(AES_LOG) && AES_LOG == 1
-        printf("\tEmpty input buffer\n");
-        #endif
-        
         return AES_CODE_EMPTY_INPUT_BUFFER;
     }
     // Normalized length calculation
     ctx->decrypted_chunks = 0;
-    size_t input_len_normalized = (size_t)(AES_ROUNDUP_TO_NEAREST_MULTIPLE_OF_16(input_len));
-    ctx->input_len_normalized = input_len_normalized;
+    size_t input_len_normalized = ctx->input_len_normalized = (size_t)(AES_ROUNDUP_TO_NEAREST_MULTIPLE_OF_16(input_len));
     if(input_len == input_len_normalized){
-        input_len_normalized += AES_BLOCK_LEN;
-        ctx->input_len_normalized = input_len_normalized;
+        ctx->input_len_normalized = input_len_normalized += AES_BLOCK_LEN;
     }
 
-    // Input buffer allocation, backup and initialization 
+    // Input buffer allocation, backup and initialization
+	uint8_t *_in;	
 	#if defined (AES_DYNAMIC_MEMORY) && (AES_DYNAMIC_MEMORY == 1)
-	uint8_t *aux_in = (uint8_t *) malloc(input_len_normalized);
-	uint8_t *_in = (uint8_t *)aux_in;
-	if(aux_in == NULL){
-		#if defined(AES_LOG) && AES_LOG == 1
-		printf("\tDynamic memory assignment error\n");
-		#endif
+	uint8_t *_aux_in = NULL;
+	_in = (uint8_t *) malloc(input_len_normalized);
+	if(_in == NULL){
 		return AES_CODE_NULL_MALLOC;
 	}
-	memset(aux_in,0,input_len_normalized);
-	memcpy(_in, in, input_len_normalized);
+	_aux_in = _in;	// Auxiliary input buffer pointer to free
+	memset(_in,0,input_len_normalized);
 	#else
-		#if defined(AES_USE_BUFFERS) && (AES_USE_BUFFERS == 1)
-	if( input_len_normalized > AES_MAX_BUFFER_SIZE){
-		#if defined(AES_LOG) && AES_LOG == 1
-		printf("ERROR: Normalized input length exceeds max buffer size\n");
-		#endif
-		return AES_CODE_INCORRECT_BUFFER_SIZE;
-	}
-	uint8_t aux_in[AES_MAX_BUFFER_SIZE];
-	uint8_t *_in = (uint8_t *)aux_in;
-	memset(_in, 0 , AES_MAX_BUFFER_SIZE);
-	memcpy(_in, in, input_len_normalized);
-		#else
-	uint8_t *_in = (uint8_t *)in;
-		#endif
+	_in = (uint8_t *)in;
 	#endif
+
+	memcpy(_in, in, ctx->input_len_normalized);
 
     // Initialization vector and output buffer allocation
 	uint8_t *_out = (uint8_t *)out; 
 	memset(_out, 0 , input_len_normalized);
 
     // Chunk decryption
-	while( ctx->input_len_normalized > 0) {
+	while( input_len_normalized != 0) {
 		#if defined(AES_LOG) && AES_LOG == 1
 		printf("Chunk %u (bytes %u to %u):\n",ctx->decrypted_chunks+1,ctx->decrypted_chunks*AES_BLOCK_LEN,(ctx->decrypted_chunks+1)*AES_BLOCK_LEN-1);
 		#endif
 
 		AES_decrypt_chunk(ctx,_in,_out);
 
-		_in += AES_BLOCK_LEN; _out += AES_BLOCK_LEN; ctx->input_len_normalized-= AES_BLOCK_LEN; ctx->decrypted_chunks++;
+		_in += AES_BLOCK_LEN; _out += AES_BLOCK_LEN; input_len_normalized-= AES_BLOCK_LEN; ctx->decrypted_chunks++;
 		
 	}
 	*output_len = ctx->decrypted_chunks*AES_BLOCK_LEN;
-	#if defined (AES_DYNAMIC_MEMORY) && (AES_DYNAMIC_MEMORY == 1)
-	free(aux_in);
-	#endif
-
+	
 	#if defined(AES_USE_PKCS7) && AES_USE_PKCS7 == 1
 	PKCS7_unpadding_t unpadder;
-	PKCS7_remove_padding(&unpadder, out, input_len_normalized);
-	
-	memcpy(out, unpadder.data_without_padding, input_len_normalized);
+	PKCS7_remove_padding(&unpadder, out, ctx->input_len_normalized);
+	memcpy(out, unpadder.data_without_padding, ctx->input_len_normalized);
 	#endif
 
+	#if defined (AES_DYNAMIC_MEMORY) && (AES_DYNAMIC_MEMORY == 1)
+	free(_aux_in);
+	#endif
 
 	return AES_CODE_OK;
 }
@@ -346,10 +305,6 @@ AES_errcode_t AES_CBC_encrypt(AES_ctx_t *ctx, void *in, void *out, size_t input_
     #endif
     // Input buffer length verification
     if(input_len<= 0){
-        #if defined(AES_LOG) && AES_LOG == 1
-        printf("\tEmpty input buffer\n");
-        #endif
-        
         return AES_CODE_EMPTY_INPUT_BUFFER;
     }
     // Normalized length calculation
@@ -357,36 +312,21 @@ AES_errcode_t AES_CBC_encrypt(AES_ctx_t *ctx, void *in, void *out, size_t input_
     size_t input_len_normalized = (size_t)(AES_ROUNDUP_TO_NEAREST_MULTIPLE_OF_16(input_len));
     ctx->input_len_normalized = input_len_normalized;
     if(input_len == input_len_normalized){
-        input_len_normalized += AES_BLOCK_LEN;
-        ctx->input_len_normalized = input_len_normalized;
+        ctx->input_len_normalized = input_len_normalized += AES_BLOCK_LEN;
     }
 
     // Input buffer allocation, backup and initialization 
+	uint8_t *_in;
 	#if defined (AES_DYNAMIC_MEMORY) && (AES_DYNAMIC_MEMORY == 1)
-	uint8_t *aux_in = (uint8_t *) malloc(input_len_normalized);
-	uint8_t *_in = (uint8_t *)aux_in;
-	if(aux_in == NULL){
-		#if defined(AES_LOG) && AES_LOG == 1
-		printf("\tDynamic memory assignment error\n");
-		#endif
+	_in = (uint8_t *) malloc(input_len_normalized);
+	uint8_t *_aux_in = NULL;
+	if(_in == NULL){
 		return AES_CODE_NULL_MALLOC;
 	}
-	memset(aux_in,0,input_len_normalized);
-	memcpy(_in, in, input_len_normalized);
+	_aux_in = _in; 	// Auxiliary input buffer pointer to free
+	memset(_in,0,ctx->input_len_normalized);
 	#else
-		#if defined(AES_USE_BUFFERS) && (AES_USE_BUFFERS == 1)
-	if( input_len_normalized > AES_MAX_BUFFER_SIZE){
-		#if defined(AES_LOG) && AES_LOG == 1
-		printf("ERROR: Normalized input length exceeds max buffer size\n");
-		#endif
-		return AES_CODE_INCORRECT_BUFFER_SIZE;
-	}
-	uint8_t aux_in[AES_MAX_BUFFER_SIZE];
-	uint8_t *_in = (uint8_t *)aux_in;
-	memset(_in, 0 , AES_MAX_BUFFER_SIZE);
-		#else
-	uint8_t *_in = (uint8_t *)in;
-		#endif
+	_in = (uint8_t *)in;
 	#endif
 
 	#if defined(AES_USE_PKCS7) && AES_USE_PKCS7 == 1
@@ -417,7 +357,7 @@ AES_errcode_t AES_CBC_encrypt(AES_ctx_t *ctx, void *in, void *out, size_t input_
 	}
 	*output_len = ctx->encrypted_chunks*AES_BLOCK_LEN;
 	#if defined (AES_DYNAMIC_MEMORY) && (AES_DYNAMIC_MEMORY == 1)
-	free(aux_in);
+	free(_aux_in);
 	#endif
 	return AES_CODE_OK;
 }
@@ -438,10 +378,6 @@ AES_errcode_t AES_CBC_decrypt(AES_ctx_t *ctx, void *in, void *out, size_t input_
     #endif
     // Input buffer length verification
     if(input_len<= 0){
-        #if defined(AES_LOG) && AES_LOG == 1
-        printf("\tEmpty input buffer\n");
-        #endif
-        
         return AES_CODE_EMPTY_INPUT_BUFFER;
     }
     // Normalized length calculation
@@ -449,38 +385,24 @@ AES_errcode_t AES_CBC_decrypt(AES_ctx_t *ctx, void *in, void *out, size_t input_
     size_t input_len_normalized = (size_t)(AES_ROUNDUP_TO_NEAREST_MULTIPLE_OF_16(input_len));
     ctx->input_len_normalized = input_len_normalized;
     if(input_len == input_len_normalized){
-        input_len_normalized += AES_BLOCK_LEN;
-        ctx->input_len_normalized = input_len_normalized;
+        ctx->input_len_normalized = input_len_normalized += AES_BLOCK_LEN;
     }
 
-    // Input buffer allocation, backup and initialization 
+    // Input buffer allocation, backup and initialization
+	uint8_t *_in;	
 	#if defined (AES_DYNAMIC_MEMORY) && (AES_DYNAMIC_MEMORY == 1)
-	uint8_t *aux_in = (uint8_t *) malloc(input_len_normalized);
-	uint8_t *_in = (uint8_t *)aux_in;
-	if(aux_in == NULL){
-		#if defined(AES_LOG) && AES_LOG == 1
-		printf("\tDynamic memory assignment error\n");
-		#endif
+	uint8_t *_aux_in = NULL;
+	_in = (uint8_t *) malloc(input_len_normalized);
+	if(_in == NULL){
 		return AES_CODE_NULL_MALLOC;
 	}
-	memset(aux_in,0,input_len_normalized);
-	memcpy(_in, in, input_len_normalized);
+	_aux_in = _in;	// Auxiliary input buffer pointer to free
+	memset(_in,0,input_len_normalized);
 	#else
-		#if defined(AES_USE_BUFFERS) && (AES_USE_BUFFERS == 1)
-	if( input_len_normalized > AES_MAX_BUFFER_SIZE){
-		#if defined(AES_LOG) && AES_LOG == 1
-		printf("ERROR: Normalized input length exceeds max buffer size\n");
-		#endif
-		return AES_CODE_INCORRECT_BUFFER_SIZE;
-	}
-	uint8_t aux_in[AES_MAX_BUFFER_SIZE];
-	uint8_t *_in = (uint8_t *)aux_in;
-	memset(_in, 0 , AES_MAX_BUFFER_SIZE);
-	memcpy(_in, in, input_len_normalized);
-		#else
-	uint8_t *_in = (uint8_t *)in;
-		#endif
+	_in = (uint8_t *)in;
 	#endif
+
+	memcpy(_in, in, ctx->input_len_normalized);
 
     // Initialization vector and output buffer allocation
 	uint8_t *_out = (uint8_t *)out; 
@@ -503,17 +425,16 @@ AES_errcode_t AES_CBC_decrypt(AES_ctx_t *ctx, void *in, void *out, size_t input_
 		
 	}
 	*output_len = ctx->decrypted_chunks*AES_BLOCK_LEN;
-	#if defined (AES_DYNAMIC_MEMORY) && (AES_DYNAMIC_MEMORY == 1)
-	free(aux_in);
-	#endif
-
+	
 	#if defined(AES_USE_PKCS7) && AES_USE_PKCS7 == 1
 	PKCS7_unpadding_t unpadder;
 	PKCS7_remove_padding(&unpadder, out, input_len_normalized);
-	
 	memcpy(out, unpadder.data_without_padding, input_len_normalized);
 	#endif
 	
+	#if defined (AES_DYNAMIC_MEMORY) && (AES_DYNAMIC_MEMORY == 1)
+	free(_aux_in);
+	#endif
 
 	return AES_CODE_OK;
 }
