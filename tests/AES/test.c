@@ -3,12 +3,13 @@
 #include <string.h>
 #include <stdlib.h>
 #include "../../src/AES/AES.h"
+#include "../../src/PKCS7/PKCS7.h"
 #include "../minunit.h"
 
 const char IV[AES_BLOCK_LEN] = "0123456789ABCDEF";    // 16-byte init vector  
-const char *TEST_STRING = "0123456789ABCDEF0";
+const char *TEST_STRING = "12345678901234567890123456789012";
 const char TEST_KEY[AES_FIXED_KEY_SIZE] = {
-"1234567890123456"
+"12345678901234567890123456789012"
 };  // Copy random key from AES_test.py script
 size_t test_string_len, test_string_len_normalized, key_len, comparison;
 size_t output_len;
@@ -41,7 +42,7 @@ static void perform_AES_ECB()
     printf("Mode: ECB.\n");
     AES_code = AES_ECB_encrypt(&AES_ctx, input_string, AES_encrypt_buffer, test_string_len, &output_len);
 
-    printf("AES output (block size %u bytes): [ ", output_len);
+    printf("AES output ( %u bytes): [ ", output_len);
     for (size_t i = 0; i != output_len; i++)
     {
         printf("%02x ", AES_encrypt_buffer[i]);
@@ -49,7 +50,12 @@ static void perform_AES_ECB()
     printf("]\n");
 
     AES_code = AES_ECB_decrypt(&AES_ctx, AES_encrypt_buffer, AES_decrypt_buffer, test_string_len, &output_len);
-    printf("Back to ASCII (%u bytes):\n<<%s>>\n", strlen(AES_decrypt_buffer), AES_decrypt_buffer);
+    printf("Back to ASCII (%u bytes):\n<<", output_len, AES_decrypt_buffer);
+    for (size_t i = 0; i != output_len; i++)
+    {
+        printf("%02x ", AES_decrypt_buffer[i]);
+    }
+    printf(">>\n");
 }
 
 static void perform_AES_CBC()
@@ -58,7 +64,7 @@ static void perform_AES_CBC()
     printf("Mode: CBC.\n");
     AES_code = AES_CBC_encrypt(&AES_ctx, input_string, AES_encrypt_buffer, test_string_len, &output_len);
 
-    printf("AES output (block size %u bytes): [ ", output_len);
+    printf("AES output (%u bytes): [ ", output_len);
     for (size_t i = 0; i != output_len; i++)
     {
         printf("%02x ", AES_encrypt_buffer[i]);
@@ -66,7 +72,12 @@ static void perform_AES_CBC()
     printf("]\n");
 
     AES_code = AES_CBC_decrypt(&AES_ctx, AES_encrypt_buffer, AES_decrypt_buffer, test_string_len, &output_len);
-    printf("Back to ASCII (%u bytes):\n<<%s>>\n", strlen(AES_decrypt_buffer), AES_decrypt_buffer);
+    printf("Back to ASCII (%u bytes):\n<<", output_len, AES_decrypt_buffer);
+    for (size_t i = 0; i != output_len; i++)
+    {
+        printf("%02x ", AES_decrypt_buffer[i]);
+    }
+    printf(">>\n");
 
 }
 

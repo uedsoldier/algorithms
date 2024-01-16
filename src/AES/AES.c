@@ -167,10 +167,10 @@ AES_errcode_t AES_ECB_encrypt(AES_ctx_t *ctx, void *in, void *out, size_t input_
     ctx->encrypted_chunks = 0;
     size_t input_len_normalized = (size_t)(AES_ROUNDUP_TO_NEAREST_MULTIPLE_OF_16(input_len));
     ctx->input_len_normalized = input_len_normalized;
-    // if(input_len == input_len_normalized){
-    //     input_len_normalized += AES_BLOCK_LEN;
-    //     ctx->input_len_normalized = input_len_normalized;
-    // }
+    if(input_len == input_len_normalized){
+        input_len_normalized += AES_BLOCK_LEN;
+        ctx->input_len_normalized = input_len_normalized;
+    }
 
     // Input buffer allocation, backup and initialization 
 	#if defined (AES_DYNAMIC_MEMORY) && (AES_DYNAMIC_MEMORY == 1)
@@ -195,7 +195,17 @@ AES_errcode_t AES_ECB_encrypt(AES_ctx_t *ctx, void *in, void *out, size_t input_
 	uint8_t aux_in[AES_MAX_BUFFER_SIZE];
 	uint8_t *_in = (uint8_t *)aux_in;
 	memset(_in, 0 , AES_MAX_BUFFER_SIZE);
+
+	#if defined(AES_USE_PKCS7) && AES_USE_PKCS7 == 1
+	PKCS7_padding_t padder;
+	PKCS7_add_padding(&padder, in, input_len, AES_BLOCK_LEN);
+	memcpy(_in, padder.data_with_padding, input_len_normalized);
+	#else
 	memcpy(_in, in, input_len_normalized);
+	#endif
+
+	
+	
 		#else
 	uint8_t *_in = (uint8_t *)in;
 		#endif
@@ -206,18 +216,18 @@ AES_errcode_t AES_ECB_encrypt(AES_ctx_t *ctx, void *in, void *out, size_t input_
 	memset(_out, 0 , input_len_normalized);
 
     // Chunk encryption
-	while( input_len_normalized > 0) {
+	while( ctx->input_len_normalized > 0) {
 		#if defined(AES_LOG) && AES_LOG == 1
 		printf("Chunk %u (bytes %u to %u):\n",ctx->encrypted_chunks+1,ctx->encrypted_chunks*AES_BLOCK_LEN,(ctx->encrypted_chunks+1)*AES_BLOCK_LEN-1);
 		#endif
 
-			AES_encrypt_chunk(ctx,_in,_out);
+		AES_encrypt_chunk(ctx,_in,_out);
 
-		_in += AES_BLOCK_LEN; _out += AES_BLOCK_LEN; input_len_normalized-= AES_BLOCK_LEN; ctx->encrypted_chunks++;
+		_in += AES_BLOCK_LEN; _out += AES_BLOCK_LEN; ctx->input_len_normalized-= AES_BLOCK_LEN; ctx->encrypted_chunks++;
 		
 	}
 	*output_len = ctx->encrypted_chunks*AES_BLOCK_LEN;
-	#if defined (XTEA_DYNAMIC_MEMORY) && (XTEA_DYNAMIC_MEMORY == 1)
+	#if defined (AES_DYNAMIC_MEMORY) && (AES_DYNAMIC_MEMORY == 1)
 	free(aux_in);
 	#endif
 	return AES_CODE_OK;
@@ -251,10 +261,10 @@ AES_errcode_t AES_ECB_decrypt(AES_ctx_t *ctx, void *in, void *out, size_t input_
     ctx->decrypted_chunks = 0;
     size_t input_len_normalized = (size_t)(AES_ROUNDUP_TO_NEAREST_MULTIPLE_OF_16(input_len));
     ctx->input_len_normalized = input_len_normalized;
-    // if(input_len == input_len_normalized){
-    //     input_len_normalized += AES_BLOCK_LEN;
-    //     ctx->input_len_normalized = input_len_normalized;
-    // }
+    if(input_len == input_len_normalized){
+        input_len_normalized += AES_BLOCK_LEN;
+        ctx->input_len_normalized = input_len_normalized;
+    }
 
     // Input buffer allocation, backup and initialization 
 	#if defined (AES_DYNAMIC_MEMORY) && (AES_DYNAMIC_MEMORY == 1)
@@ -290,20 +300,29 @@ AES_errcode_t AES_ECB_decrypt(AES_ctx_t *ctx, void *in, void *out, size_t input_
 	memset(_out, 0 , input_len_normalized);
 
     // Chunk decryption
-	while( input_len_normalized > 0) {
+	while( ctx->input_len_normalized > 0) {
 		#if defined(AES_LOG) && AES_LOG == 1
 		printf("Chunk %u (bytes %u to %u):\n",ctx->decrypted_chunks+1,ctx->decrypted_chunks*AES_BLOCK_LEN,(ctx->decrypted_chunks+1)*AES_BLOCK_LEN-1);
 		#endif
 
-			AES_decrypt_chunk(ctx,_in,_out);
+		AES_decrypt_chunk(ctx,_in,_out);
 
-		_in += AES_BLOCK_LEN; _out += AES_BLOCK_LEN; input_len_normalized-= AES_BLOCK_LEN; ctx->decrypted_chunks++;
+		_in += AES_BLOCK_LEN; _out += AES_BLOCK_LEN; ctx->input_len_normalized-= AES_BLOCK_LEN; ctx->decrypted_chunks++;
 		
 	}
 	*output_len = ctx->decrypted_chunks*AES_BLOCK_LEN;
-	#if defined (XTEA_DYNAMIC_MEMORY) && (XTEA_DYNAMIC_MEMORY == 1)
+	#if defined (AES_DYNAMIC_MEMORY) && (AES_DYNAMIC_MEMORY == 1)
 	free(aux_in);
 	#endif
+
+	#if defined(AES_USE_PKCS7) && AES_USE_PKCS7 == 1
+	PKCS7_unpadding_t unpadder;
+	PKCS7_remove_padding(&unpadder, out, input_len_normalized);
+	
+	memcpy(out, unpadder.data_without_padding, input_len_normalized);
+	#endif
+
+
 	return AES_CODE_OK;
 }
 
@@ -337,10 +356,10 @@ AES_errcode_t AES_CBC_encrypt(AES_ctx_t *ctx, void *in, void *out, size_t input_
     ctx->encrypted_chunks = 0;
     size_t input_len_normalized = (size_t)(AES_ROUNDUP_TO_NEAREST_MULTIPLE_OF_16(input_len));
     ctx->input_len_normalized = input_len_normalized;
-    // if(input_len == input_len_normalized){
-    //     input_len_normalized += AES_BLOCK_LEN;
-    //     ctx->input_len_normalized = input_len_normalized;
-    // }
+    if(input_len == input_len_normalized){
+        input_len_normalized += AES_BLOCK_LEN;
+        ctx->input_len_normalized = input_len_normalized;
+    }
 
     // Input buffer allocation, backup and initialization 
 	#if defined (AES_DYNAMIC_MEMORY) && (AES_DYNAMIC_MEMORY == 1)
@@ -365,10 +384,17 @@ AES_errcode_t AES_CBC_encrypt(AES_ctx_t *ctx, void *in, void *out, size_t input_
 	uint8_t aux_in[AES_MAX_BUFFER_SIZE];
 	uint8_t *_in = (uint8_t *)aux_in;
 	memset(_in, 0 , AES_MAX_BUFFER_SIZE);
-	memcpy(_in, in, input_len_normalized);
 		#else
 	uint8_t *_in = (uint8_t *)in;
 		#endif
+	#endif
+
+	#if defined(AES_USE_PKCS7) && AES_USE_PKCS7 == 1
+	PKCS7_padding_t padder;
+	PKCS7_add_padding(&padder, in, input_len, AES_BLOCK_LEN);
+	memcpy(_in, padder.data_with_padding, input_len_normalized);
+	#else
+	memcpy(_in, in, input_len_normalized);
 	#endif
 
     // Initialization vector and output buffer allocation
@@ -377,7 +403,7 @@ AES_errcode_t AES_CBC_encrypt(AES_ctx_t *ctx, void *in, void *out, size_t input_
 	uint8_t *xor_vector = ctx->iv;
 
     // Chunk encryption
-	while( input_len_normalized > 0) {
+	while( ctx->input_len_normalized > 0) {
 		#if defined(AES_LOG) && AES_LOG == 1
 		printf("Chunk %u (bytes %u to %u):\n",ctx->encrypted_chunks+1,ctx->encrypted_chunks*AES_BLOCK_LEN,(ctx->encrypted_chunks+1)*AES_BLOCK_LEN-1);
 		#endif
@@ -386,11 +412,11 @@ AES_errcode_t AES_CBC_encrypt(AES_ctx_t *ctx, void *in, void *out, size_t input_
 			AES_encrypt_chunk(ctx,_in,_out);
 			xor_vector = _out;
 
-		_in += AES_BLOCK_LEN; _out += AES_BLOCK_LEN; input_len_normalized-= AES_BLOCK_LEN; ctx->encrypted_chunks++;
+		_in += AES_BLOCK_LEN; _out += AES_BLOCK_LEN; ctx->input_len_normalized-= AES_BLOCK_LEN; ctx->encrypted_chunks++;
 		
 	}
 	*output_len = ctx->encrypted_chunks*AES_BLOCK_LEN;
-	#if defined (XTEA_DYNAMIC_MEMORY) && (XTEA_DYNAMIC_MEMORY == 1)
+	#if defined (AES_DYNAMIC_MEMORY) && (AES_DYNAMIC_MEMORY == 1)
 	free(aux_in);
 	#endif
 	return AES_CODE_OK;
@@ -422,10 +448,10 @@ AES_errcode_t AES_CBC_decrypt(AES_ctx_t *ctx, void *in, void *out, size_t input_
     ctx->decrypted_chunks = 0;
     size_t input_len_normalized = (size_t)(AES_ROUNDUP_TO_NEAREST_MULTIPLE_OF_16(input_len));
     ctx->input_len_normalized = input_len_normalized;
-    // if(input_len == input_len_normalized){
-    //     input_len_normalized += AES_BLOCK_LEN;
-    //     ctx->input_len_normalized = input_len_normalized;
-    // }
+    if(input_len == input_len_normalized){
+        input_len_normalized += AES_BLOCK_LEN;
+        ctx->input_len_normalized = input_len_normalized;
+    }
 
     // Input buffer allocation, backup and initialization 
 	#if defined (AES_DYNAMIC_MEMORY) && (AES_DYNAMIC_MEMORY == 1)
@@ -464,7 +490,7 @@ AES_errcode_t AES_CBC_decrypt(AES_ctx_t *ctx, void *in, void *out, size_t input_
 
 
     // Chunk decryption
-	while( input_len_normalized > 0) {
+	while( ctx->input_len_normalized > 0) {
 		#if defined(AES_LOG) && AES_LOG == 1
 		printf("Chunk %u (bytes %u to %u):\n",ctx->decrypted_chunks+1,ctx->decrypted_chunks*AES_BLOCK_LEN,(ctx->decrypted_chunks+1)*AES_BLOCK_LEN-1);
 		#endif
@@ -473,13 +499,22 @@ AES_errcode_t AES_CBC_decrypt(AES_ctx_t *ctx, void *in, void *out, size_t input_
 		AddRoundKey(_out, xor_vector);
 		memcpy(xor_vector,_in,AES_BLOCK_LEN);
 
-		_in += AES_BLOCK_LEN; _out += AES_BLOCK_LEN; input_len_normalized-= AES_BLOCK_LEN; ctx->decrypted_chunks++;
+		_in += AES_BLOCK_LEN; _out += AES_BLOCK_LEN; ctx->input_len_normalized-= AES_BLOCK_LEN; ctx->decrypted_chunks++;
 		
 	}
 	*output_len = ctx->decrypted_chunks*AES_BLOCK_LEN;
-	#if defined (XTEA_DYNAMIC_MEMORY) && (XTEA_DYNAMIC_MEMORY == 1)
+	#if defined (AES_DYNAMIC_MEMORY) && (AES_DYNAMIC_MEMORY == 1)
 	free(aux_in);
 	#endif
+
+	#if defined(AES_USE_PKCS7) && AES_USE_PKCS7 == 1
+	PKCS7_unpadding_t unpadder;
+	PKCS7_remove_padding(&unpadder, out, input_len_normalized);
+	
+	memcpy(out, unpadder.data_without_padding, input_len_normalized);
+	#endif
+	
+
 	return AES_CODE_OK;
 }
 

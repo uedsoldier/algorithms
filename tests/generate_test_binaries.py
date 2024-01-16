@@ -2,7 +2,7 @@ from argparse import ArgumentParser
 from os import chdir,getcwd,system,mkdir,path
 from shutil import rmtree
 
-algorithm_choices = ('BASE64','CRC','XTEA','CHECKSUM8','AES','SHA1')
+algorithm_choices = ('BASE64','CRC','XTEA','CHECKSUM8','AES','SHA1','PKCS7')
 
 build_dir = 'build/'
 

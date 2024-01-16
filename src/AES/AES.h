@@ -28,9 +28,9 @@ extern "C"
 
 #pragma region Useful macros
 
-#define AES128 1
+#define AES128 0
 #define AES192 0
-#define AES256 0
+#define AES256 1
 
 /**
  * @brief Macro para depuración mediante la función printf(). Se recomienda usar únicamente
@@ -101,6 +101,17 @@ static const char *AES_TAG = "AES";
 #ifdef AES_USE_BUFFERS
 #define AES_MAX_BUFFER_SIZE 64
 #endif
+
+/**
+ * @brief Use PKCS7 standard syntax for storing signed and/or encrypted data
+ * 
+ */
+#define AES_USE_PKCS7   1
+
+#if defined(AES_USE_PKCS7) && AES_USE_PKCS7 == 1
+#include "../PKCS7/PKCS7.h"      // Modify path to convenience 
+#endif
+
 #pragma endregion
 
 #pragma region General constants
@@ -374,6 +385,7 @@ static void ReverseSubBytes(uint8_t * state);
 static void ReverseShiftRows(uint8_t * plain_text);
 static void ReverseMixColumns(uint8_t *plain_text);
 
+// Multiplication
 static uint8_t gmul(uint8_t rhs, uint8_t lhs);
 
 #pragma endregion
