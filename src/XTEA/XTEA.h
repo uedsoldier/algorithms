@@ -34,6 +34,16 @@ extern "C" {
 #define XTEA_LOG 0
 #endif
 
+/**
+ * @brief Use PKCS7 standard syntax for storing signed and/or encrypted data
+ * 
+ */
+#define XTEA_USE_PKCS7 1
+
+#if defined(XTEA_USE_PKCS7) && XTEA_USE_PKCS7 == 1
+#include "../PKCS7/PKCS7.h"      // Modify path to convenience 
+#endif
+
 #pragma region Memory macros
 /**
  * @brief Macro para utilización de asignación dinámica de memoria en las funciones XTEA.

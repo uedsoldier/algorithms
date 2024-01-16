@@ -6,5 +6,5 @@ set( CMAKE_C_COMPILER "gcc")
 # set the project name
 project(XTEA_testing VERSION 0.1.0)
 
-add_executable(test "test.c" "../../src/XTEA/XTEA.c" )
+add_executable(test "test.c" "../../src/XTEA/XTEA.c" "../../src/PKCS7/PKCS7.c")
 

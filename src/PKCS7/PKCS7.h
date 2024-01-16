@@ -33,7 +33,7 @@ extern "C"
  * @brief 
  * 
  */
-#define PKCS7_LOG   0
+#define PKCS7_LOG   1
 
 
 #pragma region Custom types

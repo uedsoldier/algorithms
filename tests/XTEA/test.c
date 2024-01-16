@@ -3,10 +3,11 @@
 #include <string.h>
 #include <stdlib.h>
 #include "../../src/XTEA/XTEA.h"
+#include "../../src/PKCS7/PKCS7.h"
 #include "../minunit.h"
 
 const xtea_iv_t *IV = "MRhMciXgcCRUy6L7";
-const char *TEST_STRING = "Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.Lorem ipsum dolor sit amet.";
+const char *TEST_STRING = "Mi bb cachorra";
 const char *TEST_KEY = "fEOk6a9X28GXfBRN";
 
 uint32_t test_string_len, test_string_len_normalized, key_len, comparison;
@@ -52,7 +53,12 @@ static void perform_xtea(uint16_t _rounds)
     printf("]\n");
 
     xtea_code = XTEA_decrypt(&xtea_test, XTEA_encrypt_buffer, XTEA_decrypt_buffer, test_string_len, ecb, &output_len);
-    printf("Back to ASCII (%u bytes):\n<<%s>>\n", strlen(XTEA_decrypt_buffer), XTEA_decrypt_buffer);
+    printf("Back to ASCII (%u bytes):\n<<", output_len, XTEA_decrypt_buffer);
+    for (size_t i = 0; i != output_len; i++)
+    {
+        printf("%02x ", XTEA_decrypt_buffer[i]);
+    }
+    printf(">>\n");
 
 }
 
@@ -70,7 +76,12 @@ static void perform_xxtea()
     printf("]\n");
 
     xtea_code = XXTEA_decrypt(&xtea_test, XTEA_encrypt_buffer, XTEA_decrypt_buffer, test_string_len, ecb, &output_len);
-    printf("Back to ASCII (%u bytes):\n<<%s>>\n", strlen(XTEA_decrypt_buffer), XTEA_decrypt_buffer);
+    printf("Back to ASCII (%u bytes):\n<<", output_len, XTEA_decrypt_buffer);
+    for (size_t i = 0; i != output_len; i++)
+    {
+        printf("%02x ", XTEA_decrypt_buffer[i]);
+    }
+    printf(">>\n");
 
 }
 

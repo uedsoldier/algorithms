@@ -247,7 +247,7 @@ XTEA_code_t XTEA_encrypt(XTEA_t *xtea, void *in, void *out, size_t input_len, bo
 	}
 	// Normalized length calculation
 	xtea->encrypted_chunks = 0;
-	xtea->input_len_normalized = (size_t)(XTEA_ROUNDUP_TO_NEAREST_MULTIPLE_OF_8(input_len));
+	size_t input_len_normalized = xtea->input_len_normalized = (size_t)(XTEA_ROUNDUP_TO_NEAREST_MULTIPLE_OF_8(input_len));
 
 	// Input buffer allocation, backup and initialization 
 	#if defined (XTEA_DYNAMIC_MEMORY) && (XTEA_DYNAMIC_MEMORY == 1)
@@ -298,6 +298,12 @@ XTEA_code_t XTEA_encrypt(XTEA_t *xtea, void *in, void *out, size_t input_len, bo
 		printf("%02x ",c);
 	}
 	printf("\n");
+	#endif
+
+	#if defined(XTEA_USE_PKCS7) && XTEA_USE_PKCS7 == 1
+	PKCS7_padding_t padder;
+	PKCS7_add_padding(&padder, in, input_len, XTEA_BLOCK_SIZE);
+	memcpy(_in, padder.data_with_padding, input_len_normalized);
 	#endif
 	
 	// Chunk encryption
@@ -351,7 +357,7 @@ XTEA_code_t XTEA_decrypt(XTEA_t *xtea, void *in, void *out, size_t input_len, bo
 	}
 	// Normalized length calculation
 	xtea->decrypted_chunks = 0;
-	xtea->input_len_normalized = (size_t)(XTEA_ROUNDUP_TO_NEAREST_MULTIPLE_OF_8(input_len));
+	size_t input_len_normalized = xtea->input_len_normalized = (size_t)(XTEA_ROUNDUP_TO_NEAREST_MULTIPLE_OF_8(input_len));
 
 	// Input buffer allocation, backup and initialization 
 	#if defined (XTEA_DYNAMIC_MEMORY) && (XTEA_DYNAMIC_MEMORY == 1)
@@ -417,6 +423,14 @@ XTEA_code_t XTEA_decrypt(XTEA_t *xtea, void *in, void *out, size_t input_len, bo
 	#if defined (XTEA_DYNAMIC_MEMORY) && (XTEA_DYNAMIC_MEMORY == 1)
 	free(aux_in);
 	#endif
+
+	#if defined(XTEA_USE_PKCS7) && XTEA_USE_PKCS7 == 1
+	PKCS7_unpadding_t unpadder;
+	PKCS7_remove_padding(&unpadder, out, input_len_normalized);
+	
+	memcpy(out, unpadder.data_without_padding, input_len_normalized);
+	#endif
+
 	return XTEA_CODE_OK;
 }
 
