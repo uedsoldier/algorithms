@@ -6,16 +6,17 @@
 #include "../minunit.h"
 
 const size_t TEST_LENGTHS[] = {
-    4, 23
+    4, 23, 14
 };
 
 const uint8_t *TEST_STRINGS[] = {
-    "Hola","La vaquita es fenomenal"
+    "Hola","La vaquita es fenomenal","Hijos de PERRA"
 };
 
 const uint8_t *EXPECTED_HASHES[SHA1_DIGEST_SIZE_BYTES] = {
     "\x4E\x46\xDC\x09\x69\xE6\x62\x1F\x2D\x61\xD2\x22\x8E\x3C\xD9\x1B\x75\xCD\x9E\xDC",
     "\xA7\x93\x6A\x16\x03\x2F\x1F\x2B\x5F\x16\xCE\x72\xFE\x9A\xE5\x6D\x87\x3E\x8C\xEC",
+    "\x62\xEA\xE8\x74\xD1\xF9\x3E\x28\x12\x1A\xB4\x15\x6E\xB6\xF6\x65\xB0\x3E\x19\xE7"
 };
 // Copy hash from SHA1_test.py script while using the TEST_STRINGS elements as input to the script
 
@@ -24,7 +25,7 @@ size_t comparison;
 SHA1_ctx_t ctx;
 
 int tests_run = 0;
-int total_tests = 1;
+int total_tests = 3;
 
 #if defined(AES_DYNAMIC_MEMORY) && (AES_DYNAMIC_MEMORY == 1)
 uint8_t *input_string;
@@ -107,6 +108,15 @@ static char *test_2(){
     return 0;
 }
 
+static char *test_3(){
+    reset_data();
+    fill_input_data(2);
+    perform_SHA1(2);
+    perform_comparison(2);
+    mu_assert("SHA1 for test 3 not OK\n", comparison == 0);
+    return 0;
+}
+
 
 
 static char *all_tests()
@@ -118,6 +128,10 @@ static char *all_tests()
     //Test 2
     test_init(TEST_LENGTHS[1]);
     mu_run_test(test_2);
+    printf("Test passed\n");
+    //Test 3
+    test_init(TEST_LENGTHS[2]);
+    mu_run_test(test_3);
     printf("Test passed\n");
     // Test 'n'
     // test_init();
