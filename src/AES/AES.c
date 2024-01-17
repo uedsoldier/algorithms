@@ -238,6 +238,9 @@ AES_errcode_t AES_ECB_decrypt(AES_ctx_t *ctx, void *in, void *out, size_t input_
     if(input_len == input_len_normalized){
         ctx->input_len_normalized = input_len_normalized += AES_BLOCK_LEN;
     }
+	if( ctx->input_len_normalized > AES_MAX_BUFFER_SIZE){
+		return AES_CODE_INCORRECT_BUFFER_SIZE;
+	}
 
     // Input buffer allocation, backup and initialization
 	uint8_t *_in;	
