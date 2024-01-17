@@ -31,7 +31,7 @@ extern "C" {
  * para fines de desarrollo y pruebas.
  */
 #ifndef XTEA_LOG
-#define XTEA_LOG 0
+#define XTEA_LOG 1
 #endif
 
 /**
@@ -55,25 +55,12 @@ extern "C" {
 #endif
 
 /**
- * @brief Macro para utilizacion de buffers fijos auxiliares para entrada de datos, de tal forma
- * que el buffer de entrada de datos no se modifica. Para utilizarse, la macro XTEA_DYNAMIC_MEMORY
- * debe estar indefinida o con valor igual a 0.
- * 
- */
-#if !defined(XTEA_DYNAMIC_MEMORY) || (XTEA_DYNAMIC_MEMORY == 0)
-#ifndef XTEA_USE_BUFFERS
-#define XTEA_USE_BUFFERS 0
-#endif
-#endif
-
-/**
  * @brief Macro para definición de máximo tamaño de buffer, para los casos en los que no se
  * requiere asignación dinámica de memoria
  * 
  */
-#ifdef XTEA_USE_BUFFERS
 #define XTEA_MAX_BUFFER_SIZE 128
-#endif
+
 #pragma endregion
 
 #pragma region Consants

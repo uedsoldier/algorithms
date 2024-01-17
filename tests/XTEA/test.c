@@ -7,7 +7,7 @@
 #include "../minunit.h"
 
 const xtea_iv_t *IV = "MRhMciXgcCRUy6L7";
-const char *TEST_STRING = "Mi bb cachorra";
+const char *TEST_STRING = "Mi bb cachorrita";
 const char *TEST_KEY = "fEOk6a9X28GXfBRN";
 
 uint32_t test_string_len, test_string_len_normalized, key_len, comparison;
@@ -88,14 +88,6 @@ static void perform_xxtea()
 void fill_input_data()
 {
     memcpy(input_string,TEST_STRING,test_string_len);
-    //sprintf(input_string, "%s", TEST_STRING);
-    printf("\nFILL INPUT DATA\n<<");
-    for (size_t i = 0; i < test_string_len_normalized; i++)
-    {
-        printf("%c",input_string[i]);
-    }
-    printf(">>\n");
-
 }
 
 void reset_data()
@@ -103,27 +95,6 @@ void reset_data()
     memset(input_string, 0, test_string_len_normalized);
     memset(XTEA_encrypt_buffer, 0, test_string_len_normalized);
     memset(XTEA_decrypt_buffer, 0, test_string_len_normalized);
-
-    printf("\nRESET DATA\n");
-    printf("input_string\n<<");
-    for (size_t i = 0; i < test_string_len_normalized; i++)
-    {
-        printf("%c",input_string[i]);
-    }
-    printf(">>\n");
-    printf("XTEA_encrypt_buffer\n<<");
-    for (size_t i = 0; i < test_string_len_normalized; i++)
-    {
-        printf("%c",XTEA_encrypt_buffer[i]);
-    }
-    printf(">>\n");
-    printf("XTEA_decrypt_buffer\n<<");    
-    for (size_t i = 0; i < test_string_len_normalized; i++)
-    {
-        printf("%c",XTEA_decrypt_buffer[i]);
-    }
-    printf(">>\n");
-
 }
 
 static char *test_xtea_cbc_8rounds()
@@ -373,8 +344,11 @@ int main(int argc, char *argv[])
     printf("XTEA testing\n");
     test_string_len = strlen(TEST_STRING);
     printf("Test string length: %u\n", test_string_len);
-    test_string_len_normalized = ((test_string_len + 7) & (-8L));
-    printf("Test string length (normalized to nearest multiple of 8): %u\n", test_string_len_normalized);
+    test_string_len_normalized = XTEA_ROUNDUP_TO_NEAREST_MULTIPLE_OF_8(test_string_len);
+    if(test_string_len == test_string_len_normalized){
+        test_string_len_normalized += XTEA_BLOCK_SIZE;
+    }
+    printf("Test string length (normalized to nearest multiple of 8 and incremented if multiple of 8): %u\n", test_string_len_normalized);
     key_len = strlen(TEST_KEY);
     memcpy(&xtea_test_key, TEST_KEY, key_len);
 

@@ -84,13 +84,13 @@ void XXTEA_init(XTEA_t *xxtea, const xtea_key_t *key, const xtea_iv_t *iv){
 	XTEA_set_fixedKey(xxtea);
 	#if defined(XTEA_LOG) && XTEA_LOG == 1
 	uint8_t i;
-	printf("\t* Iterations: %u\n\t* Dec sum: 0x%08lX\n\t* Key (hex bytes): [",xtea->iterations,xtea->dec_sum);
+	printf("\t* Iterations: %u\n\t* Dec sum: 0x%08lX\n\t* Key (hex bytes): [",xxtea->iterations,xxtea->dec_sum);
 	for (i = 0; i != XTEA_FIXED_KEY_SIZE; i++){
-		printf("%02x (%c)",xtea->key.key_bytes[i],xtea->key.key_bytes[i]);
+		printf("%02x (%c)",xxtea->key.key_bytes[i],xxtea->key.key_bytes[i]);
 	}
 	printf("]\n\t* Initializating vector (hex bytes): [");
 	for (i = 0; i != XTEA_INIT_VECTOR_SIZE; i++){
-		printf("%02x (%c)",xtea->iv[i],xtea->iv[i]);
+		printf("%02x (%c)",xxtea->iv[i],xxtea->iv[i]);
 	}
 	printf("]\n");
 	#endif
@@ -239,43 +239,31 @@ XTEA_code_t XTEA_encrypt(XTEA_t *xtea, void *in, void *out, size_t input_len, bo
 	#endif
 	// Input buffer length verification
 	if(input_len<= 0){
-		#if defined(XTEA_LOG) && XTEA_LOG == 1
-		printf("\tEmpty input buffer\n");
-		#endif
-		
 		return XTEA_CODE_EMPTY_INPUT_BUFFER;
 	}
 	// Normalized length calculation
 	xtea->encrypted_chunks = 0;
 	size_t input_len_normalized = xtea->input_len_normalized = (size_t)(XTEA_ROUNDUP_TO_NEAREST_MULTIPLE_OF_8(input_len));
+	if(input_len == xtea->input_len_normalized){
+        xtea->input_len_normalized += XTEA_BLOCK_SIZE;
+    }
 
-	// Input buffer allocation, backup and initialization 
-	#if defined (XTEA_DYNAMIC_MEMORY) && (XTEA_DYNAMIC_MEMORY == 1)
-	uint8_t *aux_in = (uint8_t *) malloc(xtea->input_len_normalized);
-	uint8_t *_in = (uint8_t *)aux_in;
-	if(aux_in == NULL){
-		#if defined(XTEA_LOG) && XTEA_LOG == 1
-		printf("\tDynamic memory assignment error\n");
-		#endif
-		return XTEA_CODE_NULL_MALLOC;
-	}
-	memset(aux_in,0,xtea->input_len_normalized);
-	memcpy(_in, in, xtea->input_len_normalized);
-	#else
-		#if defined(XTEA_USE_BUFFERS) && (XTEA_USE_BUFFERS == 1)
 	if( xtea->input_len_normalized > XTEA_MAX_BUFFER_SIZE){
-		#if defined(XTEA_LOG) && XTEA_LOG == 1
-		printf("ERROR: Normalized input length exceeds max buffer size\n");
-		#endif
 		return XTEA_CODE_INCORRECT_BUFFER_SIZE;
 	}
-	uint8_t aux_in[XTEA_MAX_BUFFER_SIZE];
-	uint8_t *_in = (uint8_t *)aux_in;
-	memset(_in, 0 , XTEA_MAX_BUFFER_SIZE);
-	memcpy(_in, in, xtea->input_len_normalized);
-		#else
-	uint8_t *_in = (uint8_t *)in;
-		#endif
+
+	// Input buffer allocation, backup and initialization 
+	uint8_t *_in;
+	#if defined (XTEA_DYNAMIC_MEMORY) && (XTEA_DYNAMIC_MEMORY == 1)
+	_in = (uint8_t *) malloc(input_len_normalized);
+	uint8_t *_aux_in = NULL;
+	if(_in == NULL){
+		return XTEA_CODE_NULL_MALLOC;
+	}
+	_aux_in = _in; 	// Auxiliary input buffer pointer to free
+	memset(_in,0,xtea->input_len_normalized);
+	#else
+	_in = (uint8_t *)in;
 	#endif
 	
 	// Initialization vector and output buffer allocation
@@ -283,33 +271,19 @@ XTEA_code_t XTEA_encrypt(XTEA_t *xtea, void *in, void *out, size_t input_len, bo
 	uint8_t temp_iv[XTEA_INIT_VECTOR_SIZE];
 	memcpy(temp_iv, xtea->iv, XTEA_INIT_VECTOR_SIZE);
 	memset(_out, 0 , xtea->input_len_normalized);
-	#if defined(XTEA_LOG) && XTEA_LOG == 1
-	uint32_t i;
-	printf("\tInput buffer:\t");
-	for( i=0 ; i!=xtea->input_len_normalized; i++){
-		uint8_t c = _in[i];
-		printf("%02x ",c);
-	}
-	printf("\n");
-
-	printf("\tOutput buffer:\t");
-	for( i=0 ; i!=xtea->input_len_normalized; i++){
-		uint8_t c = _out[i];
-		printf("%02x ",c);
-	}
-	printf("\n");
-	#endif
-
+	
 	#if defined(XTEA_USE_PKCS7) && XTEA_USE_PKCS7 == 1
 	PKCS7_padding_t padder;
 	PKCS7_add_padding(&padder, in, input_len, XTEA_BLOCK_SIZE);
 	memcpy(_in, padder.data_with_padding, input_len_normalized);
+	#else
+	memcpy(_in, in, input_len_normalized);
 	#endif
 	
 	// Chunk encryption
 	while(xtea->input_len_normalized> 0) {
 		#if defined(XTEA_LOG) && XTEA_LOG == 1
-		printf("\tChunk %u: ",encrypted_chunks);
+		printf("\tChunk %u: ",xtea->encrypted_chunks);
 		#endif
 		if(!ecb){
 			for(uint8_t j=0; j != XTEA_INIT_VECTOR_SIZE; j++){
@@ -328,7 +302,7 @@ XTEA_code_t XTEA_encrypt(XTEA_t *xtea, void *in, void *out, size_t input_len, bo
 	}
 	*output_len = xtea->encrypted_chunks*XTEA_BLOCK_SIZE;
 	#if defined (XTEA_DYNAMIC_MEMORY) && (XTEA_DYNAMIC_MEMORY == 1)
-	free(aux_in);
+	free(_aux_in);
 	#endif
 	return XTEA_CODE_OK;
 }
@@ -350,48 +324,39 @@ XTEA_code_t XTEA_decrypt(XTEA_t *xtea, void *in, void *out, size_t input_len, bo
 	#endif
 	// Input buffer length verification
 	if(input_len<= 0){
-		#if defined(XTEA_LOG) && XTEA_LOG == 1
-		printf("\tEmpty input buffer\n");
-		#endif
 		return XTEA_CODE_EMPTY_INPUT_BUFFER;
 	}
 	// Normalized length calculation
 	xtea->decrypted_chunks = 0;
 	size_t input_len_normalized = xtea->input_len_normalized = (size_t)(XTEA_ROUNDUP_TO_NEAREST_MULTIPLE_OF_8(input_len));
-
-	// Input buffer allocation, backup and initialization 
-	#if defined (XTEA_DYNAMIC_MEMORY) && (XTEA_DYNAMIC_MEMORY == 1)
-	uint8_t *aux_in = (uint8_t *) malloc(xtea->input_len_normalized);
-	uint8_t *_in = (uint8_t *)aux_in;
-	if(aux_in == NULL){
-		#if defined(XTEA_LOG) && XTEA_LOG == 1
-		printf("\tDynamic memory assignment error\n");
-		#endif
-		return XTEA_CODE_NULL_MALLOC;
-	}
-	memset(aux_in,0,xtea->input_len_normalized);
-	memcpy(_in, in, xtea->input_len_normalized);
-	#else
-	#if defined(XTEA_USE_BUFFERS) && (XTEA_USE_BUFFERS == 1)
+	if(input_len == input_len_normalized){
+        xtea->input_len_normalized = input_len_normalized += XTEA_BLOCK_SIZE;
+    }
 	if( xtea->input_len_normalized > XTEA_MAX_BUFFER_SIZE){
-		#if defined(XTEA_LOG) && XTEA_LOG == 1
-		printf("ERROR: Normalized input length exceeds max buffer size\n");
-		#endif
 		return XTEA_CODE_INCORRECT_BUFFER_SIZE;
 	}
-	uint8_t aux_in[XTEA_MAX_BUFFER_SIZE];
-	uint8_t *_in = (uint8_t *)aux_in;
-	memset(_in, 0 , XTEA_MAX_BUFFER_SIZE);
+
+	// Input buffer allocation, backup and initialization
+	uint8_t *_in;	
+	#if defined (XTEA_DYNAMIC_MEMORY) && (XTEA_DYNAMIC_MEMORY == 1)
+	uint8_t *_aux_in = NULL;
+	_in = (uint8_t *) malloc(input_len_normalized);
+	if(_in == NULL){
+		return AES_CODE_NULL_MALLOC;
+	}
+	_aux_in = _in;	// Auxiliary input buffer pointer to free
+	memset(_in,0,input_len_normalized);
+	#else
+	_in = (uint8_t *)in;
+	#endif
+
 	memcpy(_in, in, xtea->input_len_normalized);
-		#else
-	uint8_t *_in = (uint8_t *)in;
-	#endif
-	#endif
 	
 	// Initialization vector and output buffer allocation
 	uint8_t *_out = (uint8_t *)out; 
 	uint8_t temp[XTEA_INIT_VECTOR_SIZE];
 	uint8_t temp_iv[XTEA_INIT_VECTOR_SIZE];
+	memset(_out, 0 , xtea->input_len_normalized);
 	memcpy(temp_iv, xtea->iv, XTEA_INIT_VECTOR_SIZE);
 	#if defined(XTEA_LOG) && XTEA_LOG == 1
 	printf("\tInput buffer: ");
@@ -402,11 +367,11 @@ XTEA_code_t XTEA_decrypt(XTEA_t *xtea, void *in, void *out, size_t input_len, bo
 	#endif
 	
 	// Chunk decryption
-	while(xtea->input_len_normalized> 0) {
+	while(input_len_normalized != 0) {
 		memcpy(temp, _in, XTEA_INIT_VECTOR_SIZE);
 
 		#if defined(XTEA_LOG) && XTEA_LOG == 1
-		printf("\tChunk %u: ",decrypted_chunks);
+		printf("\tChunk %u: ",xtea->decrypted_chunks);
 		#endif
 		
 		XTEA_decrypt_chunk(xtea, (uint32_t *)_in, (uint32_t *)_out);
@@ -417,18 +382,18 @@ XTEA_code_t XTEA_decrypt(XTEA_t *xtea, void *in, void *out, size_t input_len, bo
 			}
 			memcpy(temp_iv, temp, XTEA_INIT_VECTOR_SIZE);	
 		}
-		_in += XTEA_BLOCK_SIZE; _out += XTEA_BLOCK_SIZE; xtea->input_len_normalized-= XTEA_BLOCK_SIZE; xtea->decrypted_chunks++;
+		_in += XTEA_BLOCK_SIZE; _out += XTEA_BLOCK_SIZE; input_len_normalized-= XTEA_BLOCK_SIZE; xtea->decrypted_chunks++;
 	}
 	*output_len = xtea->decrypted_chunks*XTEA_BLOCK_SIZE;
-	#if defined (XTEA_DYNAMIC_MEMORY) && (XTEA_DYNAMIC_MEMORY == 1)
-	free(aux_in);
-	#endif
-
+	
 	#if defined(XTEA_USE_PKCS7) && XTEA_USE_PKCS7 == 1
 	PKCS7_unpadding_t unpadder;
-	PKCS7_remove_padding(&unpadder, out, input_len_normalized);
-	
-	memcpy(out, unpadder.data_without_padding, input_len_normalized);
+	PKCS7_remove_padding(&unpadder, out, xtea->input_len_normalized);
+	memcpy(out, unpadder.data_without_padding, xtea->input_len_normalized);
+	#endif
+
+	#if defined (XTEA_DYNAMIC_MEMORY) && (XTEA_DYNAMIC_MEMORY == 1)
+	free(_aux_in);
 	#endif
 
 	return XTEA_CODE_OK;
@@ -512,7 +477,7 @@ XTEA_code_t XXTEA_encrypt(XTEA_t *xxtea, void *in, void *out, size_t input_len, 
 	// Chunk encryption
 	while(xxtea->input_len_normalized> 0) {
 		#if defined(XTEA_LOG) && XTEA_LOG == 1
-		printf("\tChunk %u: ",encrypted_chunks);
+		printf("\tChunk %u: ",xxtea->encrypted_chunks);
 		#endif
 		if(!ecb){
 			for(uint8_t j=0; j != XTEA_INIT_VECTOR_SIZE; j++){
@@ -607,7 +572,7 @@ XTEA_code_t XXTEA_decrypt(XTEA_t *xxtea, void *in, void *out, size_t input_len, 
 		memcpy(temp, _in, XTEA_INIT_VECTOR_SIZE);
 
 		#if defined(XTEA_LOG) && XTEA_LOG == 1
-		printf("\tChunk %u: ",decrypted_chunks);
+		printf("\tChunk %u: ",xxtea->decrypted_chunks);
 		#endif
 		
 		XXTEA_decrypt_chunk(xxtea, (uint32_t *)_in, (uint32_t *)_out);
