@@ -1,6 +1,7 @@
 from argparse import ArgumentParser
 from os import chdir,getcwd,system,mkdir,path
 from shutil import rmtree
+import platform
 
 algorithm_choices = ('BASE64','CRC','XTEA','CHECKSUM8','AES','SHA1','PKCS7')
 
@@ -24,9 +25,22 @@ def main():
     if path.exists(build_dir):    
         rmtree(build_dir,ignore_errors=True)
     mkdir(build_dir)
-    system('cmake -S . -B build/ -G "MinGW Makefiles"')
+    
+    os_platform = platform.system()
+    print(f'Running in {os_platform} platform')
+    
+    if(os_platform == 'Linux'):
+        cmake_command = 'cmake -S . -B build/'
+        make_command = 'make'
+    elif(os_platform == 'Windows'):
+        cmake_command = 'cmake -S . -B build/ -G "MinGW Makefiles"'
+        make_command = 'mingw32-make'
+    else:
+        print(f'Unsupported OS/platform {os_platform}')
+        raise SystemExit(-1)
+    system(cmake_command)
     chdir(build_dir)
-    system('mingw32-make')
+    system(make_command)
 
 if __name__ == '__main__':
     main()
