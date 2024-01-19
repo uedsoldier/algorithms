@@ -1,17 +1,17 @@
 /**
- * @file AES.c
+ * @file AES256.c
  * @author your name (you@domain.com)
- * @brief
+ * @brief 
  * @version 0.1
- * @date 2024-01-06
- *
+ * @date 2024-01-19
+ * 
  * @copyright Copyright (c) 2024
- *
+ * 
  */
 
-#include "AES.h"
+#include "AES256.h"
 
-#if defined(AES_LOG) && AES_LOG == 1
+#if defined(AES256_LOG) && AES256_LOG == 1
 void print_buffer(uint8_t *buffer, size_t len, const char *msg){
 
     size_t i;
@@ -27,41 +27,27 @@ void print_buffer(uint8_t *buffer, size_t len, const char *msg){
 
 
 /**
- * @brief
- *
- * @param ctx
- * @param key
+ * @brief 
+ * 
+ * @param ctx 
+ * @param key 
+ * @param iv 
  */
-void AES_init_ctx(AES_ctx_t *ctx, const uint8_t *key)
+void AES256_init_ctx(AES256_ctx_t *ctx, const uint8_t *key, const uint8_t *iv)
 {
-    #if defined(AES_LOG) && AES_LOG == 1
-    printf("AES init context. Make sure key is %u bytes long\n",AES_FIXED_KEY_SIZE);
+    #if defined(AES256_LOG) && AES256_LOG == 1
+    printf("AES-256 init context. Make sure key is %u bytes long\n",AES256_FIXED_KEY_SIZE);
     #endif
-    memcpy(ctx->key,key,AES_FIXED_KEY_SIZE);
+    memcpy(ctx->key.array,key,AES256_FIXED_KEY_SIZE);
     ctx->decrypted_chunks = 0;
     ctx->encrypted_chunks = 0;
-    #if defined(AES_LOG) && AES_LOG == 1
+    #if defined(AES256_LOG) && AES256_LOG == 1
 	
-    print_buffer(ctx->key,AES_FIXED_KEY_SIZE,"AES KEY");
+    print_buffer(ctx->key.array,AES256_FIXED_KEY_SIZE,"AES-256 KEY");
 	#endif
-    
-    
-}
-
-#if (defined(AES_CBC) && (AES_CBC == 1)) || (defined(AES_CTR) && (AES_CTR == 1))
-
-/**
- * @brief
- *
- * @param ctx
- * @param key
- * @param iv
- */
-void AES_init_ctx_iv(AES_ctx_t *ctx, const uint8_t *key, const uint8_t *iv)
-{
-    AES_init_ctx(ctx, key);
+	if(iv == NULL) return;
     memcpy(ctx->iv, iv, AES_BLOCK_LEN);
-    #if defined(AES_LOG) && AES_LOG == 1
+    #if defined(AES256_LOG) && AES256_LOG == 1
     printf("* Initializating vector (hex bytes): [");
 	for (uint8_t i = 0; i != AES_BLOCK_LEN; i++){
 		printf("%02x (%c)",iv[i],iv[i]);
@@ -69,7 +55,6 @@ void AES_init_ctx_iv(AES_ctx_t *ctx, const uint8_t *key, const uint8_t *iv)
 	printf("]\n");
     #endif
 }
-#endif
 
 /**
  * @brief Function that encrypts the PlainText.
@@ -78,16 +63,16 @@ void AES_init_ctx_iv(AES_ctx_t *ctx, const uint8_t *key, const uint8_t *iv)
  * @param in_state 
  * @param out_state 
  */
-static void AES_encrypt_chunk(AES_ctx_t *ctx, uint8_t *in,uint8_t *out)
+static void AES256_encrypt_chunk(AES256_ctx_t *ctx, uint8_t *in,uint8_t *out)
 {
     uint8_t round = 0;
     memcpy(out,in,AES_BLOCK_LEN);
 
-    uint8_t expandedKey[AES_KEY_EXP_SIZE]; 
-	KeyExpansion(ctx->key, expandedKey);
-	AddRoundKey(out, ctx->key);
+    uint8_t expandedKey[AES256_KEY_EXP_SIZE]; 
+	KeyExpansion(ctx->key.array, expandedKey);
+	AddRoundKey(out, ctx->key.array);
 
-	for (size_t i = 0; i < AES_NUM_ROUNDS - 1; i++) {
+	for (size_t i = 0; i < AES256_NUM_ROUNDS - 1; i++) {
 		SubBytes(out);
 		ShiftRows(out);
 		MixColumns(out);
@@ -96,15 +81,14 @@ static void AES_encrypt_chunk(AES_ctx_t *ctx, uint8_t *in,uint8_t *out)
 
 	SubBytes(out);
 	ShiftRows(out);
-	AddRoundKey(out, expandedKey + (AES_BLOCK_LEN * AES_NUM_ROUNDS));
+	AddRoundKey(out, expandedKey + (AES_BLOCK_LEN * AES256_NUM_ROUNDS));
 
-    #if defined(AES_LOG) && AES_LOG == 1
-    print_buffer(out,AES_BLOCK_LEN,"out buffer");
+    #if defined(AES256_LOG) && AES256_LOG == 1
+    print_buffer(out,AES_BLOCK_LEN,"out");
 	#endif
 }
 
 
-#if (defined(AES_CBC) && AES_CBC == 1) || (defined(AES_ECB) && AES_ECB == 1)
 
 /**
  * @brief 
@@ -113,20 +97,20 @@ static void AES_encrypt_chunk(AES_ctx_t *ctx, uint8_t *in,uint8_t *out)
  * @param in 
  * @param out 
  */
-static void AES_decrypt_chunk(AES_ctx_t *ctx, uint8_t *in,uint8_t *out)
+static void AES256_decrypt_chunk(AES256_ctx_t *ctx, uint8_t *in,uint8_t *out)
 {
     memcpy(out,in,AES_BLOCK_LEN);
 
-    uint8_t expandedKey[AES_KEY_EXP_SIZE];
+    uint8_t expandedKey[AES256_KEY_EXP_SIZE];
 
-	KeyExpansion(ctx->key, expandedKey);
+	KeyExpansion(ctx->key.array, expandedKey);
 
-	AddRoundKey(out, expandedKey + (AES_BLOCK_LEN * AES_NUM_ROUNDS ));
+	AddRoundKey(out, expandedKey + (AES_BLOCK_LEN * AES256_NUM_ROUNDS ));
 
 	ReverseShiftRows(out);
 	ReverseSubBytes(out);
 
-	for (size_t i = AES_NUM_ROUNDS -1; i >= 1; i--) {
+	for (size_t i = AES256_NUM_ROUNDS -1; i >= 1; i--) {
 		AddRoundKey(out, expandedKey + (AES_BLOCK_LEN * i));
 		ReverseMixColumns(out);
 		ReverseShiftRows(out);
@@ -134,26 +118,24 @@ static void AES_decrypt_chunk(AES_ctx_t *ctx, uint8_t *in,uint8_t *out)
 	}
 	AddRoundKey(out, expandedKey);
 
-    #if defined(AES_LOG) && AES_LOG == 1
-    print_buffer(out,AES_BLOCK_LEN,"out buffer");
+    #if defined(AES256_LOG) && AES256_LOG == 1
+    print_buffer(out,AES_BLOCK_LEN,"out");
 	#endif
 }
-#endif
 
-#if defined(AES_ECB) && (AES_ECB == 1)
 /**
  * @brief 
  * 
- * @param AES 
+ * @param ctx 
  * @param in 
  * @param out 
  * @param input_len 
  * @param output_len 
  * @return AES_errcode_t 
  */
-AES_errcode_t AES_ECB_encrypt(AES_ctx_t *ctx, void *in, void *out, size_t input_len, uint32_t *output_len){
-    #if defined(AES_LOG) && AES_LOG == 1
-    printf("AES ECB encrypt\n");
+AES_errcode_t AES256_ECB_encrypt(AES256_ctx_t *ctx, void *in, void *out, size_t input_len, uint32_t *output_len){
+    #if defined(AES256_LOG) && AES256_LOG == 1
+    printf("AES-256 ECB encrypt\n");
     #endif
     // Input buffer length verification
     if(input_len<= 0){
@@ -166,13 +148,13 @@ AES_errcode_t AES_ECB_encrypt(AES_ctx_t *ctx, void *in, void *out, size_t input_
         ctx->input_len_normalized += AES_BLOCK_LEN;
     }
 
-	if( ctx->input_len_normalized > AES_MAX_BUFFER_SIZE){
+	if( ctx->input_len_normalized > AES256_MAX_BUFFER_SIZE){
 		return AES_CODE_INCORRECT_BUFFER_SIZE;
 	}
 
     // Input buffer allocation, backup and initialization 
 	uint8_t *_in;
-	#if defined (AES_DYNAMIC_MEMORY) && (AES_DYNAMIC_MEMORY == 1)
+	#if defined (AES256_DYNAMIC_MEMORY) && (AES256_DYNAMIC_MEMORY == 1)
 	_in = (uint8_t *) malloc(ctx->input_len_normalized);
 	uint8_t *_aux_in = NULL;
 	if(_in == NULL){
@@ -184,7 +166,7 @@ AES_errcode_t AES_ECB_encrypt(AES_ctx_t *ctx, void *in, void *out, size_t input_
 	_in = (uint8_t *)in;
 	#endif
 
-	#if defined(AES_USE_PKCS7) && AES_USE_PKCS7 == 1
+	#if defined(AES256_USE_PKCS7) && AES256_USE_PKCS7 == 1
 	PKCS7_padding_t padder;
 	PKCS7_add_padding(&padder, in, input_len, AES_BLOCK_LEN);
 	memcpy(_in, padder.data_with_padding, ctx->input_len_normalized);
@@ -198,17 +180,17 @@ AES_errcode_t AES_ECB_encrypt(AES_ctx_t *ctx, void *in, void *out, size_t input_
 
     // Chunk encryption
 	while( ctx->input_len_normalized != 0) {
-		#if defined(AES_LOG) && AES_LOG == 1
+		#if defined(AES256_LOG) && AES256_LOG == 1
 		printf("Chunk %u (bytes %u to %u):\n",ctx->encrypted_chunks+1,ctx->encrypted_chunks*AES_BLOCK_LEN,(ctx->encrypted_chunks+1)*AES_BLOCK_LEN-1);
 		#endif
 
-		AES_encrypt_chunk(ctx,_in,_out);
+		AES256_encrypt_chunk(ctx,_in,_out);
 
 		_in += AES_BLOCK_LEN; _out += AES_BLOCK_LEN; ctx->input_len_normalized-= AES_BLOCK_LEN; ctx->encrypted_chunks++;
 		
 	}
 	*output_len = ctx->encrypted_chunks*AES_BLOCK_LEN;
-	#if defined (AES_DYNAMIC_MEMORY) && (AES_DYNAMIC_MEMORY == 1)
+	#if defined (AES256_DYNAMIC_MEMORY) && (AES256_DYNAMIC_MEMORY == 1)
 	free(_aux_in);
 	#endif
 	return AES_CODE_OK;
@@ -224,9 +206,9 @@ AES_errcode_t AES_ECB_encrypt(AES_ctx_t *ctx, void *in, void *out, size_t input_
  * @param output_len 
  * @return AES_errcode_t 
  */
-AES_errcode_t AES_ECB_decrypt(AES_ctx_t *ctx, void *in, void *out, size_t input_len, uint32_t *output_len){
-    #if defined(AES_LOG) && AES_LOG == 1
-    printf("AES ECB decrypt\n");
+AES_errcode_t AES256_ECB_decrypt(AES256_ctx_t *ctx, void *in, void *out, size_t input_len, uint32_t *output_len){
+    #if defined(AES256_LOG) && AES256_LOG == 1
+    printf("AES-256 ECB decrypt\n");
     #endif
     // Input buffer length verification
     if(input_len<= 0){
@@ -238,13 +220,13 @@ AES_errcode_t AES_ECB_decrypt(AES_ctx_t *ctx, void *in, void *out, size_t input_
     if(input_len == input_len_normalized){
         ctx->input_len_normalized = input_len_normalized += AES_BLOCK_LEN;
     }
-	if( ctx->input_len_normalized > AES_MAX_BUFFER_SIZE){
+	if( ctx->input_len_normalized > AES256_MAX_BUFFER_SIZE){
 		return AES_CODE_INCORRECT_BUFFER_SIZE;
 	}
 
     // Input buffer allocation, backup and initialization
 	uint8_t *_in;	
-	#if defined (AES_DYNAMIC_MEMORY) && (AES_DYNAMIC_MEMORY == 1)
+	#if defined (AES256_DYNAMIC_MEMORY) && (AES256_DYNAMIC_MEMORY == 1)
 	uint8_t *_aux_in = NULL;
 	_in = (uint8_t *) malloc(input_len_normalized);
 	if(_in == NULL){
@@ -264,34 +246,30 @@ AES_errcode_t AES_ECB_decrypt(AES_ctx_t *ctx, void *in, void *out, size_t input_
 
     // Chunk decryption
 	while( input_len_normalized != 0) {
-		#if defined(AES_LOG) && AES_LOG == 1
+		#if defined(AES256_LOG) && AES256_LOG == 1
 		printf("Chunk %u (bytes %u to %u):\n",ctx->decrypted_chunks+1,ctx->decrypted_chunks*AES_BLOCK_LEN,(ctx->decrypted_chunks+1)*AES_BLOCK_LEN-1);
 		#endif
 
-		AES_decrypt_chunk(ctx,_in,_out);
+		AES256_decrypt_chunk(ctx,_in,_out);
 
 		_in += AES_BLOCK_LEN; _out += AES_BLOCK_LEN; input_len_normalized-= AES_BLOCK_LEN; ctx->decrypted_chunks++;
 		
 	}
 	*output_len = ctx->decrypted_chunks*AES_BLOCK_LEN;
 	
-	#if defined(AES_USE_PKCS7) && AES_USE_PKCS7 == 1
+	#if defined(AES256_USE_PKCS7) && AES256_USE_PKCS7 == 1
 	PKCS7_unpadding_t unpadder;
 	PKCS7_remove_padding(&unpadder, out, ctx->input_len_normalized);
 	memcpy(out, unpadder.data_without_padding, ctx->input_len_normalized);
 	#endif
 
-	#if defined (AES_DYNAMIC_MEMORY) && (AES_DYNAMIC_MEMORY == 1)
+	#if defined (AES256_DYNAMIC_MEMORY) && (AES256_DYNAMIC_MEMORY == 1)
 	free(_aux_in);
 	#endif
 
 	return AES_CODE_OK;
 }
 
-#endif
-
-#if defined(AES_CBC) && (AES_CBC == 1)
-    
 /**
  * @brief 
  * 
@@ -302,9 +280,9 @@ AES_errcode_t AES_ECB_decrypt(AES_ctx_t *ctx, void *in, void *out, size_t input_
  * @param output_len 
  * @return AES_errcode_t 
  */
-AES_errcode_t AES_CBC_encrypt(AES_ctx_t *ctx, void *in, void *out, size_t input_len, uint32_t *output_len){
-    #if defined(AES_LOG) && AES_LOG == 1
-    printf("AES CBC encrypt\n");
+AES_errcode_t AES256_CBC_encrypt(AES256_ctx_t *ctx, void *in, void *out, size_t input_len, uint32_t *output_len){
+    #if defined(AES256_LOG) && AES256_LOG == 1
+    printf("AES-256 CBC encrypt\n");
     #endif
     // Input buffer length verification
     if(input_len<= 0){
@@ -320,7 +298,7 @@ AES_errcode_t AES_CBC_encrypt(AES_ctx_t *ctx, void *in, void *out, size_t input_
 
     // Input buffer allocation, backup and initialization 
 	uint8_t *_in;
-	#if defined (AES_DYNAMIC_MEMORY) && (AES_DYNAMIC_MEMORY == 1)
+	#if defined (AES256_DYNAMIC_MEMORY) && (AES256_DYNAMIC_MEMORY == 1)
 	_in = (uint8_t *) malloc(input_len_normalized);
 	uint8_t *_aux_in = NULL;
 	if(_in == NULL){
@@ -332,7 +310,7 @@ AES_errcode_t AES_CBC_encrypt(AES_ctx_t *ctx, void *in, void *out, size_t input_
 	_in = (uint8_t *)in;
 	#endif
 
-	#if defined(AES_USE_PKCS7) && AES_USE_PKCS7 == 1
+	#if defined(AES256_USE_PKCS7) && AES256_USE_PKCS7 == 1
 	PKCS7_padding_t padder;
 	PKCS7_add_padding(&padder, in, input_len, AES_BLOCK_LEN);
 	memcpy(_in, padder.data_with_padding, input_len_normalized);
@@ -347,19 +325,19 @@ AES_errcode_t AES_CBC_encrypt(AES_ctx_t *ctx, void *in, void *out, size_t input_
 
     // Chunk encryption
 	while( ctx->input_len_normalized > 0) {
-		#if defined(AES_LOG) && AES_LOG == 1
+		#if defined(AES256_LOG) && AES256_LOG == 1
 		printf("Chunk %u (bytes %u to %u):\n",ctx->encrypted_chunks+1,ctx->encrypted_chunks*AES_BLOCK_LEN,(ctx->encrypted_chunks+1)*AES_BLOCK_LEN-1);
 		#endif
 
 			AddRoundKey(_in,xor_vector);
-			AES_encrypt_chunk(ctx,_in,_out);
+			AES256_encrypt_chunk(ctx,_in,_out);
 			xor_vector = _out;
 
 		_in += AES_BLOCK_LEN; _out += AES_BLOCK_LEN; ctx->input_len_normalized-= AES_BLOCK_LEN; ctx->encrypted_chunks++;
 		
 	}
 	*output_len = ctx->encrypted_chunks*AES_BLOCK_LEN;
-	#if defined (AES_DYNAMIC_MEMORY) && (AES_DYNAMIC_MEMORY == 1)
+	#if defined (AES256_DYNAMIC_MEMORY) && (AES256_DYNAMIC_MEMORY == 1)
 	free(_aux_in);
 	#endif
 	return AES_CODE_OK;
@@ -375,9 +353,9 @@ AES_errcode_t AES_CBC_encrypt(AES_ctx_t *ctx, void *in, void *out, size_t input_
  * @param output_len 
  * @return AES_errcode_t 
  */
-AES_errcode_t AES_CBC_decrypt(AES_ctx_t *ctx, void *in, void *out, size_t input_len, uint32_t *output_len){
-    #if defined(AES_LOG) && AES_LOG == 1
-    printf("AES CBC decrypt\n");
+AES_errcode_t AES256_CBC_decrypt(AES256_ctx_t *ctx, void *in, void *out, size_t input_len, uint32_t *output_len){
+    #if defined(AES256_LOG) && AES256_LOG == 1
+    printf("AES-256 CBC decrypt\n");
     #endif
     // Input buffer length verification
     if(input_len<= 0){
@@ -393,7 +371,7 @@ AES_errcode_t AES_CBC_decrypt(AES_ctx_t *ctx, void *in, void *out, size_t input_
 
     // Input buffer allocation, backup and initialization
 	uint8_t *_in;	
-	#if defined (AES_DYNAMIC_MEMORY) && (AES_DYNAMIC_MEMORY == 1)
+	#if defined (AES256_DYNAMIC_MEMORY) && (AES256_DYNAMIC_MEMORY == 1)
 	uint8_t *_aux_in = NULL;
 	_in = (uint8_t *) malloc(input_len_normalized);
 	if(_in == NULL){
@@ -416,11 +394,11 @@ AES_errcode_t AES_CBC_decrypt(AES_ctx_t *ctx, void *in, void *out, size_t input_
 
     // Chunk decryption
 	while( ctx->input_len_normalized > 0) {
-		#if defined(AES_LOG) && AES_LOG == 1
+		#if defined(AES256_LOG) && AES256_LOG == 1
 		printf("Chunk %u (bytes %u to %u):\n",ctx->decrypted_chunks+1,ctx->decrypted_chunks*AES_BLOCK_LEN,(ctx->decrypted_chunks+1)*AES_BLOCK_LEN-1);
 		#endif
 		memcpy(placeholder,_in,AES_BLOCK_LEN);
-		AES_decrypt_chunk(ctx,_in,_out);
+		AES256_decrypt_chunk(ctx,_in,_out);
 		AddRoundKey(_out, xor_vector);
 		memcpy(xor_vector,_in,AES_BLOCK_LEN);
 
@@ -429,46 +407,41 @@ AES_errcode_t AES_CBC_decrypt(AES_ctx_t *ctx, void *in, void *out, size_t input_
 	}
 	*output_len = ctx->decrypted_chunks*AES_BLOCK_LEN;
 	
-	#if defined(AES_USE_PKCS7) && AES_USE_PKCS7 == 1
+	#if defined(AES256_USE_PKCS7) && AES256_USE_PKCS7 == 1
 	PKCS7_unpadding_t unpadder;
 	PKCS7_remove_padding(&unpadder, out, input_len_normalized);
 	memcpy(out, unpadder.data_without_padding, input_len_normalized);
 	#endif
 	
-	#if defined (AES_DYNAMIC_MEMORY) && (AES_DYNAMIC_MEMORY == 1)
+	#if defined (AES256_DYNAMIC_MEMORY) && (AES256_DYNAMIC_MEMORY == 1)
 	free(_aux_in);
 	#endif
 
 	return AES_CODE_OK;
 }
 
-#endif
-
-#if defined(AES_CTR) && (AES_CTR == 1)
-    
-    AES_errcode_t AES_CTR_xcrypt(AES_ctx_t *ctx, void *in, void *out, size_t input_len, uint32_t *output_len){
-        
-    }
-#endif
-
-
-
+/**
+ * @brief 
+ * 
+ * @param inputKey 
+ * @param expandedKeys 
+ */
 static void KeyExpansion(uint8_t *inputKey, uint8_t *expandedKeys){
     size_t i;
-    for (i = 0; i != AES_FIXED_KEY_SIZE; i++) {
+    for (i = 0; i != AES256_FIXED_KEY_SIZE; i++) {
 		expandedKeys[i] = inputKey[i];
 	}
 
-	size_t bytesGenerated = AES_FIXED_KEY_SIZE;
+	size_t bytesGenerated = AES256_FIXED_KEY_SIZE;
 	size_t rcon_location = 1;
 	uint8_t key_block[4];
 
 
-	while (bytesGenerated < AES_KEY_EXP_SIZE) {
+	while (bytesGenerated < AES256_KEY_EXP_SIZE) {
 		for (i = 0; i != 4; i++) { //while is less than the number of 32 bit words in 176 bit expanded keys
 			key_block[i] = expandedKeys[i + bytesGenerated - 4];
 		}
-		if (bytesGenerated % AES_FIXED_KEY_SIZE == 0) {
+		if (bytesGenerated % AES256_FIXED_KEY_SIZE == 0) {
 
 			uint8_t temp_val = key_block[0];
 			key_block[0] = key_block[1];
@@ -485,34 +458,48 @@ static void KeyExpansion(uint8_t *inputKey, uint8_t *expandedKeys){
 			rcon_location++;
 		}
 
-		#if defined(AES256) && AES256 == 1
-		if(bytesGenerated % AES_FIXED_KEY_SIZE == AES_BLOCK_LEN){
+		if(bytesGenerated % AES256_FIXED_KEY_SIZE == AES_BLOCK_LEN){
 			for (i = 0; i != 4; i++) {
 			key_block[i] = s_box[key_block[i]];
 		}
 		}
 		
-		#endif
 
 		for (i = 0; i != 4; i++) {
-			expandedKeys[bytesGenerated] = expandedKeys[bytesGenerated - AES_FIXED_KEY_SIZE] ^ key_block[i];
+			expandedKeys[bytesGenerated] = expandedKeys[bytesGenerated - AES256_FIXED_KEY_SIZE] ^ key_block[i];
 			bytesGenerated++;
 		}
 	}
 }
 
+/**
+ * @brief 
+ * 
+ * @param plain_text 
+ * @param roundKey 
+ */
 static void AddRoundKey(uint8_t* plain_text, uint8_t * roundKey){
     for (size_t i = 0; i != AES_BLOCK_LEN; i++) {
 		plain_text[i] = plain_text[i] ^ roundKey[i];
 	}
 }
 
+/**
+ * @brief 
+ * 
+ * @param plain_text 
+ */
 static void SubBytes(uint8_t * plain_text){
     for (size_t i = 0; i != AES_BLOCK_LEN; i++) {
 		plain_text[i] = s_box[plain_text[i]];
 	}
 }
 
+/**
+ * @brief 
+ * 
+ * @param plain_text 
+ */
 static void ShiftRows(uint8_t * plain_text){
     uint8_t temp_block[AES_BLOCK_LEN];
 
@@ -529,6 +516,11 @@ static void ShiftRows(uint8_t * plain_text){
 	}
 }
 
+/**
+ * @brief 
+ * 
+ * @param plain_text 
+ */
 static void MixColumns(uint8_t *plain_text){
     uint8_t temp_block[AES_BLOCK_LEN];
 
@@ -545,12 +537,22 @@ static void MixColumns(uint8_t *plain_text){
 	}
 }
 
+/**
+ * @brief 
+ * 
+ * @param state 
+ */
 static void ReverseSubBytes(uint8_t * state){
     for (size_t i = 0; i != AES_BLOCK_LEN; i++) {
 		state[i] = inv_s[state[i]];
 	}
 }
 
+/**
+ * @brief 
+ * 
+ * @param plain_text 
+ */
 static void ReverseShiftRows(uint8_t * plain_text){
     uint8_t temp_block[AES_BLOCK_LEN];
     size_t i;
@@ -567,6 +569,11 @@ static void ReverseShiftRows(uint8_t * plain_text){
 	}
 }
 
+/**
+ * @brief 
+ * 
+ * @param plain_text 
+ */
 static void ReverseMixColumns(uint8_t *plain_text){
     uint8_t temp_block[AES_BLOCK_LEN];
     size_t i;
@@ -590,6 +597,13 @@ static void ReverseMixColumns(uint8_t *plain_text){
 	}
 }
 
+/**
+ * @brief 
+ * 
+ * @param rhs 
+ * @param lhs 
+ * @return uint8_t 
+ */
 static uint8_t gmul(uint8_t rhs, uint8_t lhs){
     uint8_t peasant = 0;
 	uint16_t irreducible = 0x11b;
