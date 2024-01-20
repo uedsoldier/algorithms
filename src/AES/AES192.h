@@ -43,14 +43,6 @@ static const char *AES192_TAG = "AES192";
 #pragma endregion
 
 #pragma region Memory macros
-/**
- * @brief Macro para utilización de asignación dinámica de memoria en las funciones AES.
- * Usar esta característica permite ahorrar memoria RAM, pero no todos los dispositivos ni todos
- * los compiladores soportan tales funcionalidades (malloc(), calloc(), realloc(), etc.)
- */
-#ifndef AES192_DYNAMIC_MEMORY
-#define AES192_DYNAMIC_MEMORY 0
-#endif
 
 /**
  * @brief Macro para definición de máximo tamaño de buffer, para los casos en los que no se

@@ -142,18 +142,7 @@ AES_errcode_t AES256_ECB_encrypt(AES256_ctx_t *ctx, void *in, void *out, size_t 
 	}
 
     // Input buffer allocation, backup and initialization 
-	uint8_t *_in;
-	#if defined (AES256_DYNAMIC_MEMORY) && (AES256_DYNAMIC_MEMORY == 1)
-	_in = (uint8_t *) malloc(ctx->input_len_normalized);
-	uint8_t *_aux_in = NULL;
-	if(_in == NULL){
-		return AES_CODE_NULL_MALLOC;
-	}
-	_aux_in = _in;	// Auxiliary input buffer pointer to free
-	memset(_in,0,ctx->input_len_normalized);
-	#else
-	_in = (uint8_t *)in;
-	#endif
+	uint8_t *_in = (uint8_t *)in;
 
 	#if defined(AES256_USE_PKCS7) && AES256_USE_PKCS7 == 1
 	PKCS7_padding_t padder;
@@ -179,9 +168,7 @@ AES_errcode_t AES256_ECB_encrypt(AES256_ctx_t *ctx, void *in, void *out, size_t 
 		
 	}
 	*output_len = ctx->encrypted_chunks*AES_BLOCK_LEN;
-	#if defined (AES256_DYNAMIC_MEMORY) && (AES256_DYNAMIC_MEMORY == 1)
-	free(_aux_in);
-	#endif
+
 	return AES_CODE_OK;
 }
 
@@ -214,18 +201,7 @@ AES_errcode_t AES256_ECB_decrypt(AES256_ctx_t *ctx, void *in, void *out, size_t 
 	}
 
     // Input buffer allocation, backup and initialization
-	uint8_t *_in;	
-	#if defined (AES256_DYNAMIC_MEMORY) && (AES256_DYNAMIC_MEMORY == 1)
-	uint8_t *_aux_in = NULL;
-	_in = (uint8_t *) malloc(input_len_normalized);
-	if(_in == NULL){
-		return AES_CODE_NULL_MALLOC;
-	}
-	_aux_in = _in;	// Auxiliary input buffer pointer to free
-	memset(_in,0,input_len_normalized);
-	#else
-	_in = (uint8_t *)in;
-	#endif
+	uint8_t *_in = (uint8_t *)in;
 
 	memcpy(_in, in, ctx->input_len_normalized);
 
@@ -250,10 +226,6 @@ AES_errcode_t AES256_ECB_decrypt(AES256_ctx_t *ctx, void *in, void *out, size_t 
 	PKCS7_unpadding_t unpadder;
 	PKCS7_remove_padding(&unpadder, out, ctx->input_len_normalized);
 	memcpy(out, unpadder.data_without_padding, ctx->input_len_normalized);
-	#endif
-
-	#if defined (AES256_DYNAMIC_MEMORY) && (AES256_DYNAMIC_MEMORY == 1)
-	free(_aux_in);
 	#endif
 
 	return AES_CODE_OK;
@@ -286,18 +258,7 @@ AES_errcode_t AES256_CBC_encrypt(AES256_ctx_t *ctx, void *in, void *out, size_t 
     }
 
     // Input buffer allocation, backup and initialization 
-	uint8_t *_in;
-	#if defined (AES256_DYNAMIC_MEMORY) && (AES256_DYNAMIC_MEMORY == 1)
-	_in = (uint8_t *) malloc(input_len_normalized);
-	uint8_t *_aux_in = NULL;
-	if(_in == NULL){
-		return AES_CODE_NULL_MALLOC;
-	}
-	_aux_in = _in; 	// Auxiliary input buffer pointer to free
-	memset(_in,0,ctx->input_len_normalized);
-	#else
-	_in = (uint8_t *)in;
-	#endif
+	uint8_t *_in = (uint8_t *)in;
 
 	#if defined(AES256_USE_PKCS7) && AES256_USE_PKCS7 == 1
 	PKCS7_padding_t padder;
@@ -326,9 +287,7 @@ AES_errcode_t AES256_CBC_encrypt(AES256_ctx_t *ctx, void *in, void *out, size_t 
 		
 	}
 	*output_len = ctx->encrypted_chunks*AES_BLOCK_LEN;
-	#if defined (AES256_DYNAMIC_MEMORY) && (AES256_DYNAMIC_MEMORY == 1)
-	free(_aux_in);
-	#endif
+
 	return AES_CODE_OK;
 }
 
@@ -359,18 +318,7 @@ AES_errcode_t AES256_CBC_decrypt(AES256_ctx_t *ctx, void *in, void *out, size_t 
     }
 
     // Input buffer allocation, backup and initialization
-	uint8_t *_in;	
-	#if defined (AES256_DYNAMIC_MEMORY) && (AES256_DYNAMIC_MEMORY == 1)
-	uint8_t *_aux_in = NULL;
-	_in = (uint8_t *) malloc(input_len_normalized);
-	if(_in == NULL){
-		return AES_CODE_NULL_MALLOC;
-	}
-	_aux_in = _in;	// Auxiliary input buffer pointer to free
-	memset(_in,0,input_len_normalized);
-	#else
-	_in = (uint8_t *)in;
-	#endif
+	uint8_t *_in = (uint8_t *)in;
 
 	memcpy(_in, in, ctx->input_len_normalized);
 
@@ -400,10 +348,6 @@ AES_errcode_t AES256_CBC_decrypt(AES256_ctx_t *ctx, void *in, void *out, size_t 
 	PKCS7_unpadding_t unpadder;
 	PKCS7_remove_padding(&unpadder, out, input_len_normalized);
 	memcpy(out, unpadder.data_without_padding, input_len_normalized);
-	#endif
-	
-	#if defined (AES256_DYNAMIC_MEMORY) && (AES256_DYNAMIC_MEMORY == 1)
-	free(_aux_in);
 	#endif
 
 	return AES_CODE_OK;
