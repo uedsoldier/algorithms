@@ -31,7 +31,6 @@ typedef enum AES_errcode
     AES_CODE_OK,                    // OK
     AES_CODE_EMPTY_INPUT_BUFFER,    // Empty input buffer
     AES_CODE_INCORRECT_BUFFER_SIZE, // Normalized input length exceeds max buffer size
-    AES_CODE_NULL_MALLOC            // Dynamic memory assignment error
 } AES_errcode_t;
 
 /**
