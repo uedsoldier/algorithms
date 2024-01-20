@@ -18,12 +18,12 @@
 
 #pragma region Custom types
 typedef enum CHECKSUM8_t{
-    CHECKSUM8_XOR, CHECKSUM8_modulo256, CHECKSUM8_2complement, CHECKSUM8_COUNT
+    CHECKSUM8_XOR, CHECKSUM8_modulo256, CHECKSUM8_2complement
 } CHECKSUM8_t;
 #pragma endregion
 
 #pragma region Function prototypes
-uint8_t checksum8(void *datos, uint16_t len, CHECKSUM8_t tipo); 
+uint8_t checksum8(void *datos, uint16_t len, CHECKSUM8_t checksum_type); 
 #if defined(CHECKSUM8_USE_IMPLEMENTATION_NAMES) && ( CHECKSUM8_USE_IMPLEMENTATION_NAMES == 1 )
 static const char checksum8_implementation_0[] = "XOR"; 
 static const char checksum8_implementation_1[] = "modulo 256";
