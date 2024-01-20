@@ -498,7 +498,7 @@ static uint32_t CRC32_getFinalXOR(crc_t crc_type)
  * @param crc_type (crc_t) dato de enumeración de tipo de CRC en cuestión.
  * @return Valor de CRC de 8 bits para los datos introducidos.
  */
-uint8_t CRC8(void *data, uint16_t data_len, crc_t crc_type)
+uint8_t CRC8(const void *data, uint16_t data_len, crc_t crc_type)
 {
 #if defined CRC_LOG && CRC_LOG == 1
 	printf("\tType: %u\n", crc_type);
@@ -590,7 +590,7 @@ uint8_t CRC8(void *data, uint16_t data_len, crc_t crc_type)
  * @param crc_type (crc_t) dato de enumeración de tipo de CRC en cuestión.
  * @return Valor de CRC de 16 bits para los datos introducidos.
  */
-uint16_t CRC16(void *data, uint16_t data_len, crc_t crc_type)
+uint16_t CRC16(const void *data, uint16_t data_len, crc_t crc_type)
 {
 #if defined CRC_LOG && CRC_LOG == 1
 	printf("\tType: %u\n", crc_type);
@@ -678,7 +678,7 @@ uint16_t CRC16(void *data, uint16_t data_len, crc_t crc_type)
  * @param crc_type (crc_t) dato de enumeración de tipo de CRC en cuestión.
  * @return Valor de CRC de 32 bits para los datos introducidos.
  */
-uint32_t CRC32(void *data, uint16_t data_len, crc_t crc_type)
+uint32_t CRC32(const void *data, uint16_t data_len, crc_t crc_type)
 {
 #if defined CRC_LOG && CRC_LOG == 1
 	printf("\tType: %u\n", crc_type);

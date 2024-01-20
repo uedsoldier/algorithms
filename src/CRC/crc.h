@@ -49,6 +49,7 @@
 
 #pragma region Dependencies
 #include <stdint.h>
+#include <stdio.h>
 #include <stdbool.h>
 #pragma endregion
 
@@ -772,9 +773,9 @@ static uint16_t CRC16_getFinalXOR(crc_t crc_type);
 static uint32_t CRC32_getFinalXOR(crc_t crc_type);
 
 // Funciones para obtención de CRC para 8, 16 y 32 bits. Múltiples implementaciones.
-uint8_t CRC8(void *data, uint16_t dataLength, crc_t crc_type);
-uint16_t CRC16(void *data, uint16_t dataLength, crc_t crc_type);
-uint32_t CRC32(void *data, uint16_t dataLength, crc_t crc_type);
+uint8_t CRC8(const void *data, uint16_t dataLength, crc_t crc_type);
+uint16_t CRC16(const void *data, uint16_t dataLength, crc_t crc_type);
+uint32_t CRC32(const void *data, uint16_t dataLength, crc_t crc_type);
 
 #if defined(CRC_USE_IMPLEMENTATION_NAMES) && (CRC_USE_IMPLEMENTATION_NAMES == 1)
 const char *get_crc8_implementation(uint8_t index);
