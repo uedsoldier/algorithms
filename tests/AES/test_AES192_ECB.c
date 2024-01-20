@@ -7,7 +7,7 @@
 #include "../../src/PKCS7/PKCS7.h"
 
 
-const char *TEST_STRING = "12345678901234567890123456789012";
+const char *TEST_STRING = "1234567890123456";
 const char TEST_KEY[AES192_FIXED_KEY_SIZE] = {
 "123456789012345678901234"
 };
@@ -15,7 +15,7 @@ const char TEST_KEY[AES192_FIXED_KEY_SIZE] = {
 const char *TEST_NAME = "AES-192 ECB";
 
 
-size_t test_string_len, test_string_len_normalized, key_len, comparison;
+size_t test_string_len, key_len, comparison;
 size_t output_len;
 
 AES192_ctx_t AES192_ctx;
@@ -37,20 +37,14 @@ int main(int argc, char *argv[]){
     printf("%s testing\n",TEST_NAME);
     test_string_len = strlen(TEST_STRING);
     printf("Test string length: %u\n", test_string_len);
-    test_string_len_normalized = AES_ROUNDUP_TO_NEAREST_MULTIPLE_OF_16(test_string_len);
-    if(test_string_len == test_string_len_normalized){
-        test_string_len_normalized += AES_BLOCK_LEN;
-    }
-    printf("Test string length (normalized to nearest multiple of 16 and incremented if multiple of 16): %u\n", test_string_len_normalized);
-    key_len = strlen(TEST_KEY);
 
-    memset(input_string, 0, test_string_len_normalized);
-    memset(AES192_encrypt_buffer, 0, test_string_len_normalized);
-    memset(AES192_decrypt_buffer, 0, test_string_len_normalized);
+    memset(input_string, 0, AES192_MAX_BUFFER_SIZE);
+    memset(AES192_encrypt_buffer, 0, AES192_MAX_BUFFER_SIZE);
+    memset(AES192_decrypt_buffer, 0, AES192_MAX_BUFFER_SIZE);
 
     memcpy(input_string,TEST_STRING,test_string_len);
     printf("\nFILL INPUT DATA\n<<");
-    for (size_t i = 0; i < test_string_len_normalized; i++)
+    for (size_t i = 0; i < test_string_len; i++)
     {
         printf("%02X ",input_string[i]);
     }

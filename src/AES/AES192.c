@@ -65,11 +65,14 @@ void AES192_init_ctx(AES192_ctx_t *ctx, const uint8_t *key, const uint8_t *iv)
  */
 static void AES192_encrypt_chunk(AES192_ctx_t *ctx, uint8_t *in,uint8_t *out)
 {
+	#if defined(AES192_LOG) && AES192_LOG == 1
+    print_buffer(in,AES_BLOCK_LEN,"in");
+	#endif
     uint8_t round = 0;
     memcpy(out,in,AES_BLOCK_LEN);
 
     uint8_t expandedKey[AES192_KEY_EXP_SIZE]; 
-	KeyExpansion(ctx->key.array, expandedKey);
+	KeyExpansion_AES192(ctx->key.array, expandedKey);
 	AddRoundKey(out, ctx->key.array);
 
 	for (size_t i = 0; i < AES192_NUM_ROUNDS - 1; i++) {
@@ -88,8 +91,6 @@ static void AES192_encrypt_chunk(AES192_ctx_t *ctx, uint8_t *in,uint8_t *out)
 	#endif
 }
 
-
-
 /**
  * @brief 
  * 
@@ -99,11 +100,14 @@ static void AES192_encrypt_chunk(AES192_ctx_t *ctx, uint8_t *in,uint8_t *out)
  */
 static void AES192_decrypt_chunk(AES192_ctx_t *ctx, uint8_t *in,uint8_t *out)
 {
+	#if defined(AES192_LOG) && AES192_LOG == 1
+    print_buffer(in,AES_BLOCK_LEN,"in");
+	#endif
     memcpy(out,in,AES_BLOCK_LEN);
 
     uint8_t expandedKey[AES192_KEY_EXP_SIZE];
 
-	KeyExpansion(ctx->key.array, expandedKey);
+	KeyExpansion_AES192(ctx->key.array, expandedKey);
 
 	AddRoundKey(out, expandedKey + (AES_BLOCK_LEN * AES192_NUM_ROUNDS ));
 
@@ -426,7 +430,7 @@ AES_errcode_t AES192_CBC_decrypt(AES192_ctx_t *ctx, void *in, void *out, size_t 
  * @param inputKey 
  * @param expandedKeys 
  */
-static void KeyExpansion(uint8_t *inputKey, uint8_t *expandedKeys){
+static void KeyExpansion_AES192(uint8_t *inputKey, uint8_t *expandedKeys){
     size_t i;
     for (i = 0; i != AES192_FIXED_KEY_SIZE; i++) {
 		expandedKeys[i] = inputKey[i];
@@ -474,152 +478,3 @@ static void KeyExpansion(uint8_t *inputKey, uint8_t *expandedKeys){
 	}
 }
 
-/**
- * @brief 
- * 
- * @param plain_text 
- * @param roundKey 
- */
-static void AddRoundKey(uint8_t* plain_text, uint8_t * roundKey){
-    for (size_t i = 0; i != AES_BLOCK_LEN; i++) {
-		plain_text[i] = plain_text[i] ^ roundKey[i];
-	}
-}
-
-/**
- * @brief 
- * 
- * @param plain_text 
- */
-static void SubBytes(uint8_t * plain_text){
-    for (size_t i = 0; i != AES_BLOCK_LEN; i++) {
-		plain_text[i] = s_box[plain_text[i]];
-	}
-}
-
-/**
- * @brief 
- * 
- * @param plain_text 
- */
-static void ShiftRows(uint8_t * plain_text){
-    uint8_t temp_block[AES_BLOCK_LEN];
-
-	for (size_t i = 0; i != AES_BLOCK_LEN; i += 4) {
-		//incrementing by 5 causes the diagonal shift effect
-		temp_block[i] = plain_text[i];
-		temp_block[i + 1] = plain_text[(i + 5) % AES_BLOCK_LEN];
-		temp_block[i + 2] = plain_text[(i + 10) % AES_BLOCK_LEN];
-		temp_block[i + 3] = plain_text[(i + 15) % AES_BLOCK_LEN];
-	}
-
-	for (int i = 0; i != AES_BLOCK_LEN; i++) {
-		plain_text[i] = temp_block[i];
-	}
-}
-
-/**
- * @brief 
- * 
- * @param plain_text 
- */
-static void MixColumns(uint8_t *plain_text){
-    uint8_t temp_block[AES_BLOCK_LEN];
-
-	for (size_t i = 0; i != AES_BLOCK_LEN; i += 4) {
-
-		temp_block[i] = gmul(plain_text[i], (uint8_t)2) ^ gmul(plain_text[i + 1], (uint8_t)3) ^ plain_text[i + 2] ^ plain_text[i + 3];
-		temp_block[i + 1] = plain_text[i] ^ gmul(plain_text[i + 1], (uint8_t) 2) ^ gmul(plain_text[i + 2], (uint8_t) 3) ^ plain_text[i + 3];
-		temp_block[i + 2] = plain_text[i] ^ plain_text[i + 1] ^ gmul(plain_text[i + 2], (uint8_t) 2) ^ gmul(plain_text[i + 3], (uint8_t) 3);
-		temp_block[i + 3] = gmul(plain_text[i], (uint8_t) 3) ^ plain_text[i + 1] ^ plain_text[i + 2] ^ gmul(plain_text[i + 3], (uint8_t) 2);
-	}
-
-	for (int i = 0; i != AES_BLOCK_LEN; i++) {
-		plain_text[i] = temp_block[i];
-	}
-}
-
-/**
- * @brief 
- * 
- * @param state 
- */
-static void ReverseSubBytes(uint8_t * state){
-    for (size_t i = 0; i != AES_BLOCK_LEN; i++) {
-		state[i] = inv_s[state[i]];
-	}
-}
-
-/**
- * @brief 
- * 
- * @param plain_text 
- */
-static void ReverseShiftRows(uint8_t * plain_text){
-    uint8_t temp_block[AES_BLOCK_LEN];
-    size_t i;
-	for ( i = 0; i != AES_BLOCK_LEN; i += 4) {
-		//incrementing by 5 causes the diagonal shift effect
-		temp_block[i] = plain_text[i];
-		temp_block[(i + 5) % AES_BLOCK_LEN] = plain_text[i+1];
-		temp_block[(i + 10) % AES_BLOCK_LEN] = plain_text[i+2];
-		temp_block[(i + 15) % AES_BLOCK_LEN] = plain_text[i+3];
-	}
-
-	for ( i = 0; i != AES_BLOCK_LEN; i++) {
-		plain_text[i] = temp_block[i];
-	}
-}
-
-/**
- * @brief 
- * 
- * @param plain_text 
- */
-static void ReverseMixColumns(uint8_t *plain_text){
-    uint8_t temp_block[AES_BLOCK_LEN];
-    size_t i;
-	for ( i = 0; i != AES_BLOCK_LEN; i += 4) { 
-	//inverse multiplication > 9,11,13,14
-		temp_block[i] = gmul(plain_text[i], (uint8_t) 14) ^ gmul(plain_text[i + 1], (uint8_t)11) ^ 
-			gmul(plain_text[i + 2], (uint8_t)13) ^ gmul(plain_text[i + 3], (uint8_t)9);
-
-		temp_block[i + 1] = gmul(plain_text[i], (uint8_t) 9) ^ gmul(plain_text[i + 1], (uint8_t)14) ^ 
-			gmul(plain_text[i + 2], (uint8_t)11) ^ gmul(plain_text[i + 3], (uint8_t)13);
-
-		temp_block[i + 2] = gmul(plain_text[i], (uint8_t)13) ^ gmul(plain_text[i + 1], (uint8_t)9) ^ 
-			gmul(plain_text[i + 2], (uint8_t)14) ^ gmul(plain_text[i + 3], (uint8_t)11);
-
-		temp_block[i + 3] = gmul(plain_text[i], (uint8_t)11) ^ gmul(plain_text[i + 1], (uint8_t)13) ^ 
-			gmul(plain_text[i + 2], (uint8_t)9) ^ gmul(plain_text[i + 3], (uint8_t)14);
-	}
-
-    for ( i = 0; i != AES_BLOCK_LEN; i++) {
-		plain_text[i] = temp_block[i];
-	}
-}
-
-/**
- * @brief 
- * 
- * @param rhs 
- * @param lhs 
- * @return uint8_t 
- */
-static uint8_t gmul(uint8_t rhs, uint8_t lhs){
-    uint8_t peasant = 0;
-	uint16_t irreducible = 0x11b;
-	while (lhs) {
-		if (lhs & 1) {
-			peasant = peasant ^ rhs;
-		}
-		if (rhs & 0x80) {
-			rhs = (rhs << 1) ^ irreducible;
-		}
-		else {
-			rhs = rhs << 1;
-		}
-		lhs = lhs >> 1;
-	}
-	return peasant;
-}

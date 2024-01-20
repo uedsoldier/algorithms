@@ -134,20 +134,7 @@ static const char *AES256_TAG = "AES256";
 #pragma endregion
 
 #pragma region Auxiliary functions
-// For encryption
-static void KeyExpansion(uint8_t *inputKey, uint8_t *expandedKeys);
-static void AddRoundKey(uint8_t* plain_text, uint8_t * roundKey);
-static void SubBytes(uint8_t * plain_text);
-static void ShiftRows(uint8_t * plain_text);
-static void MixColumns(uint8_t *plain_text);
-
-// For decryption
-static void ReverseSubBytes(uint8_t * state);
-static void ReverseShiftRows(uint8_t * plain_text);
-static void ReverseMixColumns(uint8_t *plain_text);
-
-// Multiplication
-static uint8_t gmul(uint8_t rhs, uint8_t lhs);
+static void KeyExpansion_AES256(uint8_t *inputKey, uint8_t *expandedKeys);
 
 #pragma endregion
 
