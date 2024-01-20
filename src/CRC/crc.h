@@ -1,10 +1,13 @@
 /**
  * @file crc.h
+ * @author José Roberto Parra Trewartha (you@domain.com)
  * @brief Librería de implementación de funciones de verificación de redundancia cíclica (CRC o Cyclic Redundancy Check)
- * @author Ing. José Roberto Parra Trewartha
- * @version 1.0
+ * @version 0.1
+ * @date 2024-01-20
+ * 
+ * @copyright Copyright (c) 2024
+ * 
  */
-
 #ifndef CRC_H
 #define CRC_H
 
@@ -47,7 +50,6 @@
 #pragma region Dependencies
 #include <stdint.h>
 #include <stdbool.h>
-#include "../../../utilities/utils.h"
 #pragma endregion
 
 #pragma region Custom types
@@ -780,5 +782,13 @@ const char *get_crc16_implementation(uint8_t index);
 const char *get_crc32_implementation(uint8_t index);
 #endif
 #pragma endregion
+
+#pragma region Internal functions
+static uint8_t bit_invert_Byte(uint8_t data);
+static uint16_t bit_invert_Int16(uint16_t data);
+static uint32_t bit_invert_Int32(uint32_t data);
+#pragma endregion
+
+
 
 #endif /*CRC_H*/

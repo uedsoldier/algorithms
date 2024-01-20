@@ -750,3 +750,50 @@ uint32_t CRC32(void *data, uint16_t data_len, crc_t crc_type)
 
 	return crc ^ CRC32_getFinalXOR(crc_type);
 }
+
+/**
+ * @brief 
+ * 
+ * @param data 
+ * @return uint8_t 
+ */
+static uint8_t bit_invert_Byte(uint8_t data) {
+	uint8_t inverted_data = 0;
+	for( uint8_t i=0 ; i != 8; i++) {
+		if ( (data & (1<<i)) != 0)
+			inverted_data|= (1 << (7-i));
+	}
+	return inverted_data;
+}
+
+/**
+ * @brief 
+ * 
+ * @param data 
+ * @return uint16_t 
+ */
+static uint16_t bit_invert_Int16(uint16_t data) {
+    uint16_t inverted_data = 0;
+    for(uint8_t i=0 ; i != 16; i++)
+    {
+        if ( (data & (1<<i)) != 0)
+            inverted_data|= (1 << (15-i));
+    }
+    return inverted_data;
+}
+
+/**
+ * @brief 
+ * 
+ * @param data 
+ * @return uint32_t 
+ */
+static uint32_t bit_invert_Int32(uint32_t data) {
+    uint32_t inverted_data = 0;
+    for(uint8_t i=0 ; i != 32; i++)
+    {
+        if ( (data & (1UL<<i)) != 0)
+            inverted_data|= (1UL << (31-i));
+    }
+    return inverted_data;
+}
