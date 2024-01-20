@@ -6,5 +6,13 @@ set( CMAKE_C_COMPILER "gcc")
 # set the project name
 project(PKCS7_testing VERSION 0.1.0)
 
-add_executable(test test.c "../../src/PKCS7/PKCS7.c" "../../src/AES/AES.c")
+enable_testing()
 
+add_executable(tester_PKCS7_1len_block128 "./test_1_128.c" "../../src/PKCS7/PKCS7.c")
+add_test(Tester_PKCS7_1len_block128 tester_PKCS7_1len_block128)
+
+add_executable(tester_PKCS7_2len_block128 "./test_2_128.c" "../../src/PKCS7/PKCS7.c")
+add_test(Tester_PKCS7_2len_block128 tester_PKCS7_2len_block128)
+
+add_executable(tester_PKCS7_10len_block128 "./test_10_128.c" "../../src/PKCS7/PKCS7.c")
+add_test(Tester_PKCS7_10len_block128 tester_PKCS7_10len_block128)

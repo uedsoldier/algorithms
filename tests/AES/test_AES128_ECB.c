@@ -15,7 +15,7 @@ const char TEST_KEY[AES128_FIXED_KEY_SIZE] = {
 const char *TEST_NAME = "AES-128 ECB";
 
 
-size_t test_string_len, key_len, comparison;
+size_t input_string_len, key_len, comparison;
 size_t output_len;
 
 AES128_ctx_t AES128_ctx;
@@ -29,23 +29,23 @@ uint8_t AES128_decrypt_buffer[AES128_MAX_BUFFER_SIZE];
 int main(int argc, char *argv[]){
 
     printf("%s testing\n",TEST_NAME);
-    test_string_len = strlen(TEST_STRING);
-    printf("Test string length: %u\n", test_string_len);
+    input_string_len = strlen(TEST_STRING);
+    printf("Test string length: %u\n", input_string_len);
 
     memset(input_string, 0, AES128_MAX_BUFFER_SIZE);
     memset(AES128_encrypt_buffer, 0, AES128_MAX_BUFFER_SIZE);
     memset(AES128_decrypt_buffer, 0, AES128_MAX_BUFFER_SIZE);
 
-    memcpy(input_string,TEST_STRING,test_string_len);
+    memcpy(input_string,TEST_STRING,input_string_len);
     printf("\nFILL INPUT DATA\n<<");
-    for (size_t i = 0; i != test_string_len; i++)
+    for (size_t i = 0; i != input_string_len; i++)
     {
         printf("%02X ",input_string[i]);
     }
     printf(">>\n");
     
     AES128_init_ctx(&AES128_ctx, TEST_KEY, NULL);
-    AES128_code = AES128_ECB_encrypt(&AES128_ctx, input_string, AES128_encrypt_buffer, test_string_len, &output_len);
+    AES128_code = AES128_ECB_encrypt(&AES128_ctx, input_string, AES128_encrypt_buffer, input_string_len, &output_len);
 
     printf("AES output ( %u bytes): [ ", output_len);
     for (size_t i = 0; i != output_len; i++)
@@ -54,7 +54,7 @@ int main(int argc, char *argv[]){
     }
     printf("]\n");
 
-    AES128_code = AES128_ECB_decrypt(&AES128_ctx, AES128_encrypt_buffer, AES128_decrypt_buffer, test_string_len, &output_len);
+    AES128_code = AES128_ECB_decrypt(&AES128_ctx, AES128_encrypt_buffer, AES128_decrypt_buffer, input_string_len, &output_len);
     printf("Back to ASCII (%u bytes):\n<<", output_len, AES128_decrypt_buffer);
     for (size_t i = 0; i != output_len; i++)
     {
@@ -62,7 +62,7 @@ int main(int argc, char *argv[]){
     }
     printf(">>\n");
 
-    comparison = memcmp(TEST_STRING, AES128_decrypt_buffer, test_string_len);
+    comparison = memcmp(TEST_STRING, AES128_decrypt_buffer, input_string_len);
     if(comparison == 0){
         printf("%s OK\n",TEST_NAME);
         return EXIT_SUCCESS;
