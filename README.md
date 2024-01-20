@@ -13,11 +13,13 @@ En caso de que este código sea necesitado, se debe hacer una copia de los archo
 * Para Windows:
 ``` cmake -S . -B build/ -G "MinGW Makefiles"```
 Desde la carpeta build/: 
-``` mingw32-make ```
+``` mingw32-make -j<n>```
 * Para Linux:
 ``` cmake -S . -B build/ -G "MinGW Makefiles"```
 Desde la carpeta build/: 
-``` make ```
+``` make -j<n>```
+
+Donde 'n' representa el número de procesos en paralelo para completar el comando 'make'
 
 # Pruebas de funcionamiento
 Dentro de la carpeta ```build/``` de cada módulo de pruebas, se genera un ejecutable con nombre ```test```

@@ -2,6 +2,7 @@ from argparse import ArgumentParser
 from os import chdir,getcwd,system,mkdir,path
 from shutil import rmtree
 import platform
+from multiprocessing import cpu_count
 
 algorithm_choices = ('BASE64','CRC','XTEA','CHECKSUM8','AES','SHA1','PKCS7')
 
@@ -29,12 +30,14 @@ def main():
     os_platform = platform.system()
     print(f'Running in {os_platform} platform')
     
+    cpus = cpu_count()
+    
     if(os_platform == 'Linux'):
         cmake_command = 'cmake -S . -B build/'
-        make_command = 'make'
+        make_command = f'make -j{cpus}'
     elif(os_platform == 'Windows'):
         cmake_command = 'cmake -S . -B build/ -G "MinGW Makefiles"'
-        make_command = 'mingw32-make'
+        make_command = f'mingw32-make -j{cpus}'
     else:
         print(f'Unsupported OS/platform {os_platform}')
         raise SystemExit(-1)
