@@ -111,8 +111,8 @@ static const char *AES128_TAG = "AES128";
     {
         AES128_key_t key;    // Key
         uint8_t iv[AES_BLOCK_LEN];          // Initialization vector for CBC and CTR modes
-        uint32_t encrypted_chunks;
-        uint32_t decrypted_chunks;
+        size_t encrypted_chunks;
+        size_t decrypted_chunks;
         size_t input_len_normalized;
 
     } AES128_ctx_t;

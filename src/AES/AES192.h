@@ -111,8 +111,8 @@ static const char *AES192_TAG = "AES192";
     {
         AES192_key_t key;    // Key
         uint8_t iv[AES_BLOCK_LEN];          // Initialization vector for CBC and CTR modes
-        uint32_t encrypted_chunks;
-        uint32_t decrypted_chunks;
+        size_t encrypted_chunks;
+        size_t decrypted_chunks;
         size_t input_len_normalized;
 
     } AES192_ctx_t;

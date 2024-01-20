@@ -15,7 +15,7 @@ const char TEST_KEY[AES128_FIXED_KEY_SIZE] = {
 const char *TEST_NAME = "AES-128 ECB";
 
 
-size_t test_string_len, test_string_len_normalized, key_len, comparison;
+size_t test_string_len, key_len, comparison;
 size_t output_len;
 
 AES128_ctx_t AES128_ctx;

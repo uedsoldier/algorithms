@@ -11,21 +11,6 @@
 
 #include "AES256.h"
 
-#if defined(AES256_LOG) && AES256_LOG == 1
-void print_buffer(uint8_t *buffer, size_t len, const char *msg){
-
-    size_t i;
-	printf("%s:\n",msg);
-	for( i=0 ; i!=len; i++){
-        uint8_t c = buffer[i];
-        printf("%02x ",c);
-	}
-    printf("\n");	
-}
-	
-#endif
-
-
 /**
  * @brief 
  * 
@@ -468,7 +453,6 @@ static void KeyExpansion_AES256(uint8_t *inputKey, uint8_t *expandedKeys){
 		}
 		}
 		
-
 		for (i = 0; i != 4; i++) {
 			expandedKeys[bytesGenerated] = expandedKeys[bytesGenerated - AES256_FIXED_KEY_SIZE] ^ key_block[i];
 			bytesGenerated++;

@@ -11,21 +11,6 @@
 
 #include "AES128.h"
 
-#if defined(AES128_LOG) && AES128_LOG == 1
-void print_buffer(uint8_t *buffer, size_t len, const char *msg){
-
-    size_t i;
-	printf("%s:\n",msg);
-	for( i=0 ; i!=len; i++){
-        uint8_t c = buffer[i];
-        printf("%02x ",c);
-	}
-    printf("\n");	
-}
-	
-#endif
-
-
 /**
  * @brief 
  * 
