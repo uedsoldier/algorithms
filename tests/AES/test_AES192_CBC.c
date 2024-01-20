@@ -22,15 +22,9 @@ AES192_ctx_t AES192_ctx;
 
 AES_errcode_t AES192_code;
 
-#if defined(AES192_DYNAMIC_MEMORY) && (AES192_DYNAMIC_MEMORY == 1)
-uint8_t *input_string;
-uint8_t *AES192_encrypt_buffer;
-uint8_t *AES192_decrypt_buffer;
-#else
 uint8_t input_string[AES192_MAX_BUFFER_SIZE];
 uint8_t AES192_encrypt_buffer[AES192_MAX_BUFFER_SIZE];
 uint8_t AES192_decrypt_buffer[AES192_MAX_BUFFER_SIZE];
-#endif
 
 int main(int argc, char *argv[]){
 
