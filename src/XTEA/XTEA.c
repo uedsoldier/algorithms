@@ -35,16 +35,21 @@ void XTEA_init(XTEA_t *xtea, uint16_t rounds, const xtea_key_t *key, const xtea_
 		case 64:
 			xtea->iterations = 64;
 			break;
+		case 128:
+			xtea->iterations = 128;
+			break;
 		
 		default:
 			#if defined(XTEA_LOG) && XTEA_LOG == 1
-			printf("XTEA rounds must be 8, 16, 32 or 64. Using default value (64).\n");
+			printf("XTEA rounds must be 8, 16, 32, 64 or 128. Using default value (64).\n");
 			#endif
 			xtea->iterations = 64;
 			break;
 	}
 	
 	xtea->dec_sum = XTEA_DELTA * (xtea->iterations);
+	memset( xtea->key.key_bytes, 0, XTEA_FIXED_KEY_SIZE);
+	memset( xtea->iv, 0, XTEA_INIT_VECTOR_SIZE);
 	memcpy( xtea->key.key_bytes, key, XTEA_FIXED_KEY_SIZE);
 	memcpy( xtea->iv, iv, XTEA_INIT_VECTOR_SIZE);
 	XTEA_set_fixedKey(xtea);
@@ -52,11 +57,11 @@ void XTEA_init(XTEA_t *xtea, uint16_t rounds, const xtea_key_t *key, const xtea_
 	uint8_t i;
 	printf("\t* Iterations: %u\n\t* Dec sum: 0x%08lX\n\t* Key (hex bytes): [",xtea->iterations,xtea->dec_sum);
 	for (i = 0; i != XTEA_FIXED_KEY_SIZE; i++){
-		printf("%02x (%c)",xtea->key.key_bytes[i],xtea->key.key_bytes[i]);
+		printf("%02x ",xtea->key.key_bytes[i]);
 	}
 	printf("]\n\t* Initializating vector (hex bytes): [");
 	for (i = 0; i != XTEA_INIT_VECTOR_SIZE; i++){
-		printf("%02x (%c)",xtea->iv[i],xtea->iv[i]);
+		printf("%02x ",xtea->iv->iv_array[i]);
 	}
 	printf("]\n");
 	#endif
@@ -95,7 +100,7 @@ static void XTEA_encrypt_chunk(XTEA_t *xtea, uint32_t *in, uint32_t *out)  {
 	printf("\t");
 	#endif
 	uint32_t v0, v1, x, y, sum = 0;
-	int8_t n = xtea->iterations;
+	int16_t n = xtea->iterations;
 	uint8_t i;
 	v0 = in[0];  v1 = in[1];
 	while(n != 0) { 
@@ -152,7 +157,7 @@ static void XTEA_decrypt_chunk(XTEA_t *xtea, uint32_t * in,uint32_t * out) {
 	printf("\t");
 	#endif
 	uint32_t  v0, v1, x, y, sum = xtea->dec_sum;
-	int8_t n = xtea->iterations;
+	int16_t n = xtea->iterations;
 	uint8_t i;
 	v0 = in[0];  v1 = in[1];
 	while(n > 0) {
@@ -211,7 +216,7 @@ XTEA_code_t XTEA_encrypt(XTEA_t *xtea, void *in, void *out, size_t input_len, bo
 	}
 	// Normalized length calculation
 	xtea->encrypted_chunks = 0;
-	size_t input_len_normalized = xtea->input_len_normalized = (size_t)(XTEA_ROUNDUP_TO_NEAREST_MULTIPLE_OF_8(input_len));
+	xtea->input_len_normalized = (size_t)(XTEA_ROUNDUP_TO_NEAREST_MULTIPLE_OF_8(input_len));
 	if(input_len == xtea->input_len_normalized){
         xtea->input_len_normalized += XTEA_BLOCK_SIZE;
     }
@@ -232,9 +237,9 @@ XTEA_code_t XTEA_encrypt(XTEA_t *xtea, void *in, void *out, size_t input_len, bo
 	#if defined(XTEA_USE_PKCS7) && XTEA_USE_PKCS7 == 1
 	PKCS7_padding_t padder;
 	PKCS7_add_padding(&padder, in, input_len, XTEA_BLOCK_SIZE);
-	memcpy(_in, padder.data_with_padding, input_len_normalized);
+	memcpy(_in, padder.data_with_padding, xtea->input_len_normalized);
 	#else
-	memcpy(_in, in, input_len_normalized);
+	memcpy(_in, in, xtea->input_len_normalized);
 	#endif
 	
 	// Chunk encryption

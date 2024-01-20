@@ -50,7 +50,7 @@ extern "C" {
  * requiere asignación dinámica de memoria
  * 
  */
-#define XTEA_MAX_BUFFER_SIZE 128
+#define XTEA_MAX_BUFFER_SIZE 256
 
 #pragma endregion
 
@@ -136,11 +136,11 @@ typedef struct XTEA{
      * 0xF1BBCDC8 para 8 iteraciones
      */
     uint32_t dec_sum;   
-    uint32_t iterations;                    // Número de iteraciones para la ejecución del algoritmo. 32 es bastante, 16 son suficientes, y alrededor de 8 serviría para muchas aplicaciones. 
+    uint8_t iterations;                    // Número de iteraciones para la ejecución del algoritmo. 32 es bastante, 16 son suficientes, y alrededor de 8 serviría para muchas aplicaciones. 
     xtea_key_t key;                         // Llave del algoritmo, consistente en 128 bits(4 enteros de 32 bits).
     xtea_iv_t iv[XTEA_INIT_VECTOR_SIZE];      // Vector de inicialización para modalidad CBC
-    uint32_t encrypted_chunks;
-    uint32_t decrypted_chunks;
+    size_t encrypted_chunks;
+    size_t decrypted_chunks;
     size_t input_len_normalized;
 } XTEA_t;
 
