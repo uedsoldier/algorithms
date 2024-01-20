@@ -14,6 +14,7 @@
 #pragma region Dependencies
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 #pragma endregion
 
 #ifdef __cplusplus
@@ -24,35 +25,13 @@ extern "C"
 #pragma region Useful macros
 
 #pragma region Memory macros
-/**
- * @brief Macro para utilización de asignación dinámica de memoria en las funciones SHA1.
- * Usar esta característica permite ahorrar memoria RAM, pero no todos los dispositivos ni todos
- * los compiladores soportan tales funcionalidades (malloc(), calloc(), realloc(), etc.)
- */
-#ifndef SHA1_DYNAMIC_MEMORY
-#define SHA1_DYNAMIC_MEMORY 0
-#endif
-
-/**
- * @brief Macro para utilizacion de buffers fijos auxiliares para entrada de datos, de tal forma
- * que el buffer de entrada de datos no se modifica. Para utilizarse, la macro SHA1_DYNAMIC_MEMORY
- * debe estar indefinida o con valor igual a 0.
- *
- */
-#if !defined(SHA1_DYNAMIC_MEMORY) || (SHA1_DYNAMIC_MEMORY == 0)
-#ifndef SHA1_USE_BUFFERS
-#define SHA1_USE_BUFFERS 1
-#endif
-#endif
 
 /**
  * @brief Macro para definición de máximo tamaño de buffer, para los casos en los que no se
  * requiere asignación dinámica de memoria. Por ejemplo: microcontroladores.
  *
  */
-#ifdef SHA1_USE_BUFFERS
 #define SHA1_MAX_BUFFER_SIZE_BYTES 64
-#endif
 #pragma endregion
 
 #pragma region General constants
