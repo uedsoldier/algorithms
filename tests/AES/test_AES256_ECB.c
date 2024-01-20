@@ -68,7 +68,7 @@ int main(int argc, char *argv[]){
     }
     else{
         printf("%s not OK\n",TEST_NAME);
-        return EXIT_SUCCESS;
+        return EXIT_FAILURE;
     }
 
 }
