@@ -1,5 +1,5 @@
 from argparse import ArgumentParser
-from os import chdir,getcwd,system,mkdir,path
+from os import chdir,system,mkdir,path
 from shutil import rmtree
 import platform
 from multiprocessing import cpu_count
