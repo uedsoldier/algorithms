@@ -4,7 +4,7 @@ from shutil import rmtree
 import platform
 from multiprocessing import cpu_count
 
-algorithm_choices = ('BASE64','CRC','XTEA','CHECKSUM8','AES','SHA1','PKCS7','SHA256')
+algorithm_choices = ('BASE64','CRC','XTEA','CHECKSUM8','AES','SHA1','PKCS7','SHA256','STRING')
 
 build_dir = 'build/'
 
