@@ -1,66 +1,38 @@
 /**
  * @file AES128.c
  * @author your name (you@domain.com)
- * @brief 
+ * @brief
  * @version 0.1
  * @date 2024-01-19
- * 
+ *
  * @copyright Copyright (c) 2024
- * 
+ *
  */
 
 #include "AES128.h"
 
-/**
- * @brief 
- * 
- * @param ctx 
- * @param key 
- * @param iv 
- */
 void AES128_init_ctx(AES128_ctx_t *ctx, const uint8_t *key, const uint8_t *iv)
 {
-    #if defined(AES128_LOG) && AES128_LOG == 1
-    printf("AES-128 init context. Make sure key is %u bytes long\n",AES128_FIXED_KEY_SIZE);
-    #endif
-    memcpy(ctx->key.array,key,AES128_FIXED_KEY_SIZE);
-    ctx->decrypted_chunks = 0;
-    ctx->encrypted_chunks = 0;
-    #if defined(AES128_LOG) && AES128_LOG == 1
-	
-    print_buffer(ctx->key.array,AES128_FIXED_KEY_SIZE,"AES-128 KEY");
-	#endif
-	if(iv == NULL) return;
-    memcpy(ctx->iv, iv, AES_BLOCK_LEN);
-    #if defined(AES128_LOG) && AES128_LOG == 1
-    printf("* Initializating vector (hex bytes): [");
-	for (uint8_t i = 0; i != AES_BLOCK_LEN; i++){
-		printf("%02x (%c)",iv[i],iv[i]);
-	}
-	printf("]\n");
-    #endif
+	memcpy(ctx->key.array, key, AES128_FIXED_KEY_SIZE);
+	ctx->decrypted_chunks = 0;
+	ctx->encrypted_chunks = 0;
+
+	if (iv == NULL)
+		return;
+	memcpy(ctx->iv, iv, AES_BLOCK_LEN);
 }
 
-/**
- * @brief Function that encrypts the PlainText.
- * 
- * @param ctx 
- * @param in_state 
- * @param out_state 
- */
-static void AES128_encrypt_chunk(AES128_ctx_t *ctx, uint8_t *in,uint8_t *out)
+static void AES128_encrypt_chunk(AES128_ctx_t *ctx, uint8_t *in, uint8_t *out)
 {
-	#if defined(AES128_LOG) && AES128_LOG == 1
-    print_buffer(in,AES_BLOCK_LEN,"in");
-	#endif
-    uint8_t round = 0;
-    memcpy(out,in,AES_BLOCK_LEN);
+	uint8_t round = 0;
+	memcpy(out, in, AES_BLOCK_LEN);
 
-    uint8_t expandedKey[AES128_KEY_EXP_SIZE]; 
+	uint8_t expandedKey[AES128_KEY_EXP_SIZE];
 	KeyExpansion_AES128(ctx->key.array, expandedKey);
 	AddRoundKey(out, ctx->key.array);
 
-	for (size_t i = 0; i < AES128_NUM_ROUNDS - 1; i++) {
+	for (size_t i = 0; i < AES128_NUM_ROUNDS - 1; i++)
+	{
 		SubBytes(out);
 		ShiftRows(out);
 		MixColumns(out);
@@ -70,296 +42,302 @@ static void AES128_encrypt_chunk(AES128_ctx_t *ctx, uint8_t *in,uint8_t *out)
 	SubBytes(out);
 	ShiftRows(out);
 	AddRoundKey(out, expandedKey + (AES_BLOCK_LEN * AES128_NUM_ROUNDS));
-
-    #if defined(AES128_LOG) && AES128_LOG == 1
-    print_buffer(out,AES_BLOCK_LEN,"out");
-	#endif
 }
 
-/**
- * @brief 
- * 
- * @param ctx 
- * @param in 
- * @param out 
- */
-static void AES128_decrypt_chunk(AES128_ctx_t *ctx, uint8_t *in,uint8_t *out)
+static void AES128_decrypt_chunk(AES128_ctx_t *ctx, uint8_t *in, uint8_t *out)
 {
-	#if defined(AES128_LOG) && AES128_LOG == 1
-    print_buffer(in,AES_BLOCK_LEN,"in");
-	#endif
-    memcpy(out,in,AES_BLOCK_LEN);
+	memcpy(out, in, AES_BLOCK_LEN);
 
-    uint8_t expandedKey[AES128_KEY_EXP_SIZE];
+	uint8_t expandedKey[AES128_KEY_EXP_SIZE];
 
 	KeyExpansion_AES128(ctx->key.array, expandedKey);
 
-	AddRoundKey(out, expandedKey + (AES_BLOCK_LEN * AES128_NUM_ROUNDS ));
+	AddRoundKey(out, expandedKey + (AES_BLOCK_LEN * AES128_NUM_ROUNDS));
 
 	ReverseShiftRows(out);
 	ReverseSubBytes(out);
 
-	for (size_t i = AES128_NUM_ROUNDS -1; i >= 1; i--) {
+	for (size_t i = AES128_NUM_ROUNDS - 1; i >= 1; i--)
+	{
 		AddRoundKey(out, expandedKey + (AES_BLOCK_LEN * i));
 		ReverseMixColumns(out);
 		ReverseShiftRows(out);
 		ReverseSubBytes(out);
 	}
 	AddRoundKey(out, expandedKey);
-
-    #if defined(AES128_LOG) && AES128_LOG == 1
-    print_buffer(out,AES_BLOCK_LEN,"out");
-	#endif
 }
 
-/**
- * @brief 
- * 
- * @param ctx 
- * @param in 
- * @param out 
- * @param input_len 
- * @param output_len 
- * @return AES_errcode_t 
- */
-AES_errcode_t AES128_ECB_encrypt(AES128_ctx_t *ctx, void *in, void *out, size_t input_len, uint32_t *output_len){
-    #if defined(AES128_LOG) && AES128_LOG == 1
-    printf("AES-128 ECB encrypt\n");
-    #endif
-    // Input buffer length verification
-    if(input_len<= 0){
+AES_errcode_t AES128_ECB_encrypt(AES128_ctx_t *ctx, void *in, void *out, size_t input_len, uint32_t *output_len, bool use_padding)
+{
+	// Input buffer length verification
+	if (input_len <= 0)
+	{
 		return AES_CODE_EMPTY_INPUT_BUFFER;
-    }
-    // Normalized length calculation
-    ctx->encrypted_chunks = 0;
-    ctx->input_len_normalized = (size_t)(AES_ROUNDUP_TO_NEAREST_MULTIPLE_OF_16(input_len));
-    if(input_len == ctx->input_len_normalized){
-        ctx->input_len_normalized += AES_BLOCK_LEN;
-    }
+	}
 
-	if( ctx->input_len_normalized > AES128_MAX_BUFFER_SIZE){
+	// Normalized length calculation
+	ctx->encrypted_chunks = 0;
+	ctx->input_len_normalized = (size_t)(AES_ROUNDUP_TO_NEAREST_MULTIPLE_OF_16(input_len));
+	if (input_len == ctx->input_len_normalized && use_padding)
+	{
+		ctx->input_len_normalized += AES_BLOCK_LEN;
+	}
+
+	if (ctx->input_len_normalized > AES128_MAX_BUFFER_SIZE)
+	{
 		return AES_CODE_INCORRECT_BUFFER_SIZE;
 	}
 
-    // Input buffer allocation, backup and initialization 
-	uint8_t *_in = (uint8_t *)in;
+	// Create a temporary buffer for processing
+	uint8_t temp_buffer[AES128_MAX_BUFFER_SIZE];
+	memset(temp_buffer, 0, AES128_MAX_BUFFER_SIZE);
 
-	#if defined(AES128_USE_PKCS7) && AES128_USE_PKCS7 == 1
-	PKCS7_padding_t padder;
-	PKCS7_add_padding(&padder, in, input_len, AES_BLOCK_LEN);
-	memcpy(_in, padder.data_with_padding, ctx->input_len_normalized);
-	#else
-	memcpy(_in, in, ctx->input_len_normalized);
-	#endif
-
-    // Initialization vector and output buffer allocation
-	uint8_t *_out = (uint8_t *)out; 
-	memset(_out, 0 , ctx->input_len_normalized);
-
-    // Chunk encryption
-	while( ctx->input_len_normalized != 0) {
-		#if defined(AES128_LOG) && AES128_LOG == 1
-		printf("Chunk %u (bytes %u to %u):\n",ctx->encrypted_chunks+1,ctx->encrypted_chunks*AES_BLOCK_LEN,(ctx->encrypted_chunks+1)*AES_BLOCK_LEN-1);
-		#endif
-
-		AES128_encrypt_chunk(ctx,_in,_out);
-
-		_in += AES_BLOCK_LEN; _out += AES_BLOCK_LEN; ctx->input_len_normalized-= AES_BLOCK_LEN; ctx->encrypted_chunks++;
-		
+	// Prepare input data with or without padding
+	if (use_padding)
+	{
+		PKCS7_padding_t padder;
+		PKCS7_add_padding(&padder, in, input_len, AES_BLOCK_LEN);
+		memcpy(temp_buffer, padder.data_with_padding, ctx->input_len_normalized);
 	}
-	*output_len = ctx->encrypted_chunks*AES_BLOCK_LEN;
+	else
+	{
+		memcpy(temp_buffer, in, input_len);
+		// Zero-pad the rest if not using PKCS7
+		if (input_len < ctx->input_len_normalized)
+		{
+			memset(temp_buffer + input_len, 0, ctx->input_len_normalized - input_len);
+		}
+	}
+
+	// Initialization vector and output buffer allocation
+	uint8_t *_out = (uint8_t *)out;
+	memset(_out, 0, ctx->input_len_normalized);
+
+	// Pointer to the current position in the temp buffer
+	uint8_t *_in = temp_buffer;
+	size_t remaining = ctx->input_len_normalized;
+
+	// Chunk encryption
+	while (remaining > 0)
+	{
+		AES128_encrypt_chunk(ctx, _in, _out);
+		_in += AES_BLOCK_LEN;
+		_out += AES_BLOCK_LEN;
+		remaining -= AES_BLOCK_LEN;
+		ctx->encrypted_chunks++;
+	}
+
+	*output_len = ctx->encrypted_chunks * AES_BLOCK_LEN;
 	return AES_CODE_OK;
 }
 
-/**
- * @brief 
- * 
- * @param ctx 
- * @param in 
- * @param out 
- * @param input_len 
- * @param output_len 
- * @return AES_errcode_t 
- */
-AES_errcode_t AES128_ECB_decrypt(AES128_ctx_t *ctx, void *in, void *out, size_t input_len, uint32_t *output_len){
-    #if defined(AES128_LOG) && AES128_LOG == 1
-    printf("AES-128 ECB decrypt\n");
-    #endif
-    // Input buffer length verification
-    if(input_len<= 0){
-        return AES_CODE_EMPTY_INPUT_BUFFER;
-    }
-    // Normalized length calculation
-    ctx->decrypted_chunks = 0;
-    size_t input_len_normalized = ctx->input_len_normalized = (size_t)(AES_ROUNDUP_TO_NEAREST_MULTIPLE_OF_16(input_len));
-    if(input_len == input_len_normalized){
-        ctx->input_len_normalized = input_len_normalized += AES_BLOCK_LEN;
-    }
-	if( ctx->input_len_normalized > AES128_MAX_BUFFER_SIZE){
+AES_errcode_t AES128_ECB_decrypt(AES128_ctx_t *ctx, void *in, void *out, size_t input_len, uint32_t *output_len, bool use_padding)
+{
+	// Input buffer length verification
+	if (input_len <= 0)
+	{
+		return AES_CODE_EMPTY_INPUT_BUFFER;
+	}
+
+	// Normalized length calculation
+	ctx->decrypted_chunks = 0;
+	size_t input_len_normalized = ctx->input_len_normalized = (size_t)(AES_ROUNDUP_TO_NEAREST_MULTIPLE_OF_16(input_len));
+
+	if (ctx->input_len_normalized > AES128_MAX_BUFFER_SIZE)
+	{
 		return AES_CODE_INCORRECT_BUFFER_SIZE;
 	}
 
-    // Input buffer allocation, backup and initialization
-	uint8_t *_in = (uint8_t *)in;
+	// Create a temporary buffer for processing
+	uint8_t temp_buffer[AES128_MAX_BUFFER_SIZE];
+	memcpy(temp_buffer, in, input_len);
 
-	memcpy(_in, in, ctx->input_len_normalized);
+	// Initialization vector and output buffer allocation
+	uint8_t *_out = (uint8_t *)out;
+	memset(_out, 0, input_len_normalized);
 
-    // Initialization vector and output buffer allocation
-	uint8_t *_out = (uint8_t *)out; 
-	memset(_out, 0 , input_len_normalized);
+	// Pointer to the current position in the temp buffer
+	uint8_t *_in = temp_buffer;
+	size_t remaining = input_len_normalized;
 
-    // Chunk decryption
-	while( input_len_normalized != 0) {
-		#if defined(AES128_LOG) && AES128_LOG == 1
-		printf("Chunk %u (bytes %u to %u):\n",ctx->decrypted_chunks+1,ctx->decrypted_chunks*AES_BLOCK_LEN,(ctx->decrypted_chunks+1)*AES_BLOCK_LEN-1);
-		#endif
-
-		AES128_decrypt_chunk(ctx,_in,_out);
-
-		_in += AES_BLOCK_LEN; _out += AES_BLOCK_LEN; input_len_normalized-= AES_BLOCK_LEN; ctx->decrypted_chunks++;
-		
+	// Chunk decryption
+	while (remaining > 0)
+	{
+		AES128_decrypt_chunk(ctx, _in, _out);
+		_in += AES_BLOCK_LEN;
+		_out += AES_BLOCK_LEN;
+		remaining -= AES_BLOCK_LEN;
+		ctx->decrypted_chunks++;
 	}
-	*output_len = ctx->decrypted_chunks*AES_BLOCK_LEN;
-	
-	#if defined(AES128_USE_PKCS7) && AES128_USE_PKCS7 == 1
-	PKCS7_unpadding_t unpadder;
-	PKCS7_remove_padding(&unpadder, out, ctx->input_len_normalized);
-	memcpy(out, unpadder.data_without_padding, ctx->input_len_normalized);
-	#endif
+
+	*output_len = ctx->decrypted_chunks * AES_BLOCK_LEN;
+
+	if (use_padding)
+	{
+		PKCS7_unpadding_t unpadder;
+		PKCS7_remove_padding(&unpadder, out, input_len_normalized);
+
+		// Create a temporary buffer for the unpadded data
+		uint8_t unpadded_buffer[AES128_MAX_BUFFER_SIZE];
+		memcpy(unpadded_buffer, unpadder.data_without_padding, unpadder.data_len_without_padding);
+
+		// Copy the unpadded data back to the output buffer
+		memset(out, 0, input_len_normalized); // Clear the output buffer first
+		memcpy(out, unpadded_buffer, unpadder.data_len_without_padding);
+
+		*output_len = unpadder.data_len_without_padding;
+	}
 
 	return AES_CODE_OK;
 }
 
-/**
- * @brief 
- * 
- * @param ctx 
- * @param in 
- * @param out 
- * @param input_len 
- * @param output_len 
- * @return AES_errcode_t 
- */
-AES_errcode_t AES128_CBC_encrypt(AES128_ctx_t *ctx, void *in, void *out, size_t input_len, uint32_t *output_len){
-    #if defined(AES128_LOG) && AES128_LOG == 1
-    printf("AES-128 CBC encrypt\n");
-    #endif
-    // Input buffer length verification
-    if(input_len<= 0){
-        return AES_CODE_EMPTY_INPUT_BUFFER;
-    }
-    // Normalized length calculation
-    ctx->encrypted_chunks = 0;
-    size_t input_len_normalized = (size_t)(AES_ROUNDUP_TO_NEAREST_MULTIPLE_OF_16(input_len));
-    ctx->input_len_normalized = input_len_normalized;
-    if(input_len == input_len_normalized){
-        ctx->input_len_normalized = input_len_normalized += AES_BLOCK_LEN;
-    }
+AES_errcode_t AES128_CBC_encrypt(AES128_ctx_t *ctx, void *in, void *out, size_t input_len, uint32_t *output_len, bool use_padding)
+{
+	// Input buffer length verification
+	if (input_len <= 0)
+	{
+		return AES_CODE_EMPTY_INPUT_BUFFER;
+	}
 
-    // Input buffer allocation, backup and initialization 
-	uint8_t *_in = (uint8_t *)in;
+	// Normalized length calculation
+	ctx->encrypted_chunks = 0;
+	size_t input_len_normalized = (size_t)(AES_ROUNDUP_TO_NEAREST_MULTIPLE_OF_16(input_len));
+	ctx->input_len_normalized = input_len_normalized;
+	if (input_len == input_len_normalized && use_padding)
+	{
+		ctx->input_len_normalized = input_len_normalized += AES_BLOCK_LEN;
+	}
 
-	#if defined(AES128_USE_PKCS7) && AES128_USE_PKCS7 == 1
-	PKCS7_padding_t padder;
-	PKCS7_add_padding(&padder, in, input_len, AES_BLOCK_LEN);
-	memcpy(_in, padder.data_with_padding, input_len_normalized);
-	#else
-	memcpy(_in, in, input_len_normalized);
-	#endif
+	if (input_len_normalized > AES128_MAX_BUFFER_SIZE)
+	{
+		return AES_CODE_INCORRECT_BUFFER_SIZE;
+	}
 
-    // Initialization vector and output buffer allocation
-	uint8_t *_out = (uint8_t *)out; 
-	memset(_out, 0 , input_len_normalized);
+	// Create a temporary buffer for processing
+	uint8_t temp_buffer[AES128_MAX_BUFFER_SIZE];
+	memset(temp_buffer, 0, AES128_MAX_BUFFER_SIZE);
+
+	// Prepare input data with or without padding
+	if (use_padding)
+	{
+		PKCS7_padding_t padder;
+		PKCS7_add_padding(&padder, in, input_len, AES_BLOCK_LEN);
+		memcpy(temp_buffer, padder.data_with_padding, input_len_normalized);
+	}
+	else
+	{
+		memcpy(temp_buffer, in, input_len);
+		// Zero-pad the rest if not using PKCS7
+		if (input_len < input_len_normalized)
+		{
+			memset(temp_buffer + input_len, 0, input_len_normalized - input_len);
+		}
+	}
+
+	// Initialization vector and output buffer allocation
+	uint8_t *_out = (uint8_t *)out;
+	memset(_out, 0, input_len_normalized);
 	uint8_t *xor_vector = ctx->iv;
 
-    // Chunk encryption
-	while( ctx->input_len_normalized > 0) {
-		#if defined(AES128_LOG) && AES128_LOG == 1
-		printf("Chunk %u (bytes %u to %u):\n",ctx->encrypted_chunks+1,ctx->encrypted_chunks*AES_BLOCK_LEN,(ctx->encrypted_chunks+1)*AES_BLOCK_LEN-1);
-		#endif
+	// Pointer to the current position in the temp buffer
+	uint8_t *_in = temp_buffer;
+	size_t remaining = input_len_normalized;
 
-			AddRoundKey(_in,xor_vector);
-			AES128_encrypt_chunk(ctx,_in,_out);
-			xor_vector = _out;
+	// Chunk encryption
+	while (remaining > 0)
+	{
+		AddRoundKey(_in, xor_vector);
+		AES128_encrypt_chunk(ctx, _in, _out);
+		xor_vector = _out;
 
-		_in += AES_BLOCK_LEN; _out += AES_BLOCK_LEN; ctx->input_len_normalized-= AES_BLOCK_LEN; ctx->encrypted_chunks++;
-		
+		_in += AES_BLOCK_LEN;
+		_out += AES_BLOCK_LEN;
+		remaining -= AES_BLOCK_LEN;
+		ctx->encrypted_chunks++;
 	}
-	*output_len = ctx->encrypted_chunks*AES_BLOCK_LEN;
+
+	*output_len = ctx->encrypted_chunks * AES_BLOCK_LEN;
 	return AES_CODE_OK;
 }
 
-/**
- * @brief 
- * 
- * @param ctx 
- * @param in 
- * @param out 
- * @param input_len 
- * @param output_len 
- * @return AES_errcode_t 
- */
-AES_errcode_t AES128_CBC_decrypt(AES128_ctx_t *ctx, void *in, void *out, size_t input_len, uint32_t *output_len){
-    #if defined(AES128_LOG) && AES128_LOG == 1
-    printf("AES-128 CBC decrypt\n");
-    #endif
-    // Input buffer length verification
-    if(input_len<= 0){
-        return AES_CODE_EMPTY_INPUT_BUFFER;
-    }
-    // Normalized length calculation
-    ctx->decrypted_chunks = 0;
-    size_t input_len_normalized = (size_t)(AES_ROUNDUP_TO_NEAREST_MULTIPLE_OF_16(input_len));
-    ctx->input_len_normalized = input_len_normalized;
-    if(input_len == input_len_normalized){
-        ctx->input_len_normalized = input_len_normalized += AES_BLOCK_LEN;
-    }
+AES_errcode_t AES128_CBC_decrypt(AES128_ctx_t *ctx, void *in, void *out, size_t input_len, uint32_t *output_len, bool use_padding)
+{
+	// Input buffer length verification
+	if (input_len <= 0)
+	{
+		return AES_CODE_EMPTY_INPUT_BUFFER;
+	}
 
-    // Input buffer allocation, backup and initialization
-	uint8_t *_in = (uint8_t *)in;
+	// Normalized length calculation
+	ctx->decrypted_chunks = 0;
+	size_t input_len_normalized = (size_t)(AES_ROUNDUP_TO_NEAREST_MULTIPLE_OF_16(input_len));
+	ctx->input_len_normalized = input_len_normalized;
 
-	memcpy(_in, in, ctx->input_len_normalized);
+	if (input_len_normalized > AES128_MAX_BUFFER_SIZE)
+	{
+		return AES_CODE_INCORRECT_BUFFER_SIZE;
+	}
 
-    // Initialization vector and output buffer allocation
-	uint8_t *_out = (uint8_t *)out; 
-	memset(_out, 0 , input_len_normalized);
+	// Create a temporary buffer for processing
+	uint8_t temp_buffer[AES128_MAX_BUFFER_SIZE];
+	memcpy(temp_buffer, in, input_len);
+
+	// Initialization vector and output buffer allocation
+	uint8_t *_out = (uint8_t *)out;
+	memset(_out, 0, input_len_normalized);
 	uint8_t *xor_vector = ctx->iv;
 	uint8_t placeholder[AES_BLOCK_LEN];
 
+	// Pointer to the current position in the temp buffer
+	uint8_t *_in = temp_buffer;
+	size_t remaining = input_len_normalized;
 
-    // Chunk decryption
-	while( ctx->input_len_normalized > 0) {
-		#if defined(AES128_LOG) && AES128_LOG == 1
-		printf("Chunk %u (bytes %u to %u):\n",ctx->decrypted_chunks+1,ctx->decrypted_chunks*AES_BLOCK_LEN,(ctx->decrypted_chunks+1)*AES_BLOCK_LEN-1);
-		#endif
-		memcpy(placeholder,_in,AES_BLOCK_LEN);
-		AES128_decrypt_chunk(ctx,_in,_out);
+	// Chunk decryption
+	while (remaining > 0)
+	{
+		memcpy(placeholder, _in, AES_BLOCK_LEN);
+		AES128_decrypt_chunk(ctx, _in, _out);
 		AddRoundKey(_out, xor_vector);
-		memcpy(xor_vector,_in,AES_BLOCK_LEN);
+		memcpy(xor_vector, placeholder, AES_BLOCK_LEN);
 
-		_in += AES_BLOCK_LEN; _out += AES_BLOCK_LEN; ctx->input_len_normalized-= AES_BLOCK_LEN; ctx->decrypted_chunks++;
-		
+		_in += AES_BLOCK_LEN;
+		_out += AES_BLOCK_LEN;
+		remaining -= AES_BLOCK_LEN;
+		ctx->decrypted_chunks++;
 	}
-	*output_len = ctx->decrypted_chunks*AES_BLOCK_LEN;
-	
-	#if defined(AES128_USE_PKCS7) && AES128_USE_PKCS7 == 1
-	PKCS7_unpadding_t unpadder;
-	PKCS7_remove_padding(&unpadder, out, input_len_normalized);
-	memcpy(out, unpadder.data_without_padding, input_len_normalized);
-	#endif
+
+	*output_len = ctx->decrypted_chunks * AES_BLOCK_LEN;
+
+	if (use_padding)
+	{
+		PKCS7_unpadding_t unpadder;
+		PKCS7_remove_padding(&unpadder, out, input_len_normalized);
+
+		// Create a temporary buffer for the unpadded data
+		uint8_t unpadded_buffer[AES128_MAX_BUFFER_SIZE];
+		memcpy(unpadded_buffer, unpadder.data_without_padding, unpadder.data_len_without_padding);
+
+		// Copy the unpadded data back to the output buffer
+		memset(out, 0, input_len_normalized); // Clear the output buffer first
+		memcpy(out, unpadded_buffer, unpadder.data_len_without_padding);
+
+		*output_len = unpadder.data_len_without_padding;
+	}
 
 	return AES_CODE_OK;
 }
 
 /**
- * @brief 
- * 
- * @param inputKey 
- * @param expandedKeys 
+ * @brief Key expansion for AES-128
+ *
+ * @param inputKey Input key (16 bytes)
+ * @param expandedKeys Output expanded key (176 bytes)
  */
-static void KeyExpansion_AES128(uint8_t *inputKey, uint8_t *expandedKeys){
-    size_t i;
-    for (i = 0; i != AES128_FIXED_KEY_SIZE; i++) {
+static void KeyExpansion_AES128(uint8_t *inputKey, uint8_t *expandedKeys)
+{
+	size_t i;
+	for (i = 0; i != AES128_FIXED_KEY_SIZE; i++)
+	{
 		expandedKeys[i] = inputKey[i];
 	}
 
@@ -367,13 +345,15 @@ static void KeyExpansion_AES128(uint8_t *inputKey, uint8_t *expandedKeys){
 	size_t rcon_location = 1;
 	uint8_t key_block[4];
 
-
-	while (bytesGenerated < AES128_KEY_EXP_SIZE) {
-		for (i = 0; i != 4; i++) { //while is less than the number of 32 bit words in 176 bit expanded keys
+	while (bytesGenerated < AES128_KEY_EXP_SIZE)
+	{
+		for (i = 0; i != 4; i++)
+		{
 			key_block[i] = expandedKeys[i + bytesGenerated - 4];
 		}
-		if (bytesGenerated % AES128_FIXED_KEY_SIZE == 0) {
 
+		if (bytesGenerated % AES128_FIXED_KEY_SIZE == 0)
+		{
 			uint8_t temp_val = key_block[0];
 			key_block[0] = key_block[1];
 			key_block[1] = key_block[2];
@@ -389,19 +369,10 @@ static void KeyExpansion_AES128(uint8_t *inputKey, uint8_t *expandedKeys){
 			rcon_location++;
 		}
 
-		#if defined(AES256) && AES256 == 1
-		if(bytesGenerated % AES128_FIXED_KEY_SIZE == AES_BLOCK_LEN){
-			for (i = 0; i != 4; i++) {
-			key_block[i] = s_box[key_block[i]];
-		}
-		}
-		
-		#endif
-
-		for (i = 0; i != 4; i++) {
+		for (i = 0; i != 4; i++)
+		{
 			expandedKeys[bytesGenerated] = expandedKeys[bytesGenerated - AES128_FIXED_KEY_SIZE] ^ key_block[i];
 			bytesGenerated++;
 		}
 	}
 }
-

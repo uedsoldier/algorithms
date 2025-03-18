@@ -1,75 +1,189 @@
 #include <stdio.h>
 #include <stdint.h>
-#include <string.h>
+#include <stdbool.h>
 #include <stdlib.h>
-#include "../../src/AES/AES256.h"
-#include "../../src/AES/AES_common.h"
-#include "../../src/PKCS7/PKCS7.h"
+#include <float.h>
+#include <math.h>
+#include <assert.h>
+#include <string.h>
 
-const char IV[AES_BLOCK_LEN] = "1234567890123456";    // 16-byte init vector  
-const char *TEST_STRING = "1234567890123456";
-const char TEST_KEY[AES256_FIXED_KEY_SIZE] = {
-"12345678901234567890123456789012"
+#include "AES256.h"
+#include "PKCS7.h"
+
+static const char *TEST_NAME = "AES-256 CBC tester";
+
+// Test cases structure for better readability and maintenance
+typedef struct
+{
+    AES256_ctx_t AES256_ctx;
+    AES_errcode_t AES256_code;
+    const char init_vector[AES_BLOCK_LEN];
+    const char *input_string;
+    const char key[AES256_FIXED_KEY_SIZE];
+    const char *description;
+    bool usePKCS7;
+    size_t input_string_len;
+    size_t key_len;
+    size_t output_len;
+    uint8_t AES256_encrypt_buffer[AES256_MAX_BUFFER_SIZE];
+    uint8_t AES256_decrypt_buffer[AES256_MAX_BUFFER_SIZE];
+} TestCase;
+
+static const TestCase test_cases[] = {
+    {.init_vector = "1234567890123456", // 16-byte IV
+     .input_string = "This is a test string for AES-256 CBC mode!",
+     .key = "AES256_SECRET_KEY_32BYTE_SECURE_KEY", // 32-byte key
+     .description = "Standard test with text that requires padding",
+     .usePKCS7 = true},
+    {.init_vector = "ABCDEFGHIJKLMNOP",    // 16-byte IV
+     .input_string = "ExactBlock16BytesX", // Exactly 16 bytes (one block)
+     .key = "0123456789abcdef0123456789abcdef",    // 32-byte key
+     .description = "Exact block size test (16 bytes)",
+     .usePKCS7 = true},
+    {.init_vector = "0000000000000000", // 16-byte IV of zeros
+     .input_string = "Short text",      // Short text requiring padding
+     .key = "SECRETKEY12345672SECRETKEY12345672",  // 32-byte key
+     .description = "Short text with zero IV",
+     .usePKCS7 = true},
+    {.init_vector = "FFFFFFFFFFFFFFFF", // 16-byte IV of F's
+     .input_string = "This is a multi-block input that will require more than one block of AES encryption to fully process.",
+     .key = "TestKey1234567890TestKey1234567890", // 32-byte key
+     .description = "Multi-block test with padding",
+     .usePKCS7 = true},
+    {.init_vector = "1234567890abcdef",                      // 16-byte IV
+     .input_string = "ExactBlock16BytesXExactBlock16BytesY", // Exactly 32 bytes (two blocks)
+     .key = "SecurityKey123456789012SecurityKey",            // 32-byte key
+     .description = "Multiple exact blocks test (32 bytes)",
+     .usePKCS7 = true},
+    {.init_vector = "abcdefghijklmnop", // 16-byte IV
+     .input_string = "Special chars: !@#$%^&*()_+-=[]{}|;':\",./<>?",
+     .key = "00000000000000000000000000000000", // 32-byte key of zeros
+     .description = "Special characters test",
+     .usePKCS7 = true},
+    {.init_vector = "1234567890123456", // 16-byte IV
+     .input_string = "This is a test string for AES-256 CBC mode without padding!",
+     .key = "AES256_SECRET_KEY_32BYTE_SECURE_KEY", // 32-byte key
+     .description = "Test with padding disabled",
+     .usePKCS7 = false},
+    {.init_vector = "0000000000000000", // 16-byte IV of zeros
+     .input_string = "ExactBlock16BytesXExactBlock16BytesY", // Exactly 32 bytes (two blocks)
+     .key = "SECRETKEY12345672SECRETKEY12345672",  // 32-byte key
+     .description = "Exact multiple blocks with padding disabled",
+     .usePKCS7 = false}
 };
 
-const char *TEST_NAME = "AES-256 CBC";
+#define TOTAL_TESTS (sizeof(test_cases) / sizeof(test_cases[0]))
 
-
-size_t input_string_len, key_len, comparison;
-size_t output_len;
-
-AES256_ctx_t AES256_ctx;
-
-AES_errcode_t AES256_code;
-
-uint8_t input_string[AES256_MAX_BUFFER_SIZE];
-uint8_t AES256_encrypt_buffer[AES256_MAX_BUFFER_SIZE];
-uint8_t AES256_decrypt_buffer[AES256_MAX_BUFFER_SIZE];
-
-int main(int argc, char *argv[]){
-
-    printf("%s testing\n",TEST_NAME);
-    input_string_len = strlen(TEST_STRING);
-    printf("Test string length: %u\n", input_string_len);
-
-    memset(input_string, 0, AES256_MAX_BUFFER_SIZE);
-    memset(AES256_encrypt_buffer, 0, AES256_MAX_BUFFER_SIZE);
-    memset(AES256_decrypt_buffer, 0, AES256_MAX_BUFFER_SIZE);
-
-    memcpy(input_string,TEST_STRING,input_string_len);
-    printf("\nFILL INPUT DATA\n<<");
-    for (size_t i = 0; i < input_string_len; i++)
+// Helper function to print hex representation of data
+void print_hex(const uint8_t *data, size_t len)
+{
+    for (size_t i = 0; i < len; i++)
     {
-        printf("%02X ",input_string[i]);
+        printf("%02X ", data[i]);
     }
-    printf(">>\n");
-    
-    AES256_init_ctx(&AES256_ctx, TEST_KEY, IV);
-    AES256_code = AES256_CBC_encrypt(&AES256_ctx, input_string, AES256_encrypt_buffer, input_string_len, &output_len);
+    printf("\n");
+}
 
-    printf("AES output ( %u bytes): [ ", output_len);
-    for (size_t i = 0; i != output_len; i++)
+int main(void)
+{
+    printf("%s\n\n", TEST_NAME);
+    bool all_tests_passed = true;
+
+    // Run tests
+    for (size_t i = 0; i < TOTAL_TESTS; i++)
     {
-        printf("%02x ", AES256_encrypt_buffer[i]);
-    }
-    printf("]\n");
+        assert(i < TOTAL_TESTS);
 
-    AES256_code = AES256_CBC_decrypt(&AES256_ctx, AES256_encrypt_buffer, AES256_decrypt_buffer, input_string_len, &output_len);
-    printf("Back to ASCII (%u bytes):\n<<", output_len, AES256_decrypt_buffer);
-    for (size_t i = 0; i != output_len; i++)
-    {
-        printf("%02x ", AES256_decrypt_buffer[i]);
-    }
-    printf(">>\n");
-    
-    comparison = memcmp(TEST_STRING, AES256_decrypt_buffer, input_string_len);
-    if(comparison == 0){
-        printf("%s OK\n",TEST_NAME);
-        return EXIT_SUCCESS;
-    }
-    else{
-        printf("%s not OK\n",TEST_NAME);
-        return EXIT_FAILURE;
+        TestCase test = test_cases[i]; // Create a modifiable copy
+
+        printf("\n--- Test %u: %s ---\n", i + 1, test.description);
+
+        // Initialize input parameters
+        test.input_string_len = strlen(test.input_string);
+        test.key_len = AES256_FIXED_KEY_SIZE;
+
+        printf("Input string (%u bytes): %s\n", test.input_string_len, test.input_string);
+        printf("Key: ");
+        print_hex((const uint8_t *)test.key, test.key_len);
+        printf("IV: ");
+        print_hex((const uint8_t *)test.init_vector, AES_BLOCK_LEN);
+        printf("PKCS7 Padding: %s\n", test.usePKCS7 ? "Enabled" : "Disabled");
+
+        // Clear buffers
+        memset(test.AES256_encrypt_buffer, 0, AES256_MAX_BUFFER_SIZE);
+        memset(test.AES256_decrypt_buffer, 0, AES256_MAX_BUFFER_SIZE);
+
+        // Initialize AES context
+        AES256_init_ctx(&test.AES256_ctx, (const uint8_t *)test.key, (const uint8_t *)test.init_vector);
+
+        // Encrypt
+        test.AES256_code = AES256_CBC_encrypt(
+            &test.AES256_ctx,
+            (const uint8_t *)test.input_string,
+            test.AES256_encrypt_buffer,
+            test.input_string_len,
+            &test.output_len,
+            test.usePKCS7);  // Pass the PKCS7 flag
+
+        if (test.AES256_code != AES_CODE_OK)
+        {
+            printf("Encryption failed with code: %d\n", test.AES256_code);
+            all_tests_passed = false;
+            continue;
+        }
+
+        printf("Encrypted (%u bytes): ", test.output_len);
+        print_hex(test.AES256_encrypt_buffer, test.output_len);
+
+        // Re-initialize context for decryption with same key and IV
+        AES256_init_ctx(&test.AES256_ctx, (const uint8_t *)test.key, (const uint8_t *)test.init_vector);
+
+        // Decrypt
+        size_t decrypted_len;
+        test.AES256_code = AES256_CBC_decrypt(
+            &test.AES256_ctx,
+            test.AES256_encrypt_buffer,
+            test.AES256_decrypt_buffer,
+            test.output_len,
+            &decrypted_len,
+            test.usePKCS7);  // Pass the PKCS7 flag
+
+        if (test.AES256_code != AES_CODE_OK)
+        {
+            printf("Decryption failed with code: %d\n", test.AES256_code);
+            all_tests_passed = false;
+            continue;
+        }
+
+        printf("Decrypted (%u bytes): ", decrypted_len);
+        print_hex(test.AES256_decrypt_buffer, decrypted_len);
+        printf("Decrypted text: %s\n", test.AES256_decrypt_buffer);
+
+        // Verify result
+        bool test_passed = false;
+        
+        if (test.usePKCS7) {
+            // With padding, we expect the decrypted length to match the original input length
+            test_passed = (decrypted_len == test.input_string_len) &&
+                         (memcmp(test.input_string, test.AES256_decrypt_buffer, test.input_string_len) == 0);
+        } else {
+            // Without padding, we need to check if the decrypted data starts with our input
+            // (there might be zero padding at the end)
+            test_passed = (decrypted_len >= test.input_string_len) &&
+                         (memcmp(test.input_string, test.AES256_decrypt_buffer, test.input_string_len) == 0);
+        }
+
+        printf("Test %u result: %s\n", i + 1, test_passed ? "PASSED" : "FAILED");
+
+        if (!test_passed)
+        {
+            all_tests_passed = false;
+        }
     }
 
+    printf("\n=== Test Summary ===\n");
+    printf("Total tests: %u\n", TOTAL_TESTS);
+    printf("Final result: %s\n", all_tests_passed ? "ALL TESTS PASSED" : "SOME TESTS FAILED");
+
+    return all_tests_passed ? EXIT_SUCCESS : EXIT_FAILURE;
 }
