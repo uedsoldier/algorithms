@@ -46,6 +46,7 @@
         "CC": "C:/MinGW/bin/gcc.exe",
         "PATH": "${env:PATH};C:/MinGW/bin"
     },
+    "terminal.integrated.scrollback": 10000,
 
     // Compiler path - using environment variable that will be different per platform
     "C_Cpp.default.compilerPath": "${env:CC}",
