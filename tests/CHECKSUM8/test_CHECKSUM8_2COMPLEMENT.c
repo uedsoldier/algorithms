@@ -7,10 +7,10 @@
 
 #include "checksum8.h"
 
-#define TEST_NAME "Checksum8 (modulo 256) tester"
+#define TEST_NAME "Checksum8 (2's complement) tester"
 
 /**
- * @brief Test case structure for CHECKSUM8 modulo 256 tests
+ * @brief Test case structure for CHECKSUM8 2's complement tests
  */
 typedef struct {
     const char *description;  // Test case description
@@ -20,7 +20,7 @@ typedef struct {
 } TestCase;
 
 /**
- * @brief Test cases for CHECKSUM8 modulo 256 calculation
+ * @brief Test cases for CHECKSUM8 2's complement calculation
  */
 static const TestCase test_cases[] = {
     // Basic cases
@@ -28,45 +28,45 @@ static const TestCase test_cases[] = {
         .description = "Simple sequence",
         .input = (const uint8_t[]){0x01, 0x02, 0x03, 0x04},
         .input_len = 4,
-        .expected_checksum_output = 0x0A  // (0x01 + 0x02 + 0x03 + 0x04) % 256
+        .expected_checksum_output = 0xF6  // -(0x01 + 0x02 + 0x03 + 0x04) & 0xFF
     },
     {
         .description = "All 0xFF",
         .input = (const uint8_t[]){0xFF, 0xFF, 0xFF, 0xFF},
         .input_len = 4,
-        .expected_checksum_output = 0xFC  // (0xFF + 0xFF + 0xFF + 0xFF) % 256
+        .expected_checksum_output = 0x04  // -(0xFF + 0xFF + 0xFF + 0xFF) & 0xFF
     },
     {
         .description = "All zeros",
         .input = (const uint8_t[]){0x00, 0x00, 0x00, 0x00},
         .input_len = 4,
-        .expected_checksum_output = 0x00  // (0x00 + 0x00 + 0x00 + 0x00) % 256
+        .expected_checksum_output = 0x00  // -(0x00 + 0x00 + 0x00 + 0x00) & 0xFF
     },
     {
         .description = "Alternating bits",
         .input = (const uint8_t[]){0xAA, 0x55},
         .input_len = 2,
-        .expected_checksum_output = 0xFF  // (0xAA + 0x55) % 256
+        .expected_checksum_output = 0x01  // -(0xAA + 0x55) & 0xFF
     },
     {
         .description = "Five byte sequence",
         .input = (const uint8_t[]){0x12, 0x34, 0x56, 0x78, 0x9A},
         .input_len = 5,
         .expected_checksum_output =
-            0xAE  // (0x12 + 0x34 + 0x56 + 0x78 + 0x9A) % 256
+            0x52  // -(0x12 + 0x34 + 0x56 + 0x78 + 0x9A) & 0xFF
     },
     // Edge cases
     {
         .description = "Single byte",
         .input = (const uint8_t[]){0x42},
         .input_len = 1,
-        .expected_checksum_output = 0x42  // (0x42) % 256
+        .expected_checksum_output = 0xBE  // -(0x42) & 0xFF
     },
     {
         .description = "Alternating 0x00 and 0xFF",
         .input = (const uint8_t[]){0x00, 0xFF, 0x00, 0xFF},
         .input_len = 4,
-        .expected_checksum_output = 0xFE  // (0x00 + 0xFF + 0x00 + 0xFF) % 256
+        .expected_checksum_output = 0x02  // -(0x00 + 0xFF + 0x00 + 0xFF) & 0xFF
     },
     {
         .description = "ASCII string",
@@ -74,19 +74,19 @@ static const TestCase test_cases[] = {
             (const uint8_t[]){0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x21},  // "Hello!"
         .input_len = 6,
         .expected_checksum_output =
-            0x15  // ('H' + 'e' + 'l' + 'l' + 'o' + '!') % 256
+            0xEB  // -('H' + 'e' + 'l' + 'l' + 'o' + '!') & 0xFF
     },
     {
         .description = "Byte values near overflow",
         .input = (const uint8_t[]){0xFE, 0xFE, 0xFE},
         .input_len = 3,
-        .expected_checksum_output = 0xFA  // (0xFE + 0xFE + 0xFE) % 256
+        .expected_checksum_output = 0x06  // -(0xFE + 0xFE + 0xFE) & 0xFF
     },
     {
         .description = "Maximum byte values",
         .input = (const uint8_t[]){0xFF, 0xFF},
         .input_len = 2,
-        .expected_checksum_output = 0xFE  // (0xFF + 0xFF) % 256
+        .expected_checksum_output = 0x02  // -(0xFF + 0xFF) & 0xFF
     }};
 
 /**
@@ -112,7 +112,7 @@ static bool run_single_test(const TestCase *test, size_t test_number) {
 
     // Calculate checksum
     uint8_t calculated_checksum = checksum8(
-        (void *)&test->input[0], test->input_len, CHECKSUM8_modulo256);
+        (void *)&test->input[0], test->input_len, CHECKSUM8_2complement);
 
     printf("Expected checksum: 0x%02X\n", test->expected_checksum_output);
     printf("Calculated checksum: 0x%02X\n", calculated_checksum);
