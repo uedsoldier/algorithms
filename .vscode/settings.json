@@ -1,0 +1,69 @@
+{
+    // CMake settings
+    "cmake.sourceDirectory": "${workspaceFolder}",
+    "cmake.buildDirectory": "${workspaceFolder}/build",
+    "cmake.generator": "MinGW Makefiles",
+    "cmake.configureSettings": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": true
+    },
+    "cmake.configureOnOpen": true,
+    "cmake.parallelJobs": 0,  // 0 means auto-detect number of processors
+    "cmake.debugConfig": {
+        "stopAtEntry": true,
+        "cwd": "${workspaceFolder}"
+    },
+
+    // C/C++ settings
+    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+    "C_Cpp.clang_format_fallbackStyle": "{ BasedOnStyle: Google, IndentWidth: 4 }",
+    "C_Cpp.default.cStandard": "c11",
+    "C_Cpp.default.intelliSenseMode": "gcc-x64",
+
+    // File associations
+    "files.associations": {
+        "*.h": "c",
+        "aes.h": "c",
+        "pkcs7.h": "c",
+        "base64.h": "c",
+        "*.c": "c",
+        "CMakeLists.txt": "cmake"
+    },
+
+    // Editor settings for C files
+    "[c]": {
+        "editor.formatOnSave": true,
+        "editor.formatOnType": true,
+        "editor.tabSize": 4,
+        "editor.insertSpaces": true,
+        "editor.detectIndentation": false
+    },
+
+    // Terminal settings
+    "terminal.integrated.defaultProfile.windows": "Command Prompt",
+    "terminal.integrated.env.windows": {
+        "MINGW_PATH": "C:/MinGW/bin",
+        "CC": "C:/MinGW/bin/gcc.exe",
+        "PATH": "${env:PATH};C:/MinGW/bin"
+    },
+
+    // Compiler path - using environment variable that will be different per platform
+    "C_Cpp.default.compilerPath": "${env:CC}",
+
+    // Disable Codium code completion if you're using it
+    "codium.codeCompletion.enable": false,
+
+    // File handling
+    "files.trimTrailingWhitespace": true,
+    "files.insertFinalNewline": true,
+    "files.trimFinalNewlines": true,
+
+    // Line ending settings
+    "files.eol": "\n",  // Use LF even on Windows for consistency
+
+    // Preferred generators
+    "cmake.preferredGenerators": [
+        "MinGW Makefiles",
+        "Ninja"
+    ]
+}

@@ -111,6 +111,5 @@ AES_errcode_t AES256_CBC_encrypt(AES256_ctx_t *ctx, const uint8_t *in, uint8_t *
 AES_errcode_t AES256_CBC_decrypt(AES256_ctx_t *ctx, const uint8_t *in, uint8_t *out,
                                  size_t input_len, size_t *output_len, bool usePKCS7);
 
-static void KeyExpansion_AES256(uint8_t *inputKey, uint8_t *expandedKeys);
 
 #endif /* AES256_H */

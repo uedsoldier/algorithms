@@ -11,6 +11,8 @@
 
 #include "AES192.h"
 
+static void KeyExpansion_AES192(uint8_t *inputKey, uint8_t *expandedKeys);
+
 /**
  * @brief Initialize AES-192 context with key and optional IV
  *
@@ -48,7 +50,6 @@ void AES192_init_ctx_ecb(AES192_ctx_t *ctx, const uint8_t *key)
  */
 static void AES192_encrypt_chunk(AES192_ctx_t *ctx, uint8_t *in, uint8_t *out)
 {
-	uint8_t round = 0;
 	memcpy(out, in, AES_BLOCK_LEN);
 
 	uint8_t expandedKey[AES192_KEY_EXP_SIZE];

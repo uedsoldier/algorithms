@@ -71,23 +71,6 @@ extern "C"
         uint32_t decrypted_chunks;
     } AES128_ctx_t;
 
-    /**
-     * @brief 
-     * 
-     * @param ctx 
-     * @param in 
-     * @param out 
-     */
-    static void AES128_encrypt_chunk(AES128_ctx_t *ctx, uint8_t *in, uint8_t *out);
-
-    /**
-     * @brief 
-     * 
-     * @param ctx 
-     * @param in 
-     * @param out 
-     */
-    static void AES128_decrypt_chunk(AES128_ctx_t *ctx, uint8_t *in, uint8_t *out);
 
     void AES128_init_ctx(AES128_ctx_t *ctx, const uint8_t *key, const uint8_t *iv);
 
@@ -142,8 +125,6 @@ extern "C"
      * @return AES_errcode_t Error code (AES_CODE_OK on success)
      */
     AES_errcode_t AES128_CBC_decrypt(AES128_ctx_t *ctx, void *in, void *out, size_t input_len, uint32_t *output_len, bool use_padding);
-
-    static void KeyExpansion_AES128(uint8_t *inputKey, uint8_t *expandedKeys);
 
 #ifdef __cplusplus
 }

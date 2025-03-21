@@ -4,14 +4,44 @@ import os
 import platform
 import shutil
 import subprocess
+import sys
 from multiprocessing import cpu_count
 from pathlib import Path
 
 class TestBuilder:
     def __init__(self):
-        self.build_dir = Path('build')
+        # Find the repository root directory (where CMakeLists.txt is located)
+        self.repo_root = self.find_repo_root()
+        if not self.repo_root:
+            print("Error: Could not find repository root with CMakeLists.txt")
+            sys.exit(1)
+            
+        # Set build directory relative to the repository root
+        self.build_dir = self.repo_root / 'build'
         self.platform = platform.system()
         self.cpu_count = cpu_count()
+        
+        # Change to the repository root directory
+        os.chdir(self.repo_root)
+        print(f"Working directory set to: {os.getcwd()}")
+
+    def find_repo_root(self):
+        """Find the repository root by looking for CMakeLists.txt"""
+        # Start with the current directory
+        current_dir = Path.cwd()
+        
+        # Also check the directory where the script is located
+        script_dir = Path(__file__).parent.parent
+        
+        # Check current directory and its parents
+        for directory in [current_dir, script_dir]:
+            while directory != directory.parent:  # Stop at the root directory
+                if (directory / 'CMakeLists.txt').exists():
+                    return directory
+                directory = directory.parent
+                
+        # If we get here, we couldn't find the repository root
+        return None
 
     def cleanup_build(self):
         """Clean up the build directory if it exists"""
@@ -37,6 +67,7 @@ class TestBuilder:
     def run_command(self, command, cwd=None):
         """Run a command and handle errors"""
         try:
+            print(f"Executing: {command}")
             result = subprocess.run(
                 command,
                 shell=True,

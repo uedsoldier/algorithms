@@ -11,6 +11,8 @@
 
 #include "AES128.h"
 
+static void KeyExpansion_AES128(uint8_t *inputKey, uint8_t *expandedKeys);
+
 void AES128_init_ctx(AES128_ctx_t *ctx, const uint8_t *key, const uint8_t *iv)
 {
 	memcpy(ctx->key.array, key, AES128_FIXED_KEY_SIZE);
@@ -24,7 +26,6 @@ void AES128_init_ctx(AES128_ctx_t *ctx, const uint8_t *key, const uint8_t *iv)
 
 static void AES128_encrypt_chunk(AES128_ctx_t *ctx, uint8_t *in, uint8_t *out)
 {
-	uint8_t round = 0;
 	memcpy(out, in, AES_BLOCK_LEN);
 
 	uint8_t expandedKey[AES128_KEY_EXP_SIZE];

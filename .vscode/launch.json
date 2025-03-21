@@ -1,0 +1,61 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug Algorithms Tests",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/bin/${input:testExecutable}",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/build/bin",
+            "environment": [],
+            "externalConsole": true,
+            "logging": {
+                "moduleLoad": false,
+                "trace": true,
+                "engineLogging": false,
+                "programOutput": true,
+                "exceptions": true
+            },
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set disassembly flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "cmake-build",
+            "linux": {
+                "MIMode": "gdb",
+                "miDebuggerPath": "/usr/bin/gdb"
+            },
+            "windows": {
+                "program": "${workspaceFolder}\\build\\bin\\${input:testExecutable}.exe",
+                "miDebuggerPath": "gdb.exe"
+            }
+        }
+    ],
+    "inputs": [
+        {
+            "id": "testExecutable",
+            "type": "pickString",
+            "description": "Select the test to debug:",
+            "options": [
+                "BASE64_tester",
+                "test_AES128_ECB_tester",
+                "test_AES128_CBC_tester",
+                "test_AES192_ECB_tester",
+                "test_AES192_CBC_tester",
+                "test_AES256_ECB_tester",
+                "test_AES256_CBC_tester"
+            ]
+        }
+    ]
+}

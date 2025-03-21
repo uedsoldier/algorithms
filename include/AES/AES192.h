@@ -111,6 +111,5 @@ AES_errcode_t AES192_CBC_encrypt(AES192_ctx_t *ctx, const uint8_t *in, uint8_t *
 AES_errcode_t AES192_CBC_decrypt(AES192_ctx_t *ctx, const uint8_t *in, uint8_t *out,
                                  size_t input_len, size_t *output_len, bool usePKCS7);
 
-static void KeyExpansion_AES192(uint8_t *inputKey, uint8_t *expandedKeys);
 
 #endif /* AES192_H */
