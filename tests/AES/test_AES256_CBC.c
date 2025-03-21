@@ -1,10 +1,10 @@
-#include <stdio.h>
-#include <stdint.h>
-#include <stdbool.h>
-#include <stdlib.h>
+#include <assert.h>
 #include <float.h>
 #include <math.h>
-#include <assert.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "AES256.h"
@@ -12,8 +12,7 @@
 
 static const char *TEST_NAME = "AES-256 CBC tester";
 
-typedef struct
-{
+typedef struct {
     AES256_ctx_t AES256_ctx;
     AES_errcode_t AES256_code;
     const uint8_t init_vector[AES_BLOCK_LEN];
@@ -29,143 +28,145 @@ typedef struct
 } TestCase;
 
 static const TestCase test_cases[] = {
-    {
-        .AES256_ctx = {0},
-        .AES256_code = AES_CODE_OK,
-        .init_vector = {'1','2','3','4','5','6','7','8','9','0','1','2','3','4','5','6'},
-        .input_string = "This is a test string for AES-256 CBC mode!",
-        .key = {'A','E','S','2','5','6','_','S','E','C','R','E','T','_','K','E','Y','_','3','2','B','Y','T','E','_','S','E','C','U','R','E','_'},
-        .description = "Standard test with text that requires padding",
-        .usePKCS7 = true,
-        .input_string_len = 0,
-        .key_len = AES256_FIXED_KEY_SIZE,
-        .output_len = 0,
-        .AES256_encrypt_buffer = {0},
-        .AES256_decrypt_buffer = {0}
-    },
-    {
-        .AES256_ctx = {0},
-        .AES256_code = AES_CODE_OK,
-        .init_vector = {'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P'},
-        .input_string = "ExactBlock16BytesX",
-        .key = {'0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f','0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'},
-        .description = "Exact block size test (16 bytes)",
-        .usePKCS7 = true,
-        .input_string_len = 0,
-        .key_len = AES256_FIXED_KEY_SIZE,
-        .output_len = 0,
-        .AES256_encrypt_buffer = {0},
-        .AES256_decrypt_buffer = {0}
-    },
-    {
-        .AES256_ctx = {0},
-        .AES256_code = AES_CODE_OK,
-        .init_vector = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        .input_string = "Short text",
-        .key = {'S','E','C','R','E','T','K','E','Y','1','2','3','4','5','6','7','2','S','E','C','R','E','T','K','E','Y','1','2','3','4','5','7'},
-        .description = "Short text with zero IV",
-        .usePKCS7 = true,
-        .input_string_len = 0,
-        .key_len = AES256_FIXED_KEY_SIZE,
-        .output_len = 0,
-        .AES256_encrypt_buffer = {0},
-        .AES256_decrypt_buffer = {0}
-    },
-    {
-        .AES256_ctx = {0},
-        .AES256_code = AES_CODE_OK,
-        .init_vector = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF},
-        .input_string = "This is a multi-block input that will require more than one block of AES encryption to fully process.",
-        .key = {'T','e','s','t','K','e','y','1','2','3','4','5','6','7','8','9','0','T','e','s','t','K','e','y','1','2','3','4','5','6','7','8'},
-        .description = "Multi-block test with padding",
-        .usePKCS7 = true,
-        .input_string_len = 0,
-        .key_len = AES256_FIXED_KEY_SIZE,
-        .output_len = 0,
-        .AES256_encrypt_buffer = {0},
-        .AES256_decrypt_buffer = {0}
-    },
-    {
-        .AES256_ctx = {0},
-        .AES256_code = AES_CODE_OK,
-        .init_vector = {'1','2','3','4','5','6','7','8','9','0','a','b','c','d','e','f'},
-        .input_string = "ExactBlock16BytesXExactBlock16BytesY",
-        .key = {'S','e','c','u','r','i','t','y','K','e','y','1','2','3','4','5','6','7','8','9','0','1','2','S','e','c','u','r','i','t','y','K'},
-        .description = "Multiple exact blocks test (32 bytes)",
-        .usePKCS7 = true,
-        .input_string_len = 0,
-        .key_len = AES256_FIXED_KEY_SIZE,
-        .output_len = 0,
-        .AES256_encrypt_buffer = {0},
-        .AES256_decrypt_buffer = {0}
-    },
-    {
-        .AES256_ctx = {0},
-        .AES256_code = AES_CODE_OK,
-        .init_vector = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p'},
-        .input_string = "Special chars: !@#$%^&*()_+-=[]{}|;':\",./<>?",
-        .key = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        .description = "Special characters test",
-        .usePKCS7 = true,
-        .input_string_len = 0,
-        .key_len = AES256_FIXED_KEY_SIZE,
-        .output_len = 0,
-        .AES256_encrypt_buffer = {0},
-        .AES256_decrypt_buffer = {0}
-    },
-    {
-        .AES256_ctx = {0},
-        .AES256_code = AES_CODE_OK,
-        .init_vector = {'1','2','3','4','5','6','7','8','9','0','1','2','3','4','5','6'},
-        .input_string = "This is a test string for AES-256 CBC mode without padding!",
-        .key = {'A','E','S','2','5','6','_','S','E','C','R','E','T','_','K','E','Y','_','3','2','B','Y','T','E','_','S','E','C','U','R','E','_'},
-        .description = "Test with padding disabled",
-        .usePKCS7 = false,
-        .input_string_len = 0,
-        .key_len = AES256_FIXED_KEY_SIZE,
-        .output_len = 0,
-        .AES256_encrypt_buffer = {0},
-        .AES256_decrypt_buffer = {0}
-    },
-    {
-        .AES256_ctx = {0},
-        .AES256_code = AES_CODE_OK,
-        .init_vector = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-        .input_string = "ExactBlock16BytesXExactBlock16BytesY",
-        .key = {'S','E','C','R','E','T','K','E','Y','1','2','3','4','5','6','7','2','S','E','C','R','E','T','K','E','Y','1','2','3','4','5','7'},
-        .description = "Exact multiple blocks with padding disabled",
-        .usePKCS7 = false,
-        .input_string_len = 0,
-        .key_len = AES256_FIXED_KEY_SIZE,
-        .output_len = 0,
-        .AES256_encrypt_buffer = {0},
-        .AES256_decrypt_buffer = {0}
-    }
-};
+    {.AES256_ctx = {0},
+     .AES256_code = AES_CODE_OK,
+     .init_vector = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2',
+                     '3', '4', '5', '6'},
+     .input_string = "This is a test string for AES-256 CBC mode!",
+     .key = {'A', 'E', 'S', '2', '5', '6', '_', 'S', 'E', 'C', 'R',
+             'E', 'T', '_', 'K', 'E', 'Y', '_', '3', '2', 'B', 'Y',
+             'T', 'E', '_', 'S', 'E', 'C', 'U', 'R', 'E', '_'},
+     .description = "Standard test with text that requires padding",
+     .usePKCS7 = true,
+     .input_string_len = 0,
+     .key_len = AES256_FIXED_KEY_SIZE,
+     .output_len = 0,
+     .AES256_encrypt_buffer = {0},
+     .AES256_decrypt_buffer = {0}},
+    {.AES256_ctx = {0},
+     .AES256_code = AES_CODE_OK,
+     .init_vector = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
+                     'M', 'N', 'O', 'P'},
+     .input_string = "ExactBlock16BytesX",
+     .key = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a',
+             'b', 'c', 'd', 'e', 'f', '0', '1', '2', '3', '4', '5',
+             '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'},
+     .description = "Exact block size test (16 bytes)",
+     .usePKCS7 = true,
+     .input_string_len = 0,
+     .key_len = AES256_FIXED_KEY_SIZE,
+     .output_len = 0,
+     .AES256_encrypt_buffer = {0},
+     .AES256_decrypt_buffer = {0}},
+    {.AES256_ctx = {0},
+     .AES256_code = AES_CODE_OK,
+     .init_vector = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+     .input_string = "Short text",
+     .key = {'S', 'E', 'C', 'R', 'E', 'T', 'K', 'E', 'Y', '1', '2',
+             '3', '4', '5', '6', '7', '2', 'S', 'E', 'C', 'R', 'E',
+             'T', 'K', 'E', 'Y', '1', '2', '3', '4', '5', '7'},
+     .description = "Short text with zero IV",
+     .usePKCS7 = true,
+     .input_string_len = 0,
+     .key_len = AES256_FIXED_KEY_SIZE,
+     .output_len = 0,
+     .AES256_encrypt_buffer = {0},
+     .AES256_decrypt_buffer = {0}},
+    {.AES256_ctx = {0},
+     .AES256_code = AES_CODE_OK,
+     .init_vector = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+                     0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF},
+     .input_string = "This is a multi-block input that will require more than "
+                     "one block of AES encryption to fully process.",
+     .key = {'T', 'e', 's', 't', 'K', 'e', 'y', '1', '2', '3', '4',
+             '5', '6', '7', '8', '9', '0', 'T', 'e', 's', 't', 'K',
+             'e', 'y', '1', '2', '3', '4', '5', '6', '7', '8'},
+     .description = "Multi-block test with padding",
+     .usePKCS7 = true,
+     .input_string_len = 0,
+     .key_len = AES256_FIXED_KEY_SIZE,
+     .output_len = 0,
+     .AES256_encrypt_buffer = {0},
+     .AES256_decrypt_buffer = {0}},
+    {.AES256_ctx = {0},
+     .AES256_code = AES_CODE_OK,
+     .init_vector = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'a', 'b',
+                     'c', 'd', 'e', 'f'},
+     .input_string = "ExactBlock16BytesXExactBlock16BytesY",
+     .key = {'S', 'e', 'c', 'u', 'r', 'i', 't', 'y', 'K', 'e', 'y',
+             '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1',
+             '2', 'S', 'e', 'c', 'u', 'r', 'i', 't', 'y', 'K'},
+     .description = "Multiple exact blocks test (32 bytes)",
+     .usePKCS7 = true,
+     .input_string_len = 0,
+     .key_len = AES256_FIXED_KEY_SIZE,
+     .output_len = 0,
+     .AES256_encrypt_buffer = {0},
+     .AES256_decrypt_buffer = {0}},
+    {.AES256_ctx = {0},
+     .AES256_code = AES_CODE_OK,
+     .init_vector = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
+                     'm', 'n', 'o', 'p'},
+     .input_string = "Special chars: !@#$%^&*()_+-=[]{}|;':\",./<>?",
+     .key = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+     .description = "Special characters test",
+     .usePKCS7 = true,
+     .input_string_len = 0,
+     .key_len = AES256_FIXED_KEY_SIZE,
+     .output_len = 0,
+     .AES256_encrypt_buffer = {0},
+     .AES256_decrypt_buffer = {0}},
+    {.AES256_ctx = {0},
+     .AES256_code = AES_CODE_OK,
+     .init_vector = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '1', '2',
+                     '3', '4', '5', '6'},
+     .input_string =
+         "This is a test string for AES-256 CBC mode without padding!",
+     .key = {'A', 'E', 'S', '2', '5', '6', '_', 'S', 'E', 'C', 'R',
+             'E', 'T', '_', 'K', 'E', 'Y', '_', '3', '2', 'B', 'Y',
+             'T', 'E', '_', 'S', 'E', 'C', 'U', 'R', 'E', '_'},
+     .description = "Test with padding disabled",
+     .usePKCS7 = false,
+     .input_string_len = 0,
+     .key_len = AES256_FIXED_KEY_SIZE,
+     .output_len = 0,
+     .AES256_encrypt_buffer = {0},
+     .AES256_decrypt_buffer = {0}},
+    {.AES256_ctx = {0},
+     .AES256_code = AES_CODE_OK,
+     .init_vector = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+     .input_string = "ExactBlock16BytesXExactBlock16BytesY",
+     .key = {'S', 'E', 'C', 'R', 'E', 'T', 'K', 'E', 'Y', '1', '2',
+             '3', '4', '5', '6', '7', '2', 'S', 'E', 'C', 'R', 'E',
+             'T', 'K', 'E', 'Y', '1', '2', '3', '4', '5', '7'},
+     .description = "Exact multiple blocks with padding disabled",
+     .usePKCS7 = false,
+     .input_string_len = 0,
+     .key_len = AES256_FIXED_KEY_SIZE,
+     .output_len = 0,
+     .AES256_encrypt_buffer = {0},
+     .AES256_decrypt_buffer = {0}}};
 
 #define TOTAL_TESTS (sizeof(test_cases) / sizeof(test_cases[0]))
 
 // Helper function to print hex representation of data
-void print_hex(const uint8_t *data, size_t len)
-{
-    for (size_t i = 0; i < len; i++)
-    {
+void print_hex(const uint8_t *data, size_t len) {
+    for (size_t i = 0; i < len; i++) {
         printf("%02X ", data[i]);
     }
     printf("\n");
 }
 
-int main(void)
-{
+int main(void) {
     printf("%s\n\n", TEST_NAME);
     bool all_tests_passed = true;
 
     // Run tests
-    for (size_t i = 0; i < TOTAL_TESTS; i++)
-    {
+    for (size_t i = 0; i < TOTAL_TESTS; i++) {
         assert(i < TOTAL_TESTS);
 
-        TestCase test = test_cases[i]; // Create a modifiable copy
+        TestCase test = test_cases[i];  // Create a modifiable copy
 
         printf("\n--- Test %u: %s ---\n", i + 1, test.description);
 
@@ -173,7 +174,8 @@ int main(void)
         test.input_string_len = strlen(test.input_string);
         test.key_len = AES256_FIXED_KEY_SIZE;
 
-        printf("Input string (%u bytes): %s\n", test.input_string_len, test.input_string);
+        printf("Input string (%u bytes): %s\n", test.input_string_len,
+               test.input_string);
         printf("Key: ");
         print_hex(test.key, test.key_len);
         printf("IV: ");
@@ -189,15 +191,10 @@ int main(void)
 
         // Encrypt
         test.AES256_code = AES256_CBC_encrypt(
-            &test.AES256_ctx,
-            (const uint8_t *)test.input_string,
-            test.AES256_encrypt_buffer,
-            test.input_string_len,
-            &test.output_len,
-            test.usePKCS7);
+            &test.AES256_ctx, test.input_string, test.AES256_encrypt_buffer,
+            test.input_string_len, &test.output_len, test.usePKCS7);
 
-        if (test.AES256_code != AES_CODE_OK)
-        {
+        if (test.AES256_code != AES_CODE_OK) {
             printf("Encryption failed with code: %d\n", test.AES256_code);
             all_tests_passed = false;
             continue;
@@ -211,16 +208,12 @@ int main(void)
 
         // Decrypt
         size_t decrypted_len;
-        test.AES256_code = AES256_CBC_decrypt(
-            &test.AES256_ctx,
-            test.AES256_encrypt_buffer,
-            test.AES256_decrypt_buffer,
-            test.output_len,
-            &decrypted_len,
-            test.usePKCS7);
+        test.AES256_code =
+            AES256_CBC_decrypt(&test.AES256_ctx, test.AES256_encrypt_buffer,
+                               test.AES256_decrypt_buffer, test.output_len,
+                               &decrypted_len, test.usePKCS7);
 
-        if (test.AES256_code != AES_CODE_OK)
-        {
+        if (test.AES256_code != AES_CODE_OK) {
             printf("Decryption failed with code: %d\n", test.AES256_code);
             all_tests_passed = false;
             continue;
@@ -232,26 +225,29 @@ int main(void)
 
         // Verify result
         bool test_passed = false;
-        
+
         if (test.usePKCS7) {
             test_passed = (decrypted_len == test.input_string_len) &&
-                         (memcmp(test.input_string, test.AES256_decrypt_buffer, test.input_string_len) == 0);
+                          (memcmp(test.input_string, test.AES256_decrypt_buffer,
+                                  test.input_string_len) == 0);
         } else {
             test_passed = (decrypted_len >= test.input_string_len) &&
-                         (memcmp(test.input_string, test.AES256_decrypt_buffer, test.input_string_len) == 0);
+                          (memcmp(test.input_string, test.AES256_decrypt_buffer,
+                                  test.input_string_len) == 0);
         }
 
-        printf("Test %u result: %s\n", i + 1, test_passed ? "PASSED" : "FAILED");
+        printf("Test %u result: %s\n", i + 1,
+               test_passed ? "PASSED" : "FAILED");
 
-        if (!test_passed)
-        {
+        if (!test_passed) {
             all_tests_passed = false;
         }
     }
 
     printf("\n=== Test Summary ===\n");
     printf("Total tests: %u\n", TOTAL_TESTS);
-    printf("Final result: %s\n", all_tests_passed ? "ALL TESTS PASSED" : "SOME TESTS FAILED");
+    printf("Final result: %s\n",
+           all_tests_passed ? "ALL TESTS PASSED" : "SOME TESTS FAILED");
 
     return all_tests_passed ? EXIT_SUCCESS : EXIT_FAILURE;
 }
