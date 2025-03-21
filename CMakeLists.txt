@@ -43,8 +43,13 @@ add_library(project_includes INTERFACE)
 target_include_directories(project_includes INTERFACE
     ${CMAKE_SOURCE_DIR}/include
     ${CMAKE_SOURCE_DIR}/include/BASE64
+    ${CMAKE_SOURCE_DIR}/include/AES
+    ${CMAKE_SOURCE_DIR}/include/CHECKSUM8
     ${CMAKE_SOURCE_DIR}/src
     ${CMAKE_SOURCE_DIR}/src/BASE64
+    ${CMAKE_SOURCE_DIR}/src/AES
+    ${CMAKE_SOURCE_DIR}/src/CHECKSUM8
+
 )
 
 # Add source directory if it exists
