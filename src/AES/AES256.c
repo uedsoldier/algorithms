@@ -13,13 +13,6 @@
 
 static void KeyExpansion_AES256(uint8_t *inputKey, uint8_t *expandedKeys);
 
-/**
- * @brief Initialize AES-256 context with key and optional IV
- *
- * @param ctx AES256 context structure
- * @param key 32-byte encryption key
- * @param iv 16-byte initialization vector (can be NULL for ECB mode)
- */
 void AES256_init_ctx(AES256_ctx_t *ctx, const uint8_t *key, const uint8_t *iv) {
     memcpy(ctx->key.array, key, AES256_FIXED_KEY_SIZE);
     ctx->decrypted_chunks = 0;
@@ -28,23 +21,10 @@ void AES256_init_ctx(AES256_ctx_t *ctx, const uint8_t *key, const uint8_t *iv) {
     memcpy(ctx->iv, iv, AES_BLOCK_LEN);
 }
 
-/**
- * @brief Initialize AES-256 context for ECB mode (no IV needed)
- *
- * @param ctx AES256 context structure
- * @param key 32-byte encryption key
- */
 void AES256_init_ctx_ecb(AES256_ctx_t *ctx, const uint8_t *key) {
     AES256_init_ctx(ctx, key, NULL);
 }
 
-/**
- * @brief Encrypt a single 16-byte block using AES-256
- *
- * @param ctx AES256 context with initialized key
- * @param in Input block (16 bytes)
- * @param out Output block (16 bytes)
- */
 static void AES256_encrypt_chunk(AES256_ctx_t *ctx, uint8_t *in, uint8_t *out) {
     memcpy(out, in, AES_BLOCK_LEN);
 
@@ -64,13 +44,6 @@ static void AES256_encrypt_chunk(AES256_ctx_t *ctx, uint8_t *in, uint8_t *out) {
     AddRoundKey(out, expandedKey + (AES_BLOCK_LEN * AES256_NUM_ROUNDS));
 }
 
-/**
- * @brief Decrypt a single 16-byte block using AES-256
- *
- * @param ctx AES256 context with initialized key
- * @param in Input block (16 bytes)
- * @param out Output block (16 bytes)
- */
 static void AES256_decrypt_chunk(AES256_ctx_t *ctx, uint8_t *in, uint8_t *out) {
     memcpy(out, in, AES_BLOCK_LEN);
 
@@ -92,17 +65,6 @@ static void AES256_decrypt_chunk(AES256_ctx_t *ctx, uint8_t *in, uint8_t *out) {
     AddRoundKey(out, expandedKey);
 }
 
-/**
- * @brief Encrypt data using AES-256 in ECB mode
- *
- * @param ctx AES256 context with initialized key
- * @param in Input data buffer
- * @param out Output data buffer (must be at least as large as the padded input)
- * @param input_len Length of input data in bytes
- * @param output_len Pointer to store the length of output data
- * @param usePKCS7 Whether to use PKCS7 padding (true) or zero padding (false)
- * @return AES_errcode_t Error code (AES_CODE_OK on success)
- */
 AES_errcode_t AES256_ECB_encrypt(AES256_ctx_t *ctx, const void *in, void *out,
                                  size_t input_len, size_t *output_len,
                                  bool usePKCS7) {
@@ -159,17 +121,6 @@ AES_errcode_t AES256_ECB_encrypt(AES256_ctx_t *ctx, const void *in, void *out,
     return AES_CODE_OK;
 }
 
-/**
- * @brief Decrypt data using AES-256 in ECB mode
- *
- * @param ctx AES256 context with initialized key
- * @param in Input data buffer (encrypted)
- * @param out Output data buffer (decrypted)
- * @param input_len Length of input data in bytes
- * @param output_len Pointer to store the length of output data
- * @param usePKCS7 Whether to use PKCS7 padding (true) or zero padding (false)
- * @return AES_errcode_t Error code (AES_CODE_OK on success)
- */
 AES_errcode_t AES256_ECB_decrypt(AES256_ctx_t *ctx, const void *in, void *out,
                                  size_t input_len, size_t *output_len,
                                  bool usePKCS7) {
@@ -224,17 +175,6 @@ AES_errcode_t AES256_ECB_decrypt(AES256_ctx_t *ctx, const void *in, void *out,
     return AES_CODE_OK;
 }
 
-/**
- * @brief Encrypt data using AES-256 in CBC mode
- *
- * @param ctx AES256 context with initialized key and IV
- * @param in Input data buffer
- * @param out Output data buffer (must be at least as large as the padded input)
- * @param input_len Length of input data in bytes
- * @param output_len Pointer to store the length of output data
- * @param usePKCS7 Whether to use PKCS7 padding (true) or zero padding (false)
- * @return AES_errcode_t Error code (AES_CODE_OK on success)
- */
 AES_errcode_t AES256_CBC_encrypt(AES256_ctx_t *ctx, const uint8_t *in,
                                  uint8_t *out, size_t input_len,
                                  size_t *output_len, bool usePKCS7) {
@@ -302,17 +242,6 @@ AES_errcode_t AES256_CBC_encrypt(AES256_ctx_t *ctx, const uint8_t *in,
     return AES_CODE_OK;
 }
 
-/**
- * @brief Decrypt data using AES-256 in CBC mode
- *
- * @param ctx AES256 context with initialized key and IV
- * @param in Input data buffer (encrypted)
- * @param out Output data buffer (decrypted)
- * @param input_len Length of input data in bytes
- * @param output_len Pointer to store the length of output data
- * @param usePKCS7 Whether to use PKCS7 padding (true) or zero padding (false)
- * @return AES_errcode_t Error code (AES_CODE_OK on success)
- */
 AES_errcode_t AES256_CBC_decrypt(AES256_ctx_t *ctx, const uint8_t *in,
                                  uint8_t *out, size_t input_len,
                                  size_t *output_len, bool usePKCS7) {
@@ -382,13 +311,6 @@ AES_errcode_t AES256_CBC_decrypt(AES256_ctx_t *ctx, const uint8_t *in,
     return AES_CODE_OK;
 }
 
-/**
- * @brief Expand the AES-256 key for encryption/decryption
- *
- * @param inputKey The 32-byte input key
- * @param expandedKeys Buffer to store the expanded key (must be
- * AES256_KEY_EXP_SIZE bytes)
- */
 static void KeyExpansion_AES256(uint8_t *inputKey, uint8_t *expandedKeys) {
     size_t i;
     for (i = 0; i != AES256_FIXED_KEY_SIZE; i++) {

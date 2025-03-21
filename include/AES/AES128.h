@@ -53,10 +53,6 @@ extern "C" {
 #define AES128_NUM_ROUNDS 10
 
 /**
- * @brief
- *
- */
-/**
  * @brief AES-128 context structure
  *
  */
