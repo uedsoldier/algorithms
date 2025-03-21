@@ -11,12 +11,14 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 file(GLOB BASE64_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/BASE64/*.c")
 file(GLOB AES_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/AES/*.c")
 file(GLOB PKCS7_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/PKCS7/*.c")
+file(GLOB CHECKSUM8_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/CHECKSUM8/*.c")
 
 # Define the algorithms library
 add_library(algorithms_lib
     ${BASE64_SOURCES}
     ${AES_SOURCES}
     ${PKCS7_SOURCES}
+    ${CHECKSUM8_SOURCES}
     # Add other algorithm implementations as they become available
 )
 
@@ -28,12 +30,14 @@ target_include_directories(algorithms_lib
         ${CMAKE_SOURCE_DIR}/include/BASE64
         ${CMAKE_SOURCE_DIR}/include/AES
         ${CMAKE_SOURCE_DIR}/include/PKCS7
+        ${CMAKE_SOURCE_DIR}/include/CHECKSUM8
     PRIVATE
         # Private implementation headers
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${CMAKE_CURRENT_SOURCE_DIR}/BASE64
         ${CMAKE_CURRENT_SOURCE_DIR}/AES
         ${CMAKE_CURRENT_SOURCE_DIR}/PKCS7
+        ${CMAKE_CURRENT_SOURCE_DIR}/CHECKSUM8
 )
 
 # Print include directories for debugging
@@ -67,14 +71,14 @@ endif()
 # Add debug include paths functionality
 if(DEBUG_INCLUDE_PATHS)
     target_compile_definitions(algorithms_lib PRIVATE DEBUG_INCLUDE_PATHS)
-    
+
     # Add compiler-specific options to show include paths during compilation
     if(CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
         target_compile_options(algorithms_lib PRIVATE -H)
     elseif(CMAKE_C_COMPILER_ID STREQUAL "MSVC")
         target_compile_options(algorithms_lib PRIVATE /showIncludes)
     endif()
-    
+
     message(STATUS "Include path debugging enabled")
 endif()
 
