@@ -36,7 +36,9 @@
  * significantly improves calculation speed. Disable to save memory at the cost
  * of performance.
  */
+#ifndef CRC8_USE_LOOKUP_TABLE
 #define CRC8_USE_LOOKUP_TABLE 0
+#endif
 
 /**
  * @brief Controls the use of pre-computed lookup tables for CRC16 calculations
@@ -46,7 +48,9 @@
  * significantly improves calculation speed. Disable to save memory at the cost
  * of performance.
  */
+#ifndef CRC16_USE_LOOKUP_TABLE
 #define CRC16_USE_LOOKUP_TABLE 0
+#endif
 
 /**
  * @brief Controls the use of pre-computed lookup tables for CRC32 calculations
@@ -56,7 +60,9 @@
  * significantly improves calculation speed. Disable to save memory at the cost
  * of performance.
  */
+#ifndef CRC32_USE_LOOKUP_TABLE
 #define CRC32_USE_LOOKUP_TABLE 0
+#endif
 
 #include <stdbool.h>
 #include <stdint.h>
