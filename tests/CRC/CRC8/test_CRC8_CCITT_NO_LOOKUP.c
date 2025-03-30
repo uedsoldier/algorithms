@@ -7,7 +7,7 @@
 
 #include "crc.h"
 
-#define TEST_NAME "CRC8-CCITT (with lookup table) tester"
+#define TEST_NAME "CRC8-CCITT (without lookup table) tester"
 
 /**
  * @brief Print the status of CRC-related macro settings

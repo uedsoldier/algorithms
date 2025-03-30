@@ -5,6 +5,7 @@ message(STATUS "=== Configuring CRC8 Tests ===")
 # Define the list of CRC8 test types
 set(CRC8_TEST_TYPES
     8_CCITT_LOOKUP
+    8_CCITT_NO_LOOKUP
 
 )
 
