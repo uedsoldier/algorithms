@@ -688,11 +688,12 @@ uint32_t CRC32(const void *data, uint16_t data_len, crc_t crc_type) {
     return crc ^ CRC32_getFinalXOR(crc_type);
 }
 
+/* Internal Helper Functions */
+
 /**
- * @brief
- *
- * @param data
- * @return uint8_t
+ * @brief Inverts bits in a byte
+ * @param data Byte to invert
+ * @return uint8_t Inverted byte
  */
 static uint8_t bit_invert_Byte(uint8_t data) {
     uint8_t inverted_data = 0;
@@ -703,10 +704,9 @@ static uint8_t bit_invert_Byte(uint8_t data) {
 }
 
 /**
- * @brief
- *
- * @param data
- * @return uint16_t
+ * @brief Inverts bits in a 16-bit integer
+ * @param data Integer to invert
+ * @return uint16_t Inverted integer
  */
 static uint16_t bit_invert_Int16(uint16_t data) {
     uint16_t inverted_data = 0;
@@ -717,10 +717,9 @@ static uint16_t bit_invert_Int16(uint16_t data) {
 }
 
 /**
- * @brief
- *
- * @param data
- * @return uint32_t
+ * @brief Inverts bits in a 32-bit integer
+ * @param data Integer to invert
+ * @return uint32_t Inverted integer
  */
 static uint32_t bit_invert_Int32(uint32_t data) {
     uint32_t inverted_data = 0;

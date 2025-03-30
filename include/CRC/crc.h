@@ -25,7 +25,7 @@
  * memory.
  */
 #ifndef CRC_USE_IMPLEMENTATION_NAMES
-#define CRC_USE_IMPLEMENTATION_NAMES 1
+#define CRC_USE_IMPLEMENTATION_NAMES 0
 #endif
 
 /**
@@ -1034,28 +1034,5 @@ const char *get_crc16_implementation(uint8_t index);
  */
 const char *get_crc32_implementation(uint8_t index);
 #endif
-
-/* Internal Helper Functions */
-
-/**
- * @brief Inverts bits in a byte
- * @param data Byte to invert
- * @return uint8_t Inverted byte
- */
-static uint8_t bit_invert_Byte(uint8_t data);
-
-/**
- * @brief Inverts bits in a 16-bit integer
- * @param data Integer to invert
- * @return uint16_t Inverted integer
- */
-static uint16_t bit_invert_Int16(uint16_t data);
-
-/**
- * @brief Inverts bits in a 32-bit integer
- * @param data Integer to invert
- * @return uint32_t Inverted integer
- */
-static uint32_t bit_invert_Int32(uint32_t data);
 
 #endif /*CRC_H*/
