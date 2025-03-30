@@ -12,6 +12,7 @@ file(GLOB BASE64_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/BASE64/*.c")
 file(GLOB AES_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/AES/*.c")
 file(GLOB PKCS7_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/PKCS7/*.c")
 file(GLOB CHECKSUM8_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/CHECKSUM8/*.c")
+file(GLOB CRC_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/CRC/*.c")
 
 # Define the algorithms library
 add_library(algorithms_lib
@@ -19,6 +20,7 @@ add_library(algorithms_lib
     ${AES_SOURCES}
     ${PKCS7_SOURCES}
     ${CHECKSUM8_SOURCES}
+    ${CRC_SOURCES}
     # Add other algorithm implementations as they become available
 )
 
@@ -31,6 +33,7 @@ target_include_directories(algorithms_lib
         ${CMAKE_SOURCE_DIR}/include/AES
         ${CMAKE_SOURCE_DIR}/include/PKCS7
         ${CMAKE_SOURCE_DIR}/include/CHECKSUM8
+        ${CMAKE_SOURCE_DIR}/include/CRC
     PRIVATE
         # Private implementation headers
         ${CMAKE_CURRENT_SOURCE_DIR}
@@ -38,6 +41,7 @@ target_include_directories(algorithms_lib
         ${CMAKE_CURRENT_SOURCE_DIR}/AES
         ${CMAKE_CURRENT_SOURCE_DIR}/PKCS7
         ${CMAKE_CURRENT_SOURCE_DIR}/CHECKSUM8
+        ${CMAKE_CURRENT_SOURCE_DIR}/CRC
 )
 
 # Print include directories for debugging
