@@ -9,5 +9,6 @@ enable_testing()
 add_subdirectory(AES)
 add_subdirectory(BASE64)
 add_subdirectory(CHECKSUM8)
+add_subdirectory(CRC)
 
 message(STATUS "=== Finished configuring Tests Root ===")
