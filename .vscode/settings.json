@@ -2,7 +2,8 @@
     // CMake settings
     "cmake.sourceDirectory": "${workspaceFolder}",
     "cmake.buildDirectory": "${workspaceFolder}/build",
-    "cmake.generator": "${os:windows} ? 'MinGW Makefiles' : 'Unix Makefiles'",
+    // !!! CHANGE FOR LINUX: Set this to "Unix Makefiles" when on Linux
+    "cmake.generator": "MinGW Makefiles",
     "cmake.configureSettings": {
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_EXPORT_COMPILE_COMMANDS": true
@@ -18,7 +19,8 @@
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
     "C_Cpp.clang_format_fallbackStyle": "{ BasedOnStyle: Google, IndentWidth: 4 }",
     "C_Cpp.default.cStandard": "c11",
-    "C_Cpp.default.intelliSenseMode": "${os:windows} ? 'gcc-x64' : 'linux-gcc-x64'",
+    // !!! CHANGE FOR LINUX: Set this to "linux-gcc-x64" when on Linux
+    "C_Cpp.default.intelliSenseMode": "windows-gcc-x64",
 
     // File associations
     "files.associations": {
@@ -41,14 +43,16 @@
 
     // Terminal settings - Windows
     "terminal.integrated.defaultProfile.windows": "Command Prompt",
+    // !!! CHANGE FOR LINUX: These Windows-specific paths won't be used on Linux
     "terminal.integrated.env.windows": {
-        "MINGW_PATH": "C:/MinGW/bin",
-        "CC": "C:/MinGW/bin/gcc.exe",
-        "PATH": "${env:PATH};C:/MinGW/bin"
+        "MINGW_PATH": "E:/MinGW/bin",        // Adjust this path to your MinGW installation
+        "CC": "E:/MinGW/bin/gcc.exe",        // Adjust this path to your MinGW installation
+        "PATH": "${env:PATH};E:/MinGW/bin"   // Adjust this path to your MinGW installation
     },
 
     // Terminal settings - Linux
     "terminal.integrated.defaultProfile.linux": "bash",
+    // !!! CHANGE FOR LINUX: Verify this path matches your gcc installation
     "terminal.integrated.env.linux": {
         "CC": "/usr/bin/gcc"
     },
@@ -56,7 +60,11 @@
     "terminal.integrated.scrollback": 10000,
 
     // Compiler path - platform specific
-    "C_Cpp.default.compilerPath": "${os:windows} ? '${env:CC}' : '/usr/bin/gcc'",
+    "C_Cpp.default.compilerPath": {
+        "windows": "${env:CC}",
+        // !!! CHANGE FOR LINUX: Verify this path matches your gcc installation
+        "linux": "/usr/bin/gcc"
+    },
 
     // Disable Codium code completion if you're using it
     "codium.codeCompletion.enable": false,
@@ -69,9 +77,11 @@
     // Line ending settings
     "files.eol": "\n",  // Use LF even on Windows for consistency
 
-    // Preferred generators - platform specific
+    // Preferred generators - these will work on both platforms
+    // CMake will automatically select the first available generator
     "cmake.preferredGenerators": [
-        "${os:windows} ? 'MinGW Makefiles' : 'Unix Makefiles'",
+        "MinGW Makefiles",
+        "Unix Makefiles",
         "Ninja"
     ]
 }
