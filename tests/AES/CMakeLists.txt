@@ -21,20 +21,21 @@ set(AES_TEST_TYPES
 
 # Function to configure a test executable
 function(configure_aes_test TYPE)
-    set(TEST_NAME "test_AES${TYPE}")
+    set(TEST_NAME "AES${TYPE}_tester")
+    set(SOURCE_FILE "test_AES${TYPE}.c")  # Keep source file name unchanged
 
     # Debug print to verify test file existence
-    message(STATUS "Looking for test file: ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_NAME}.c")
-    if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${TEST_NAME}.c")
-        message(STATUS "Test file found: ${TEST_NAME}.c")
+    message(STATUS "Looking for test file: ${CMAKE_CURRENT_SOURCE_DIR}/${SOURCE_FILE}")
+    if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${SOURCE_FILE}")
+        message(STATUS "Test file found: ${SOURCE_FILE}")
     else()
-        message(WARNING "Test file not found: ${TEST_NAME}.c")
+        message(WARNING "Test file not found: ${SOURCE_FILE}")
         return()
     endif()
 
     # Add executable
     add_executable(${TEST_NAME}
-        ${TEST_NAME}.c
+        ${SOURCE_FILE}
         ${AES_IMPL_FILES}
     )
 
