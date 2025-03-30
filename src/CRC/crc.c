@@ -8,6 +8,72 @@
 
 #include "crc.h"
 
+/**
+ * @brief Inverts bits in a data value of specified length
+ * @param data Pointer to the data to invert
+ * @param bit_length Number of bits to invert (must be 8, 16, or 32)
+ * @return uint32_t Inverted value (cast as needed)
+ */
+static uint32_t bit_invert(const void *data, uint8_t bit_length) {
+    uint32_t input = 0;
+    uint32_t inverted = 0;
+
+    // Validate input parameters
+    if (data == NULL ||
+        (bit_length != 8 && bit_length != 16 && bit_length != 32)) {
+        return 0;
+    }
+
+    // Copy input data based on bit length
+    switch (bit_length) {
+        case 8:
+            input = *(const uint8_t *)data;
+            break;
+        case 16:
+            input = *(const uint16_t *)data;
+            break;
+        case 32:
+            input = *(const uint32_t *)data;
+            break;
+    }
+
+    // Perform bit inversion
+    for (uint8_t i = 0; i < bit_length; i++) {
+        if ((input & (1UL << i)) != 0) {
+            inverted |= (1UL << (bit_length - 1 - i));
+        }
+    }
+
+    return inverted;
+}
+
+/**
+ * @brief Inverts bits in a byte
+ * @param data Byte to invert
+ * @return uint8_t Inverted byte
+ */
+static uint8_t bit_invert_Byte(uint8_t data) {
+    return (uint8_t)bit_invert(&data, 8);
+}
+
+/**
+ * @brief Inverts bits in a 16-bit integer
+ * @param data Integer to invert
+ * @return uint16_t Inverted integer
+ */
+static uint16_t bit_invert_Int16(uint16_t data) {
+    return (uint16_t)bit_invert(&data, 16);
+}
+
+/**
+ * @brief Inverts bits in a 32-bit integer
+ * @param data Integer to invert
+ * @return uint32_t Inverted integer
+ */
+static uint32_t bit_invert_Int32(uint32_t data) {
+    return bit_invert(&data, 32);
+}
+
 #if defined(CRC_USE_IMPLEMENTATION_NAMES) && (CRC_USE_IMPLEMENTATION_NAMES == 1)
 
 const char *get_crc8_implementation(uint8_t index) {
@@ -686,45 +752,4 @@ uint32_t CRC32(const void *data, uint16_t data_len, crc_t crc_type) {
     crc = output_reflected ? bit_invert_Int32(crc) : crc;
 
     return crc ^ CRC32_getFinalXOR(crc_type);
-}
-
-/* Internal Helper Functions */
-
-/**
- * @brief Inverts bits in a byte
- * @param data Byte to invert
- * @return uint8_t Inverted byte
- */
-static uint8_t bit_invert_Byte(uint8_t data) {
-    uint8_t inverted_data = 0;
-    for (uint8_t i = 0; i != 8; i++) {
-        if ((data & (1 << i)) != 0) inverted_data |= (1 << (7 - i));
-    }
-    return inverted_data;
-}
-
-/**
- * @brief Inverts bits in a 16-bit integer
- * @param data Integer to invert
- * @return uint16_t Inverted integer
- */
-static uint16_t bit_invert_Int16(uint16_t data) {
-    uint16_t inverted_data = 0;
-    for (uint8_t i = 0; i != 16; i++) {
-        if ((data & (1 << i)) != 0) inverted_data |= (1 << (15 - i));
-    }
-    return inverted_data;
-}
-
-/**
- * @brief Inverts bits in a 32-bit integer
- * @param data Integer to invert
- * @return uint32_t Inverted integer
- */
-static uint32_t bit_invert_Int32(uint32_t data) {
-    uint32_t inverted_data = 0;
-    for (uint8_t i = 0; i != 32; i++) {
-        if ((data & (1UL << i)) != 0) inverted_data |= (1UL << (31 - i));
-    }
-    return inverted_data;
 }
