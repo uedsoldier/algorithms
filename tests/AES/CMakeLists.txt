@@ -21,7 +21,7 @@ set(AES_TEST_TYPES
 
 # Function to configure a test executable
 function(configure_aes_test TYPE)
-    set(TEST_NAME "test_AES${TYPE}")  # Changed to match your naming convention
+    set(TEST_NAME "test_AES${TYPE}")
 
     # Debug print to verify test file existence
     message(STATUS "Looking for test file: ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_NAME}.c")
