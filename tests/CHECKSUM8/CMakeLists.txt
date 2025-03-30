@@ -94,5 +94,5 @@ endforeach()
 # Set the list of tests in parent scope
 set(CHECKSUM8_TESTS ${ADDED_TESTS} PARENT_SCOPE)
 
-message(STATUS "=== Finished configuring CHECKSUM8 Tests ===")
 message(STATUS "Configured tests: ${ADDED_TESTS}")
+message(STATUS "=== Finished configuring CHECKSUM8 Tests ===")
