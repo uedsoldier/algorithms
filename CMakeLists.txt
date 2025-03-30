@@ -28,6 +28,11 @@ enable_testing()
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED True)
 
+# Set C++ standard
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 # Set default build type if not specified
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Debug")
@@ -63,13 +68,17 @@ add_subdirectory(tests)
 # Set compiler warnings
 if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Wpedantic -Wno-missing-braces")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -Wno-missing-braces")
 endif()
 
 # Print configuration information
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "C Compiler: ${CMAKE_C_COMPILER_ID} ${CMAKE_C_COMPILER_VERSION}")
+message(STATUS "C++ Compiler: ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}")
 message(STATUS "C Standard: ${CMAKE_C_STANDARD}")
+message(STATUS "C++ Standard: ${CMAKE_CXX_STANDARD}")
 message(STATUS "C Flags: ${CMAKE_C_FLAGS}")
+message(STATUS "C++ Flags: ${CMAKE_CXX_FLAGS}")
 message(STATUS "Parallel jobs: ${PROCESSOR_COUNT}")
 
 # Print include directories for debugging
