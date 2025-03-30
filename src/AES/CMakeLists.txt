@@ -4,6 +4,7 @@ set(AES_SOURCES
     AES192.c
     AES256.c
     AES_common.c
+    AES128.cpp
 )
 
 # Add these files to the parent target

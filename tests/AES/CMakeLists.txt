@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.12)
 
 message(STATUS "=== Configuring AES Tests (tests/AES/CMakeLists.txt) ===")
 
-# Define the list of AES test files
+# Define the list of AES test files (without extensions)
 set(AES_TESTS
     test_AES128_ECB
     test_AES128_CBC
@@ -10,6 +10,8 @@ set(AES_TESTS
     test_AES192_CBC
     test_AES256_ECB
     test_AES256_CBC
+
+    test_AES128_CBC_OO
 )
 
 # Create a list to store added tests
@@ -17,8 +19,22 @@ set(ADDED_TESTS "")
 
 # Process each test
 foreach(TEST_NAME ${AES_TESTS})
+    # Determine the source file extension
+    if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_NAME}.cpp)
+        set(SOURCE_FILE ${TEST_NAME}.cpp)
+        set(LINK_LANGUAGE CXX) # Explicitly set C++ for .cpp files
+    elseif(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_NAME}.c)
+        set(SOURCE_FILE ${TEST_NAME}.c)
+        set(LINK_LANGUAGE C) # Explicitly set C for .c files
+    else()
+        message(FATAL_ERROR "Source file for test '${TEST_NAME}' not found!")
+    endif()
+
     # Create the test executable
-    add_executable(${TEST_NAME} ${TEST_NAME}.c)
+    add_executable(${TEST_NAME} ${SOURCE_FILE})
+
+    # Set the language explicitly for the target
+    set_target_properties(${TEST_NAME} PROPERTIES LINKER_LANGUAGE ${LINK_LANGUAGE})
 
     # Link with algorithms library
     target_link_libraries(${TEST_NAME}
@@ -42,7 +58,7 @@ foreach(TEST_NAME ${AES_TESTS})
 
     # Add to our list of tests
     list(APPEND ADDED_TESTS ${TEST_NAME})
-    message(STATUS "Added test: ${TEST_NAME}")
+    message(STATUS "Added test: ${TEST_NAME} (Source: ${SOURCE_FILE})")
 endforeach()
 
 # Set the list of tests in parent scope

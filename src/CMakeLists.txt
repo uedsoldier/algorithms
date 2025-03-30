@@ -9,7 +9,7 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 # Find implementation files
 file(GLOB BASE64_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/BASE64/*.c")
-file(GLOB AES_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/AES/*.c")
+file(GLOB AES_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/AES/*.c" "${CMAKE_CURRENT_SOURCE_DIR}/AES/*.cpp")
 file(GLOB PKCS7_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/PKCS7/*.c")
 file(GLOB CHECKSUM8_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/CHECKSUM8/*.c")
 
@@ -21,6 +21,9 @@ add_library(algorithms_lib
     ${CHECKSUM8_SOURCES}
     # Add other algorithm implementations as they become available
 )
+
+# Set the language explicitly for the library
+set_target_properties(algorithms_lib PROPERTIES LINKER_LANGUAGE CXX)
 
 # Set include directories for the library
 target_include_directories(algorithms_lib

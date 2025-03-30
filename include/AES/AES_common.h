@@ -12,6 +12,10 @@
 #ifndef AES_COMMON_H
 #define AES_COMMON_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -167,5 +171,9 @@ void ReverseShiftRows(uint8_t *plain_text);
  * @param plain_text Pointer to state array
  */
 void ReverseMixColumns(uint8_t *plain_text);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /*AES_COMMON_H*/
