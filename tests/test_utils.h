@@ -17,4 +17,10 @@
  */
 void print_hex(const uint8_t *data, size_t len);
 
+/**
+ * @brief Compare two byte arrays for equality
+ */
+bool bytes_equal(const uint8_t *s1, size_t len1, const uint8_t *s2,
+                 size_t len2);
+
 #endif /* TEST_UTILS_H */

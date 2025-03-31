@@ -158,17 +158,6 @@ static const TestCase test_cases[] = {
 #define TOTAL_TESTS (sizeof(test_cases) / sizeof(test_cases[0]))
 
 /**
- * @brief Compare two byte arrays for equality
- */
-static bool bytes_equal(const uint8_t *s1, size_t len1, const uint8_t *s2,
-                        size_t len2) {
-    if (len1 != len2) return false;
-    if (s1 == NULL && s2 == NULL) return true;
-    if (s1 == NULL || s2 == NULL) return false;
-    return memcmp(s1, s2, len1) == 0;
-}
-
-/**
  * @brief Run a single Base64 test case
  */
 static bool run_single_test(base64_converter_t *converter, const TestCase *test,

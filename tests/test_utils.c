@@ -5,12 +5,21 @@
 #include "test_utils.h"
 
 #include <stdio.h>
+#include <string.h>
 
 void print_hex(const uint8_t *data, size_t len) {
     for (size_t i = 0; i < len; i++) {
         printf("%02X ", data[i]);
     }
     printf("\n");
+}
+
+bool bytes_equal(const uint8_t *s1, size_t len1, const uint8_t *s2,
+                 size_t len2) {
+    if (len1 != len2) return false;
+    if (s1 == NULL && s2 == NULL) return true;
+    if (s1 == NULL || s2 == NULL) return false;
+    return memcmp(s1, s2, len1) == 0;
 }
 
 // void print_crc16_config(crc_t type) {
