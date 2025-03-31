@@ -6,6 +6,8 @@ message(STATUS "=== Configuring CRC8 Tests ===")
 set(CRC8_TEST_TYPES
     8_CCITT_LOOKUP
     8_CCITT_NO_LOOKUP
+    # 8_CDMA_LOOKUP
+    # 8_CDMA_NO_LOOKUP
 
 )
 
@@ -23,10 +25,11 @@ function(configure_crc8_test TYPE)
         return()
     endif()
 
-    # Add executable
+    # Add executable with utils source
     add_executable(${TEST_NAME}
         ${SOURCE_FILE}
         ${CRC_IMPL_FILES}
+        ${CRC8_UTILS_SOURCE}
     )
 
     # Include directories
@@ -46,22 +49,27 @@ function(configure_crc8_test TYPE)
     )
 
     # Add specific compile definitions based on LOOKUP/NO_LOOKUP type
-    if(TYPE MATCHES ".*LOOKUP$")
+    if(TYPE MATCHES "^8_[A-Z0-9]+_LOOKUP$")
+        message(STATUS "Configuring test for LOOKUP table: ${TYPE}")
         target_compile_definitions(${TEST_NAME}
             PRIVATE
                 CRC8_USE_LOOKUP_TABLE=1
         )
-    elseif(TYPE MATCHES ".*NO_LOOKUP$")
+    elseif(TYPE MATCHES "^8_[A-Z0-9]+_NO_LOOKUP$")
+        message(STATUS "Configuring test for NO_LOOKUP table: ${TYPE}")
         target_compile_definitions(${TEST_NAME}
             PRIVATE
                 CRC8_USE_LOOKUP_TABLE=0
         )
+    else()
+        message(FATAL_ERROR "Unknown CRC8 test type: ${TYPE}")
     endif()
 
-    # Link with the main library
+    # Link with the main library and test_utils
     target_link_libraries(${TEST_NAME}
         PRIVATE
             algorithms_lib
+            test_utils
     )
 
     # Set compiler options

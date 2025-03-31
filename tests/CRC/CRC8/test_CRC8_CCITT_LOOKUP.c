@@ -6,21 +6,23 @@
 #include <string.h>
 
 #include "crc.h"
+#include "test_utils.h"
 
 #define TEST_NAME "CRC8-CCITT (with lookup table) tester"
+#define CRC8_TYPE CRC8_CCITT
 
 /**
  * @brief Print the status of CRC-related macro settings
  */
 static void print_macro_settings(void) {
     printf("=== Macro Settings ===\n");
-#ifdef CRC8_USE_LOOKUP_TABLE
+#if defined(CRC8_USE_LOOKUP_TABLE)
     printf("CRC8_USE_LOOKUP_TABLE is defined as: %d\n", CRC8_USE_LOOKUP_TABLE);
 #else
     printf("CRC8_USE_LOOKUP_TABLE is not defined\n");
 #endif
 
-#ifdef CRC_USE_IMPLEMENTATION_NAMES
+#if defined(CRC_USE_IMPLEMENTATION_NAMES)
     printf("CRC_USE_IMPLEMENTATION_NAMES is defined as: %d\n",
            CRC_USE_IMPLEMENTATION_NAMES);
 #else
@@ -48,21 +50,21 @@ static const TestCase test_cases[] = {
         "Test case 1: Basic test",
         (const uint8_t *)"Hello, World!",
         13,
-        CRC8_CCITT,
+        CRC8_TYPE,
         0x87,
     },
     {
         "Test case 2: Empty string",
         (const uint8_t *)"",
         0,
-        CRC8_CCITT,
+        CRC8_TYPE,
         0x00,
     },
     {
         "Test case 3: Single byte",
         (const uint8_t *)"A",
         1,
-        CRC8_CCITT,
+        CRC8_TYPE,
         0xC0,
     },
     // Additional test cases
@@ -70,63 +72,53 @@ static const TestCase test_cases[] = {
         "Standard test vector '123456789'",
         (const uint8_t *)"123456789",
         9,
-        CRC8_CCITT,
+        CRC8_TYPE,
         0xF4,
     },
     {
         "All zeros (8 bytes)",
         (const uint8_t *)"\x00\x00\x00\x00\x00\x00\x00\x00",
         8,
-        CRC8_CCITT,
+        CRC8_TYPE,
         0x00,
     },
     {
         "All ones (8 bytes)",
         (const uint8_t *)"\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF",
         8,
-        CRC8_CCITT,
+        CRC8_TYPE,
         0xD7,
     },
     {
         "Alternating pattern (0x55, 0xAA)",
         (const uint8_t *)"\x55\xAA\x55\xAA",
         4,
-        CRC8_CCITT,
+        CRC8_TYPE,
         0x6F,
     },
     {
         "Binary sequence",
         (const uint8_t *)"\x00\x01\x02\x03\x04\x05\x06\x07",
         8,
-        CRC8_CCITT,
+        CRC8_TYPE,
         0xD8,
     },
     {
         "Single byte (0xFF)",
         (const uint8_t *)"\xFF",
         1,
-        CRC8_CCITT,
+        CRC8_TYPE,
         0xF3,
     },
     {
         "Random bytes sequence",
         (const uint8_t *)"\x12\x34\x56\x78\x9A\xBC\xDE\xF0",
         8,
-        CRC8_CCITT,
+        CRC8_TYPE,
         0xE7,
     }};
 
 #define TOTAL_TESTS (sizeof(test_cases) / sizeof(test_cases[0]))
-
-/**
- * @brief Print data in hexadecimal format
- */
-static void print_hex(const uint8_t *data, size_t len) {
-    for (size_t i = 0; i < len; i++) {
-        printf("%02X ", data[i]);
-    }
-    printf("\n");
-}
 
 /**
  * @brief Run a single Base64 test case
@@ -165,6 +157,8 @@ static bool run_single_test(const TestCase *test, size_t test_number) {
 int main(void) {
     printf("%s\n\n", TEST_NAME);
     print_macro_settings();
+    // Print CRC8 configuration
+    print_crc8_config(CRC8_TYPE);
     bool all_tests_passed = true;
 
     // Run all tests
