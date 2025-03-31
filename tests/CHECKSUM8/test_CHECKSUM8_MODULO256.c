@@ -6,6 +6,7 @@
 #include <string.h>
 
 #include "checksum8.h"
+#include "test_utils.h"
 
 #define TEST_NAME "Checksum8 (modulo 256) tester"
 
@@ -88,16 +89,6 @@ static const TestCase test_cases[] = {
         .input_len = 2,
         .expected_checksum_output = 0xFE  // (0xFF + 0xFF) % 256
     }};
-
-/**
- * @brief Print data in hexadecimal format
- */
-static void print_hex(const uint8_t *data, size_t len) {
-    for (size_t i = 0; i < len; i++) {
-        printf("%02X ", data[i]);
-    }
-    printf("\n");
-}
 
 /**
  * @brief Run a single checksum test case

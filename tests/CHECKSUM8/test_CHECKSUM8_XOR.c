@@ -6,6 +6,7 @@
 #include <string.h>
 
 #include "checksum8.h"
+#include "test_utils.h"
 
 #define TEST_NAME "Checksum8 (XOR) tester"
 
@@ -155,15 +156,6 @@ static const TestCase test_cases[] = {
         .expected_checksum_output =
             0x07  // 0x02 ^ 0x03 ^ 0x05 ^ 0x07 ^ 0x0B ^ 0x0D ^ 0x11 ^ 0x13
     }};
-/**
- * @brief Print data in hexadecimal format
- */
-static void print_hex(const uint8_t *data, size_t len) {
-    for (size_t i = 0; i < len; i++) {
-        printf("%02X ", data[i]);
-    }
-    printf("\n");
-}
 
 /**
  * @brief Run a single checksum test case

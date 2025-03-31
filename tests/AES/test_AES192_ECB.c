@@ -10,6 +10,7 @@
 
 #include "AES192.h"
 #include "PKCS7.h"
+#include "test_utils.h"
 
 static const char *TEST_NAME = "AES-192 ECB tester";
 
@@ -128,14 +129,6 @@ static const TestCase test_cases[] = {
      .AES192_decrypt_buffer = {0}}};
 
 #define TOTAL_TESTS (sizeof(test_cases) / sizeof(test_cases[0]))
-
-// Helper function to print hex representation of data
-void print_hex(const uint8_t *data, size_t len) {
-    for (size_t i = 0; i < len; i++) {
-        printf("%02X ", data[i]);
-    }
-    printf("\n");
-}
 
 int main(void) {
     printf("%s\n\n", TEST_NAME);
