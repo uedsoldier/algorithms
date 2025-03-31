@@ -40,6 +40,7 @@ function(configure_checksum8_test TYPE)
     target_link_libraries(${TEST_NAME}_tester
         PRIVATE
             algorithms_lib
+            test_utils
     )
 
     # Set compiler options

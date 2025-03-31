@@ -53,6 +53,7 @@ function(configure_aes_test TYPE)
     target_link_libraries(${TEST_NAME}
         PRIVATE
             algorithms_lib
+            test_utils
     )
 
     # Set compiler options

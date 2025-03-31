@@ -29,7 +29,6 @@ function(configure_crc8_test TYPE)
     add_executable(${TEST_NAME}
         ${SOURCE_FILE}
         ${CRC_IMPL_FILES}
-        ${CRC8_UTILS_SOURCE}
     )
 
     # Include directories

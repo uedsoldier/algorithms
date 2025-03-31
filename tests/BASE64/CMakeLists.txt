@@ -29,16 +29,17 @@ target_include_directories(BASE64_tester
 target_link_libraries(BASE64_tester
     PRIVATE
         algorithms_lib
+        test_utils
 )
 
 # Set compiler options
 if(CMAKE_C_COMPILER_ID MATCHES "MSVC")
     target_compile_options(BASE64_tester PRIVATE /W4)
 else()
-    target_compile_options(BASE64_tester PRIVATE 
-        -Wall 
-        -Wextra 
-        -Wpedantic 
+    target_compile_options(BASE64_tester PRIVATE
+        -Wall
+        -Wextra
+        -Wpedantic
         -Wno-missing-braces
     )
     # Link math library on non-MSVC platforms
