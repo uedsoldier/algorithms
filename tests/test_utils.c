@@ -18,7 +18,7 @@ void print_hex(const uint8_t *data, size_t len) {
 void print_crc8_config(crc_t type) {
     printf("=== CRC8 Configuration ===\n");
 
-    printf("Type:           %s\n", get_crc8_implementation(type));
+    printf("Type:           %s\n", get_crc_implementation_name(type));
     printf("Polynomial:     0x%02X\n", CRC8_getPoly(type));
     printf("Initial value:  0x%02X\n", CRC8_getSeed(type));
     printf("Final XOR:      0x%02X\n", CRC8_getFinalXOR(type));
