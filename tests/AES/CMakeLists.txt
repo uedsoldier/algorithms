@@ -47,6 +47,7 @@ function(configure_aes_test TYPE)
             ${CMAKE_SOURCE_DIR}/src
             ${CMAKE_SOURCE_DIR}/src/AES
             ${CMAKE_CURRENT_SOURCE_DIR}
+            ${CMAKE_CURRENT_SOURCE_DIR}/test_data  # Directory containing aes_test_data.h
     )
 
     # Link with the main library
