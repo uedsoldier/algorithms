@@ -130,86 +130,31 @@ typedef enum crc_t {
     CRC32_POSIX,  /**< CRC-32/POSIX - POSIX cksum */
     CRC32_JAMCRC, /**< CRC-32/JAMCRC - JAM STAPL */
     CRC32_XFER,   /**< CRC-32/XFER - XFER protocol */
+
+    CRC_IMPL_COUNT /**< Total number of CRC implementations */
 } crc_t;
 
 #if defined(CRC_USE_IMPLEMENTATION_NAMES) && (CRC_USE_IMPLEMENTATION_NAMES == 1)
-static const char crc8_implementation_0[] = "CRC8_CCITT";
-static const char crc8_implementation_1[] = "CRC8_CDMA2000";
-static const char crc8_implementation_2[] = "CRC8_DARC";
-static const char crc8_implementation_3[] = "CRC8_DVB_S2";
-static const char crc8_implementation_4[] = "CRC8_EBU";
-static const char crc8_implementation_5[] = "CRC8_I_CODE";
-static const char crc8_implementation_6[] = "CRC8_ITU";
-static const char crc8_implementation_7[] = "CRC8_MAXIM";
-static const char crc8_implementation_8[] = "CRC8_ROHC";
-static const char crc8_implementation_9[] = "CRC8_WCDMA";
-static const char crc8_implementation_10[] = "CRC8_SAE_J1850";
-static const char crc8_implementation_11[] = "CRC8_SAE_J1850_ZERO";
-static const char crc8_implementation_12[] = "CRC8_8H2F";
-static const char crc16_implementation_0[] = "CRC16_XMODEM";
-static const char crc16_implementation_1[] = "CRC16_AUG_CCITT";
-static const char crc16_implementation_2[] = "CRC16_CCITT_FALSE";
-static const char crc16_implementation_3[] = "CRC16_GENIBUS";
-static const char crc16_implementation_4[] = "CRC16_CCITT_KERMIT";
-static const char crc16_implementation_5[] = "CRC16_TMS37157";
-static const char crc16_implementation_6[] = "CRC16_RIELLO";
-static const char crc16_implementation_7[] = "CRC16_A";
-static const char crc16_implementation_8[] = "CRC16_MCRF4XX";
-static const char crc16_implementation_9[] = "CRC16_X25";
-static const char crc16_implementation_10[] = "CRC16_ARC";
-static const char crc16_implementation_11[] = "CRC16_BUYPASS";
-static const char crc16_implementation_12[] = "CRC16_DDS110";
-static const char crc16_implementation_13[] = "CRC16_MAXIM";
-static const char crc16_implementation_14[] = "CRC16_USB";
-static const char crc16_implementation_15[] = "CRC16_MODBUS";
-static const char crc16_implementation_16[] = "CRC16_DECT_X";
-static const char crc16_implementation_17[] = "CRC16_DECT_R";
-static const char crc16_implementation_18[] = "CRC16_DNP";
-static const char crc16_implementation_19[] = "CRC16_EN13757";
-static const char crc16_implementation_20[] = "CRC16_T10_DIF";
-static const char crc16_implementation_21[] = "CRC16_TELEDISK";
-static const char crc16_implementation_22[] = "CRC16_CDMA2000";
-static const char crc32_implementation_0[] = "CRC32_D";
-static const char crc32_implementation_1[] = "CRC32_Q";
-static const char crc32_implementation_2[] = "CRC32_C";
-static const char crc32_implementation_3[] = "CRC32_ISO";
-static const char crc32_implementation_4[] = "CRC32_BZIP2";
-static const char crc32_implementation_5[] = "CRC32_MPEG_2";
-static const char crc32_implementation_6[] = "CRC32_POSIX";
-static const char crc32_implementation_7[] = "CRC32_JAMCRC";
-static const char crc32_implementation_8[] = "CRC32_XFER";
-// static const char crc32_implementation_9[] = "CRC32_K1";
-// static const char crc32_implementation_10[] = "CRC32_K2";
+/**
+ * @brief Array containing all CRC implementation names
+ */
+const char *const crc_implementations[] = {
+    // CRC8 implementations
+    "CRC8_CCITT", "CRC8_CDMA2000", "CRC8_DARC", "CRC8_DVB_S2", "CRC8_EBU",
+    "CRC8_I_CODE", "CRC8_ITU", "CRC8_MAXIM", "CRC8_ROHC", "CRC8_WCDMA",
+    "CRC8_SAE_J1850", "CRC8_SAE_J1850_ZERO", "CRC8_8H2F",
 
-static const char *const crc8_implementations[] = {
-    crc8_implementation_0, crc8_implementation_1,  crc8_implementation_2,
-    crc8_implementation_3, crc8_implementation_4,  crc8_implementation_5,
-    crc8_implementation_6, crc8_implementation_7,  crc8_implementation_8,
-    crc8_implementation_9, crc8_implementation_10, crc8_implementation_11,
-    crc8_implementation_12  //... más casos
-};
+    // CRC16 implementations
+    "CRC16_XMODEM", "CRC16_AUG_CCITT", "CRC16_CCITT_FALSE", "CRC16_GENIBUS",
+    "CRC16_CCITT_KERMIT", "CRC16_TMS37157", "CRC16_RIELLO", "CRC16_A",
+    "CRC16_MCRF4XX", "CRC16_X25", "CRC16_ARC", "CRC16_BUYPASS", "CRC16_DDS110",
+    "CRC16_MAXIM", "CRC16_USB", "CRC16_MODBUS", "CRC16_DECT_X", "CRC16_DECT_R",
+    "CRC16_DNP", "CRC16_EN13757", "CRC16_T10_DIF", "CRC16_TELEDISK",
+    "CRC16_CDMA2000",
 
-static const char *const crc16_implementations[] = {
-    crc16_implementation_0,  crc16_implementation_1,  crc16_implementation_2,
-    crc16_implementation_3,  crc16_implementation_4,  crc16_implementation_5,
-    crc16_implementation_6,  crc16_implementation_7,  crc16_implementation_8,
-    crc16_implementation_9,  crc16_implementation_10, crc16_implementation_11,
-    crc16_implementation_12, crc16_implementation_13, crc16_implementation_14,
-    crc16_implementation_15, crc16_implementation_16, crc16_implementation_17,
-    crc16_implementation_18, crc16_implementation_19, crc16_implementation_20,
-    crc16_implementation_21, crc16_implementation_22  //... más casos
-};
-
-static const char *const crc32_implementations[] = {
-    crc32_implementation_0, crc32_implementation_1, crc32_implementation_2,
-    crc32_implementation_3, crc32_implementation_4, crc32_implementation_5,
-    crc32_implementation_6, crc32_implementation_7,
-    crc32_implementation_8  //... más casos
-};
-
-static const uint8_t crc8_implementations_size = sizeof(crc8_implementations);
-static const uint8_t crc16_implementations_size = sizeof(crc16_implementations);
-static const uint8_t crc32_implementations_size = sizeof(crc32_implementations);
+    // CRC32 implementations
+    "CRC32_D", "CRC32_Q", "CRC32_C", "CRC32_ISO", "CRC32_BZIP2", "CRC32_MPEG_2",
+    "CRC32_POSIX", "CRC32_JAMCRC", "CRC32_XFER"};
 #endif
 #if defined(CRC8_USE_LOOKUP_TABLE) && (CRC8_USE_LOOKUP_TABLE == 1)
 #define CRC8_0x07_LOOKUP_TABLE  // 0x07 --> x^8 + x^5 + x^4 + 1
@@ -1100,28 +1045,12 @@ uint32_t CRC32(const void *data, uint16_t dataLength, crc_t crc_type);
 
 #if defined(CRC_USE_IMPLEMENTATION_NAMES) && (CRC_USE_IMPLEMENTATION_NAMES == 1)
 /**
- * @brief Gets the string name of a CRC8 implementation
+ * @brief Gets the string name of a CRC implementation
  *
- * @param index Index of the CRC8 implementation
+ * @param index Index from crc_t enum
  * @return const char* Name of the implementation or NULL if invalid index
  */
-const char *get_crc8_implementation(uint8_t index);
-
-/**
- * @brief Gets the string name of a CRC16 implementation
- *
- * @param index Index of the CRC16 implementation
- * @return const char* Name of the implementation or NULL if invalid index
- */
-const char *get_crc16_implementation(uint8_t index);
-
-/**
- * @brief Gets the string name of a CRC32 implementation
- *
- * @param index Index of the CRC32 implementation
- * @return const char* Name of the implementation or NULL if invalid index
- */
-const char *get_crc32_implementation(uint8_t index);
+const char *get_crc_implementation_name(crc_t index);
 #endif
 
 #endif /*CRC_H*/

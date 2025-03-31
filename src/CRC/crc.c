@@ -75,38 +75,11 @@ static uint32_t bit_invert_Int32(uint32_t data) {
 }
 
 #if defined(CRC_USE_IMPLEMENTATION_NAMES) && (CRC_USE_IMPLEMENTATION_NAMES == 1)
-
-const char *get_crc8_implementation(uint8_t index) {
-    static const char *unknown = "Unknown";
-    static const size_t num_implementations = sizeof(crc8_implementations) / sizeof(crc8_implementations[0]);
-    
-    if (index >= num_implementations) {
-        return unknown;
+const char *get_crc_implementation_name(crc_t index) {
+    if (index < CRC_IMPL_COUNT) {
+        return crc_implementations[index];
     }
-    
-    return crc8_implementations[index];
-}
-
-const char *get_crc16_implementation(uint8_t index) {
-    static const char *unknown = "Unknown";
-    static const size_t num_implementations = sizeof(crc16_implementations) / sizeof(crc16_implementations[0]);
-    
-    if (index >= num_implementations) {
-        return unknown;
-    }
-    
-    return crc16_implementations[index];
-}
-
-const char *get_crc32_implementation(uint8_t index) {
-    static const char *unknown = "Unknown";
-    static const size_t num_implementations = sizeof(crc32_implementations) / sizeof(crc32_implementations[0]);
-    
-    if (index >= num_implementations) {
-        return unknown;
-    }
-    
-    return crc32_implementations[index];
+    return NULL;
 }
 #endif
 
