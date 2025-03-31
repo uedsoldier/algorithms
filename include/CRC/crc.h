@@ -154,7 +154,10 @@ const char *const crc_implementations[] = {
 
     // CRC32 implementations
     "CRC32_D", "CRC32_Q", "CRC32_C", "CRC32_ISO", "CRC32_BZIP2", "CRC32_MPEG_2",
-    "CRC32_POSIX", "CRC32_JAMCRC", "CRC32_XFER"};
+    "CRC32_POSIX", "CRC32_JAMCRC", "CRC32_XFER"
+
+    // Add more implementations here if needed
+};
 #endif
 #if defined(CRC8_USE_LOOKUP_TABLE) && (CRC8_USE_LOOKUP_TABLE == 1)
 #define CRC8_0x07_LOOKUP_TABLE  // 0x07 --> x^8 + x^5 + x^4 + 1

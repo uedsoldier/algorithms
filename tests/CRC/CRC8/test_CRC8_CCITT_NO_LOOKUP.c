@@ -135,7 +135,6 @@ static bool run_single_test(const TestCase *test, size_t test_number) {
 
     // Get CRC8
     uint8_t calculated_crc = CRC8(test->input, test->input_len, test->crc_type);
-    printf("CRC8 type:    %s\n", crc8_implementations[test->crc_type]);
 
     // Compare CRC8 with expected value
     bool crc_matches = (calculated_crc == test->expected_crc);
