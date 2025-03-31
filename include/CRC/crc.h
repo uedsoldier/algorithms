@@ -134,31 +134,6 @@ typedef enum crc_t {
     CRC_IMPL_COUNT /**< Total number of CRC implementations */
 } crc_t;
 
-#if defined(CRC_USE_IMPLEMENTATION_NAMES) && (CRC_USE_IMPLEMENTATION_NAMES == 1)
-/**
- * @brief Array containing all CRC implementation names
- */
-const char *const crc_implementations[] = {
-    // CRC8 implementations
-    "CRC8_CCITT", "CRC8_CDMA2000", "CRC8_DARC", "CRC8_DVB_S2", "CRC8_EBU",
-    "CRC8_I_CODE", "CRC8_ITU", "CRC8_MAXIM", "CRC8_ROHC", "CRC8_WCDMA",
-    "CRC8_SAE_J1850", "CRC8_SAE_J1850_ZERO", "CRC8_8H2F",
-
-    // CRC16 implementations
-    "CRC16_XMODEM", "CRC16_AUG_CCITT", "CRC16_CCITT_FALSE", "CRC16_GENIBUS",
-    "CRC16_CCITT_KERMIT", "CRC16_TMS37157", "CRC16_RIELLO", "CRC16_A",
-    "CRC16_MCRF4XX", "CRC16_X25", "CRC16_ARC", "CRC16_BUYPASS", "CRC16_DDS110",
-    "CRC16_MAXIM", "CRC16_USB", "CRC16_MODBUS", "CRC16_DECT_X", "CRC16_DECT_R",
-    "CRC16_DNP", "CRC16_EN13757", "CRC16_T10_DIF", "CRC16_TELEDISK",
-    "CRC16_CDMA2000",
-
-    // CRC32 implementations
-    "CRC32_D", "CRC32_Q", "CRC32_C", "CRC32_ISO", "CRC32_BZIP2", "CRC32_MPEG_2",
-    "CRC32_POSIX", "CRC32_JAMCRC", "CRC32_XFER"
-
-    // Add more implementations here if needed
-};
-#endif
 #if defined(CRC8_USE_LOOKUP_TABLE) && (CRC8_USE_LOOKUP_TABLE == 1)
 #define CRC8_0x07_LOOKUP_TABLE  // 0x07 --> x^8 + x^5 + x^4 + 1
 #define CRC8_0x2F_LOOKUP_TABLE  // 0x2F --> x^8 + x^5 + x^3 + x^2 + x + 1
