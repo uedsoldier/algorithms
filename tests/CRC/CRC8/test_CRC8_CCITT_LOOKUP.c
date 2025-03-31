@@ -101,6 +101,24 @@ static const TestCase test_cases[] = {
 #define TOTAL_TESTS (sizeof(test_cases) / sizeof(test_cases[0]))
 
 /**
+ * @brief Print CRC configuration details
+ * @param type CRC type enumeration
+ */
+void print_crc8_config(crc_t type) {
+    printf("=== CRC8 Configuration ===\n");
+
+    printf("Type:           %s\n", get_crc_implementation_name(type));
+    printf("Polynomial:     0x%02X\n", CRC8_getPoly(type));
+    printf("Initial value:  0x%02X\n", CRC8_getSeed(type));
+    printf("Final XOR:      0x%02X\n", CRC8_getFinalXOR(type));
+    printf("Reflect input:  %s\n", CRC_getInputReflected(type) ? "Yes" : "No");
+    printf("Reflect output: %s\n", CRC_getOutputReflected(type) ? "Yes" : "No");
+    printf("CRC8 lookup table:    %s\n", CRC8_USE_LOOKUP_TABLE ? "Yes" : "No");
+
+    printf("====================\n\n");
+}
+
+/**
  * @brief Run a single Base64 test case
  */
 static bool run_single_test(const TestCase *test, size_t test_number) {
@@ -128,6 +146,26 @@ static bool run_single_test(const TestCase *test, size_t test_number) {
     printf("Test %u result: %s\n", test_number + 1,
            test_passed ? "PASSED" : "FAILED");
     return test_passed;
+}
+
+/**
+ * @brief Print the status of CRC-related macro settings
+ */
+void crc8_print_macro_settings(void) {
+    printf("=== Macro Settings ===\n");
+#if defined(CRC8_USE_LOOKUP_TABLE)
+    printf("CRC8_USE_LOOKUP_TABLE is defined as: %d\n", CRC8_USE_LOOKUP_TABLE);
+#else
+    printf("CRC8_USE_LOOKUP_TABLE is not defined\n");
+#endif
+
+#if defined(CRC_USE_IMPLEMENTATION_NAMES)
+    printf("CRC_USE_IMPLEMENTATION_NAMES is defined as: %d\n",
+           CRC_USE_IMPLEMENTATION_NAMES);
+#else
+    printf("CRC_USE_IMPLEMENTATION_NAMES is not defined\n");
+#endif
+    printf("====================\n\n");
 }
 
 /**

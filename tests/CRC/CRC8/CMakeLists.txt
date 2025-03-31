@@ -47,13 +47,15 @@ function(configure_crc8_test TYPE)
         message(STATUS "Configuring test for LOOKUP table: ${TYPE}")
         target_compile_definitions(${TEST_NAME}
             PRIVATE
-                CRC8_USE_LOOKUP_TABLE=1
+                "CRC8_USE_LOOKUP_TABLE=1"  # Add quotes to ensure proper expansion
+            FORCE  # Force override any existing definition
         )
     elseif(TYPE MATCHES "^8_[A-Z0-9]+_NO_LOOKUP$")
         message(STATUS "Configuring test for NO_LOOKUP table: ${TYPE}")
         target_compile_definitions(${TEST_NAME}
             PRIVATE
-                CRC8_USE_LOOKUP_TABLE=0
+                "CRC8_USE_LOOKUP_TABLE=0"  # Add quotes to ensure proper expansion
+            FORCE  # Force override any existing definition
         )
     else()
         message(FATAL_ERROR "Unknown CRC8 test type: ${TYPE}")

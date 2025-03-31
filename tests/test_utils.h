@@ -17,10 +17,4 @@
  */
 void print_hex(const uint8_t *data, size_t len);
 
-/**
- * @brief Print CRC configuration details
- * @param type CRC type enumeration
- */
-void print_crc8_config(crc_t type);
-
 #endif /* TEST_UTILS_H */
