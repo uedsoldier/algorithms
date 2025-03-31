@@ -985,6 +985,89 @@ static const uint32_t CRC32_0x741B8CD7_table[256] = {
 #endif
 
 /* Function Prototypes */
+
+/**
+ * @brief Function to obtain the generator polynomial for 8-bit CRC.
+ * @param crc_type (crc_t) enumeration data of the CRC type in question
+ * @return Polynomial in hexadecimal format for 8-bit CRC calculation.
+ */
+uint8_t CRC8_getPoly(crc_t crc_type);
+
+/**
+ * @brief Function to obtain the generator polynomial for 16-bit CRC.
+ * @param crc_type (crc_t) enumeration data of the CRC type in question
+ * @return Polynomial in hexadecimal format for 16-bit CRC calculation.
+ */
+uint16_t CRC16_getPoly(crc_t crc_type);
+
+/**
+ * @brief Function to obtain the generator polynomial for 32-bit CRC.
+ * @param crc_type (crc_t) enumeration data of the CRC type in question
+ * @return Polynomial in hexadecimal format for 32-bit CRC calculation.
+ */
+uint32_t CRC32_getPoly(crc_t crc_type);
+
+/**
+ * @brief Function to obtain initial values (seed) for 8-bit CRC
+ * @param crc_type (crc_t) enumeration data of the CRC type in question
+ * @return Initial value (seed) in hexadecimal format for 8-bit CRC calculation
+ */
+uint8_t CRC8_getSeed(crc_t crc_type);
+
+/**
+ * @brief Function to obtain initial values (seed) for 16-bit CRC
+ * @param crc_type (crc_t) enumeration data of the CRC type in question
+ * @return Initial value (seed) in hexadecimal format for 16-bit CRC calculation
+ */
+uint16_t CRC16_getSeed(crc_t crc_type);
+
+/**
+ * @brief Function to obtain initial values (seed) for 32-bit CRC
+ * @param crc_type (crc_t) enumeration data of the CRC type in question
+ * @return Initial value (seed) in hexadecimal format for 32-bit CRC calculation
+ */
+uint32_t CRC32_getSeed(crc_t crc_type);
+
+/**
+ * @brief Function to verify input reflected value for 8, 16 and 32-bit CRC.
+ * @param crc_type (crc_t) enumeration data of the CRC type in question.
+ * @return true if the CRC in question requires reflected (inverted) input data,
+ * false otherwise.
+ */
+bool CRC_getInputReflected(crc_t crc_type);
+
+/**
+ * @brief Function to verify output reflected value for 8, 16 and 32-bit CRC.
+ * @param crc_type (crc_t) enumeration data of the CRC type in question.
+ * @return true if the CRC in question requires reflected (inverted) output
+ * data, false otherwise.
+ */
+bool CRC_getOutputReflected(crc_t crc_type);
+
+/**
+ * @brief Function to obtain XOR mask value for 8-bit CRC output.
+ * @param crc_type (crc_t) enumeration data of the CRC type in question.
+ * @return Final XOR mask depending on the required CRC. If 0,
+ * means the CRC algorithm doesn't require XOR mask.
+ */
+uint8_t CRC8_getFinalXOR(crc_t crc_type);
+
+/**
+ * @brief Function to obtain XOR mask value for 16-bit CRC output.
+ * @param crc_type (crc_t) enumeration data of the CRC type in question.
+ * @return Final XOR mask depending on the required CRC. If 0,
+ * means the CRC algorithm doesn't require XOR mask.
+ */
+uint16_t CRC16_getFinalXOR(crc_t crc_type);
+
+/**
+ * @brief Function to obtain XOR mask value for 32-bit CRC output.
+ * @param crc_type (crc_t) enumeration data of the CRC type in question.
+ * @return Final XOR mask depending on the required CRC. If 0,
+ * means the CRC algorithm doesn't require XOR mask.
+ */
+uint32_t CRC32_getFinalXOR(crc_t crc_type);
+
 /**
  * @brief Calculates CRC8 checksum for given data
  *
