@@ -87,15 +87,9 @@ const char *get_crc16_implementation(uint8_t index) {
 const char *get_crc32_implementation(uint8_t index) {
     return crc32_implementations[index];
 }
-
 #endif
 
-/**
- * @brief Función para obtención de polinomio generador de CRC de 8 bits.
- * @param crc_type (crc_t) dato de enumeración de tipo de CRC en cuestión
- * @return Polinomio en formato hexadecimal para cálculo de CRC de 8 bits.
- */
-static uint8_t CRC8_getPoly(crc_t crc_type) {
+uint8_t CRC8_getPoly(crc_t crc_type) {
     uint8_t retVal;
     switch (crc_type) {
         case CRC8_CCITT:
@@ -129,16 +123,10 @@ static uint8_t CRC8_getPoly(crc_t crc_type) {
             retVal = 0;  // Caso sin sentido
             break;
     }
-
     return retVal;
 }
 
-/**
- * @brief Función para obtención de polinomio generador de CRC de 16 bits.
- * @param crc_type (crc_t) dato de enumeración de tipo de CRC en cuestión
- * @return Polinomio en formato hexadecimal para cálculo de CRC de 16 bits.
- */
-static uint16_t CRC16_getPoly(crc_t crc_type) {
+uint16_t CRC16_getPoly(crc_t crc_type) {
     uint16_t retVal;
     switch (crc_type) {
         case CRC16_CCITT_FALSE:
@@ -186,12 +174,7 @@ static uint16_t CRC16_getPoly(crc_t crc_type) {
     return retVal;
 }
 
-/**
- * @brief Función para obtención de polinomio generador de CRC de 32 bits.
- * @param crc_type (crc_t) dato de enumeración de tipo de CRC en cuestión
- * @return Polinomio en formato hexadecimal para cálculo de CRC de 32 bits.
- */
-static uint32_t CRC32_getPoly(crc_t crc_type) {
+uint32_t CRC32_getPoly(crc_t crc_type) {
     uint32_t retVal;
     switch (crc_type) {
         case CRC32_D:
@@ -223,18 +206,10 @@ static uint32_t CRC32_getPoly(crc_t crc_type) {
             retVal = 0UL;
             break;  // Caso sin sentido
     }
-
     return retVal;
 }
 
-/**
- * @brief Función para obtención de valores iniciales (semilla o seed) de CRC de
- * 8 bits
- * @param crc_type (crc_t) dato de enumeración de tipo de CRC en cuestión
- * @return Valor de inicio (seed) formato hexadecimal para cálculo de CRC de 8
- * bits
- */
-static uint8_t CRC8_getSeed(crc_t crc_type) {
+uint8_t CRC8_getSeed(crc_t crc_type) {
     uint8_t retVal;
     switch (crc_type) {
         case CRC8_CCITT:
@@ -259,18 +234,10 @@ static uint8_t CRC8_getSeed(crc_t crc_type) {
             retVal = 0;
             break;  // Caso sin sentido
     }
-
     return retVal;
 }
 
-/**
- * @brief Función para obtención de valores iniciales (semilla o seed) de CRC de
- * 16 bits
- * @param crc_type (crc_t) dato de enumeración de tipo de CRC en cuestión
- * @return Valor de inicio (seed) formato hexadecimal para cálculo de CRC de 16
- * bits
- */
-static uint16_t CRC16_getSeed(crc_t crc_type) {
+uint16_t CRC16_getSeed(crc_t crc_type) {
     uint16_t retVal;
     switch (crc_type) {
         case CRC16_CCITT_FALSE:
@@ -314,18 +281,10 @@ static uint16_t CRC16_getSeed(crc_t crc_type) {
             retVal = 0;
             break;  // Caso sin sentido
     }
-
     return retVal;
 }
 
-/**
- * @brief Función para obtención de valores iniciales (semilla o seed) de CRC de
- * 32 bits
- * @param crc_type (crc_t) dato de enumeración de tipo de CRC en cuestión
- * @return Valor de inicio (seed) formato hexadecimal para cálculo de CRC de 32
- * bits
- */
-static uint32_t CRC32_getSeed(crc_t crc_type) {
+uint32_t CRC32_getSeed(crc_t crc_type) {
     uint32_t retVal;
     switch (crc_type) {
         case CRC32_Q:
@@ -337,18 +296,10 @@ static uint32_t CRC32_getSeed(crc_t crc_type) {
             retVal = 0xFFFFFFFFUL;
             break;  // El resto de los casos
     }
-
     return retVal;
 }
 
-/**
- * @brief Función para verificación de valor de entrada reflejada (input
- * reflected) de CRC para 8, 16 y 32 bits.
- * @param crc_type (crc_t) dato de enumeración de tipo de CRC en cuestión.
- * @return true si el CRC en cuestión requiere entrada de datos reflejados
- * (invertidos), falso en caso contrario.
- */
-static bool CRC_getInputReflected(crc_t crc_type) {
+bool CRC_getInputReflected(crc_t crc_type) {
     bool retVal;
     switch (crc_type) {
         // CRC8
@@ -389,14 +340,7 @@ static bool CRC_getInputReflected(crc_t crc_type) {
     return retVal;
 }
 
-/**
- * @brief Función para verificación de valor de salida reflejada (output
- * reflected) de CRC para 8, 16 y 32 bits.
- * @param crc_type (crc_t) dato de enumeración de tipo de CRC en cuestión.
- * @return true si el CRC en cuestión requiere salida de datos reflejados
- * (invertidos), falso en caso contrario.
- */
-static bool CRC_getOutputReflected(crc_t crc_type) {
+bool CRC_getOutputReflected(crc_t crc_type) {
     bool retVal;
     switch (crc_type) {
         // CRC8
@@ -433,18 +377,10 @@ static bool CRC_getOutputReflected(crc_t crc_type) {
             retVal = true;
             break;  // Todos los casos restantes
     }
-
     return retVal;
 }
 
-/**
- * @brief Función para obtención de valor de máscara XOR de valor de salida de
- * CRC para 8 bits.
- * @param crc_type (crc_t) dato de enumeración de tipo de CRC en cuestión.
- * @return Máscara XOR de valor final dependiendo el CRC requerido. Si es 0,
- * significa que el algoritmo CRC no requiere máscara XOR.
- */
-static uint8_t CRC8_getFinalXOR(crc_t crc_type) {
+uint8_t CRC8_getFinalXOR(crc_t crc_type) {
     uint8_t retVal;
     switch (crc_type) {
         case CRC8_ITU:
@@ -458,18 +394,10 @@ static uint8_t CRC8_getFinalXOR(crc_t crc_type) {
             retVal = 0x00;
             break;  // Posibles casos restantes...
     }
-
     return retVal;
 }
 
-/**
- * @brief Función para obtención de valor de máscara XOR de valor de salida de
- * CRC para 16 bits.
- * @param crc_type (crc_t) dato de enumeración de tipo de CRC en cuestión.
- * @return Máscara XOR de valor final dependiendo el CRC requerido. Si es 0,
- * significa que el algoritmo CRC no requiere máscara XOR.
- */
-static uint16_t CRC16_getFinalXOR(crc_t crc_type) {
+uint16_t CRC16_getFinalXOR(crc_t crc_type) {
     uint16_t retVal;
     switch (crc_type) {
         case CRC16_XMODEM:
@@ -498,18 +426,10 @@ static uint16_t CRC16_getFinalXOR(crc_t crc_type) {
             retVal = 0;
             break;  // Posibles casos restantes...
     }
-
     return retVal;
 }
 
-/**
- * @brief Función para obtención de valor de máscara XOR de valor de salida de
- * CRC para 32 bits.
- * @param crc_type (crc_t) dato de enumeración de tipo de CRC en cuestión.
- * @return Máscara XOR de valor final dependiendo el CRC requerido. Si es 0,
- * significa que el algoritmo CRC no requiere máscara XOR.
- */
-static uint32_t CRC32_getFinalXOR(crc_t crc_type) {
+uint32_t CRC32_getFinalXOR(crc_t crc_type) {
     uint32_t retVal;
     switch (crc_type) {
         case CRC32_BZIP2:
@@ -523,18 +443,9 @@ static uint32_t CRC32_getFinalXOR(crc_t crc_type) {
             retVal = 0UL;
             break;  // Posibles casos restantes...
     }
-
     return retVal;
 }
 
-/**
- * @brief Función de implementación de algoritmos CRC para 8 bits.
- * @param data (void*) Apuntador a arreglo o estructura de datos para aplicar
- * CRC
- * @param data_length (uint16_t) Cantidad de datos para cálculo de CRC
- * @param crc_type (crc_t) dato de enumeración de tipo de CRC en cuestión.
- * @return Valor de CRC de 8 bits para los datos introducidos.
- */
 uint8_t CRC8(const void *data, uint16_t data_len, crc_t crc_type) {
     uint8_t crc = CRC8_getSeed(crc_type);   // Inicialización de valor "semilla"
     uint8_t poly = CRC8_getPoly(crc_type);  // Obtención de polinomio
@@ -607,14 +518,6 @@ uint8_t CRC8(const void *data, uint16_t data_len, crc_t crc_type) {
     return crc ^ CRC8_getFinalXOR(crc_type);
 }
 
-/**
- * @brief Función de implementación de algoritmos CRC para 16 bits.
- * @param data (void*) Apuntador a arreglo o estructura de datos para aplicar
- * CRC
- * @param data_length (uint16_t) Cantidad de datos para cálculo de CRC
- * @param crc_type (crc_t) dato de enumeración de tipo de CRC en cuestión.
- * @return Valor de CRC de 16 bits para los datos introducidos.
- */
 uint16_t CRC16(const void *data, uint16_t data_len, crc_t crc_type) {
     uint16_t crc =
         CRC16_getSeed(crc_type);  // Inicialización de valor "semilla"
@@ -683,14 +586,6 @@ uint16_t CRC16(const void *data, uint16_t data_len, crc_t crc_type) {
     return crc ^ CRC16_getFinalXOR(crc_type);
 }
 
-/**
- * @brief Función de implementación de algoritmos CRC para 32 bits.
- * @param data (void*) Apuntador a arreglo o estructura de datos para aplicar
- * CRC
- * @param data_length (uint16_t) Cantidad de datos para cálculo de CRC
- * @param crc_type (crc_t) dato de enumeración de tipo de CRC en cuestión.
- * @return Valor de CRC de 32 bits para los datos introducidos.
- */
 uint32_t CRC32(const void *data, uint16_t data_len, crc_t crc_type) {
     uint32_t crc =
         CRC32_getSeed(crc_type);  // Inicialización de valor "semilla"
