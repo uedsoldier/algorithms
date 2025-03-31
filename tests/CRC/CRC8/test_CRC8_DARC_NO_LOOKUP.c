@@ -9,7 +9,7 @@
 #include "crc8_test_data.h"
 #include "test_utils.h"
 
-#define TEST_NAME "CRC8-CCITT (with lookup table) tester"
+#define TEST_NAME "CRC8-DARC (without lookup table) tester"
 
 /**
  * @brief Print CRC configuration details
@@ -44,7 +44,7 @@ static bool run_single_test(const TestInput *test, uint8_t expected_crc,
     print_hex(test->input, test->input_len);
 
     // Get CRC8
-    uint8_t calculated_crc = CRC8(test->input, test->input_len, CRC8_CCITT);
+    uint8_t calculated_crc = CRC8(test->input, test->input_len, CRC8_DARC);
 
     // Compare CRC8 with expected value
     bool crc_matches = (calculated_crc == expected_crc);
@@ -85,20 +85,20 @@ void crc8_print_macro_settings(void) {
  */
 int main(void) {
     /* Runtime check for array size match */
-    assert(sizeof(expected_crc8_ccitt_crcs) /
-                   sizeof(expected_crc8_ccitt_crcs[0]) ==
+    assert(sizeof(expected_crc8_darc_crcs) /
+                   sizeof(expected_crc8_darc_crcs[0]) ==
                TOTAL_TESTS &&
            "Expected CRC count must match test input count");
 
     printf("%s\n\n", TEST_NAME);
     crc8_print_macro_settings();
-    print_crc8_config(CRC8_CCITT);
+    print_crc8_config(CRC8_DARC);
 
     bool all_tests_passed = true;
 
     // Run all tests
     for (size_t i = 0; i < TOTAL_TESTS; i++) {
-        if (!run_single_test(&test_inputs[i], expected_crc8_ccitt_crcs[i], i)) {
+        if (!run_single_test(&test_inputs[i], expected_crc8_darc_crcs[i], i)) {
             all_tests_passed = false;
         }
     }

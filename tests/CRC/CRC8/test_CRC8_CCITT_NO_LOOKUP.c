@@ -6,87 +6,10 @@
 #include <string.h>
 
 #include "crc.h"
+#include "crc8_test_data.h"
 #include "test_utils.h"
 
 #define TEST_NAME "CRC8-CCITT (without lookup table) tester"
-
-/**
- * @brief Test case structure for CRC8 encoding/decoding tests
- */
-typedef struct {
-    const char *description;     // Test case description
-    const uint8_t *input;        // Input data to encode
-    size_t input_len;            // Length of input data
-    const uint8_t expected_crc;  // Expected CRC8
-} TestCase;
-
-/**
- * @brief Test cases for CRC8 encoding/decoding
- */
-static const TestCase test_cases[] = {
-    {
-        "Test case 1: Basic test",
-        (const uint8_t *)"Hello, World!",
-        13,
-        0x87,
-    },
-    {
-        "Test case 2: Empty string",
-        (const uint8_t *)"",
-        0,
-        0x00,
-    },
-    {
-        "Test case 3: Single byte",
-        (const uint8_t *)"A",
-        1,
-        0xC0,
-    },
-    // Additional test cases
-    {
-        "Standard test vector '123456789'",
-        (const uint8_t *)"123456789",
-        9,
-        0xF4,
-    },
-    {
-        "All zeros (8 bytes)",
-        (const uint8_t *)"\x00\x00\x00\x00\x00\x00\x00\x00",
-        8,
-        0x00,
-    },
-    {
-        "All ones (8 bytes)",
-        (const uint8_t *)"\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF",
-        8,
-        0xD7,
-    },
-    {
-        "Alternating pattern (0x55, 0xAA)",
-        (const uint8_t *)"\x55\xAA\x55\xAA",
-        4,
-        0x6F,
-    },
-    {
-        "Binary sequence",
-        (const uint8_t *)"\x00\x01\x02\x03\x04\x05\x06\x07",
-        8,
-        0xD8,
-    },
-    {
-        "Single byte (0xFF)",
-        (const uint8_t *)"\xFF",
-        1,
-        0xF3,
-    },
-    {
-        "Random bytes sequence",
-        (const uint8_t *)"\x12\x34\x56\x78\x9A\xBC\xDE\xF0",
-        8,
-        0xE7,
-    }};
-
-#define TOTAL_TESTS (sizeof(test_cases) / sizeof(test_cases[0]))
 
 /**
  * @brief Print CRC configuration details
@@ -109,7 +32,8 @@ void print_crc8_config(crc_t type) {
 /**
  * @brief Run a single Base64 test case
  */
-static bool run_single_test(const TestCase *test, size_t test_number) {
+static bool run_single_test(const TestInput *test, uint8_t expected_crc,
+                            size_t test_number) {
     printf("\n--- Test %u: %s ---\n", test_number + 1, test->description);
 
     bool test_passed = true;
@@ -123,11 +47,11 @@ static bool run_single_test(const TestCase *test, size_t test_number) {
     uint8_t calculated_crc = CRC8(test->input, test->input_len, CRC8_CCITT);
 
     // Compare CRC8 with expected value
-    bool crc_matches = (calculated_crc == test->expected_crc);
+    bool crc_matches = (calculated_crc == expected_crc);
     test_passed = crc_matches;
 
     // Print info
-    printf("Expected CRC8: 0x%02X\n", test->expected_crc);
+    printf("Expected CRC8: 0x%02X\n", expected_crc);
     printf("Calculated CRC8: 0x%02X\n", calculated_crc);
     printf("CRC8 matches: %s\n", crc_matches ? "YES" : "NO");
 
@@ -160,6 +84,12 @@ void crc8_print_macro_settings(void) {
  * @brief Main entry point for Base64 tests
  */
 int main(void) {
+    /* Runtime check for array size match */
+    assert(sizeof(expected_crc8_ccitt_crcs) /
+                   sizeof(expected_crc8_ccitt_crcs[0]) ==
+               TOTAL_TESTS &&
+           "Expected CRC count must match test input count");
+
     printf("%s\n\n", TEST_NAME);
     crc8_print_macro_settings();
     // Print CRC8 configuration
@@ -168,7 +98,7 @@ int main(void) {
 
     // Run all tests
     for (size_t i = 0; i < TOTAL_TESTS; i++) {
-        if (!run_single_test(&test_cases[i], i)) {
+        if (!run_single_test(&test_inputs[i], expected_crc8_ccitt_crcs[i], i)) {
             all_tests_passed = false;
         }
     }

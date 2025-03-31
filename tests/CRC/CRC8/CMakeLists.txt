@@ -10,6 +10,8 @@ set(CRC8_TEST_TYPES
     CDMA2000_NO_LOOKUP
     MAXIM_LOOKUP
     MAXIM_NO_LOOKUP
+    DARC_LOOKUP
+    DARC_NO_LOOKUP
 
 )
 
@@ -41,6 +43,7 @@ function(configure_crc8_test TYPE)
             ${CMAKE_SOURCE_DIR}/src
             ${CMAKE_SOURCE_DIR}/src/CRC
             ${CMAKE_CURRENT_SOURCE_DIR}
+            ${CMAKE_CURRENT_SOURCE_DIR}/test_data  # Directory containing crc8_test_data.h
     )
 
     # Add specific compile definitions based on LOOKUP/NO_LOOKUP type
