@@ -6,8 +6,8 @@ message(STATUS "=== Configuring CRC8 Tests ===")
 set(CRC8_TEST_TYPES
     8_CCITT_LOOKUP
     8_CCITT_NO_LOOKUP
-    # 8_CDMA_LOOKUP
-    # 8_CDMA_NO_LOOKUP
+    8_CDMA2000_LOOKUP
+    8_CDMA2000_NO_LOOKUP
 
 )
 
