@@ -4,17 +4,19 @@ message(STATUS "=== Configuring CRC8 Tests ===")
 
 # Define the list of CRC8 test types
 set(CRC8_TEST_TYPES
-    8_CCITT_LOOKUP
-    8_CCITT_NO_LOOKUP
-    8_CDMA2000_LOOKUP
-    8_CDMA2000_NO_LOOKUP
+    CCITT_LOOKUP
+    CCITT_NO_LOOKUP
+    CDMA2000_LOOKUP
+    CDMA2000_NO_LOOKUP
+    MAXIM_LOOKUP
+    MAXIM_NO_LOOKUP
 
 )
 
 # Function to configure a CRC8 test executable
 function(configure_crc8_test TYPE)
-    set(TEST_NAME "CRC${TYPE}_tester")
-    set(SOURCE_FILE "test_CRC${TYPE}.c")
+    set(TEST_NAME "CRC8_${TYPE}_tester")
+    set(SOURCE_FILE "test_CRC8_${TYPE}.c")
 
     # Debug print to verify test file existence
     message(STATUS "Looking for test file: ${CMAKE_CURRENT_SOURCE_DIR}/${SOURCE_FILE}")
@@ -42,14 +44,14 @@ function(configure_crc8_test TYPE)
     )
 
     # Add specific compile definitions based on LOOKUP/NO_LOOKUP type
-    if(TYPE MATCHES "^8_[A-Z0-9]+_LOOKUP$")
+    if(TYPE MATCHES "^[A-Z0-9]+_LOOKUP$")
         message(STATUS "Configuring test for LOOKUP table: ${TYPE}")
         target_compile_definitions(${TEST_NAME}
             PRIVATE
                 "CRC8_USE_LOOKUP_TABLE=1"  # Add quotes to ensure proper expansion
             FORCE  # Force override any existing definition
         )
-    elseif(TYPE MATCHES "^8_[A-Z0-9]+_NO_LOOKUP$")
+    elseif(TYPE MATCHES "^[A-Z0-9]+_NO_LOOKUP$")
         message(STATUS "Configuring test for NO_LOOKUP table: ${TYPE}")
         target_compile_definitions(${TEST_NAME}
             PRIVATE
