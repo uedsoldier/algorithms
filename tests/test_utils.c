@@ -15,6 +15,26 @@ void print_hex(const uint8_t *data, size_t len) {
     printf("\n");
 }
 
+/**
+ * @brief Print the status of CRC-related macro settings
+ */
+void crc8_print_macro_settings(void) {
+    printf("=== Macro Settings ===\n");
+#if defined(CRC8_USE_LOOKUP_TABLE)
+    printf("CRC8_USE_LOOKUP_TABLE is defined as: %d\n", CRC8_USE_LOOKUP_TABLE);
+#else
+    printf("CRC8_USE_LOOKUP_TABLE is not defined\n");
+#endif
+
+#if defined(CRC_USE_IMPLEMENTATION_NAMES)
+    printf("CRC_USE_IMPLEMENTATION_NAMES is defined as: %d\n",
+           CRC_USE_IMPLEMENTATION_NAMES);
+#else
+    printf("CRC_USE_IMPLEMENTATION_NAMES is not defined\n");
+#endif
+    printf("====================\n\n");
+}
+
 void print_crc8_config(crc_t type) {
     printf("=== CRC8 Configuration ===\n");
 

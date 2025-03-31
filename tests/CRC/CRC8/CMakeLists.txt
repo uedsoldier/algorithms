@@ -42,12 +42,6 @@ function(configure_crc8_test TYPE)
             ${CMAKE_CURRENT_SOURCE_DIR}
     )
 
-    # Add common compile definitions for all CRC tests
-    target_compile_definitions(${TEST_NAME}
-        PRIVATE
-            CRC_USE_IMPLEMENTATION_NAMES=1
-    )
-
     # Add specific compile definitions based on LOOKUP/NO_LOOKUP type
     if(TYPE MATCHES "^8_[A-Z0-9]+_LOOKUP$")
         message(STATUS "Configuring test for LOOKUP table: ${TYPE}")

@@ -12,26 +12,6 @@
 #define CRC8_TYPE CRC8_CCITT
 
 /**
- * @brief Print the status of CRC-related macro settings
- */
-static void print_macro_settings(void) {
-    printf("=== Macro Settings ===\n");
-#if defined(CRC8_USE_LOOKUP_TABLE)
-    printf("CRC8_USE_LOOKUP_TABLE is defined as: %d\n", CRC8_USE_LOOKUP_TABLE);
-#else
-    printf("CRC8_USE_LOOKUP_TABLE is not defined\n");
-#endif
-
-#if defined(CRC_USE_IMPLEMENTATION_NAMES)
-    printf("CRC_USE_IMPLEMENTATION_NAMES is defined as: %d\n",
-           CRC_USE_IMPLEMENTATION_NAMES);
-#else
-    printf("CRC_USE_IMPLEMENTATION_NAMES is not defined\n");
-#endif
-    printf("====================\n\n");
-}
-
-/**
  * @brief Test case structure for CRC8 encoding/decoding tests
  */
 typedef struct {
@@ -155,7 +135,7 @@ static bool run_single_test(const TestCase *test, size_t test_number) {
  */
 int main(void) {
     printf("%s\n\n", TEST_NAME);
-    print_macro_settings();
+    crc8_print_macro_settings();
     // Print CRC8 configuration
     print_crc8_config(CRC8_TYPE);
     bool all_tests_passed = true;
