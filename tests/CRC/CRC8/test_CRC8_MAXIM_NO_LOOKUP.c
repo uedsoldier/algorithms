@@ -17,7 +17,6 @@ typedef struct {
     const char *description;     // Test case description
     const uint8_t *input;        // Input data to encode
     size_t input_len;            // Length of input data
-    crc_t crc_type;              // CRC algorithm variant to use
     const uint8_t expected_crc;  // Expected CRC8
 } TestCase;
 
@@ -27,7 +26,7 @@ typedef struct {
 static const TestCase test_cases[] = {
     {
         "Test case 1: Basic test", (const uint8_t *)"Hello, World!", 13,
-        0xA2,  // Value specific to MAXIM
+        0x9C,  // Value specific to MAXIM
     },
     {
         "Test case 2: Empty string", (const uint8_t *)"", 0,
@@ -35,7 +34,7 @@ static const TestCase test_cases[] = {
     },
     {
         "Test case 3: Single byte", (const uint8_t *)"A", 1,
-        0x3C,  // Value specific to MAXIM
+        0x18,  // Value specific to MAXIM
     },
     {
         "Standard test vector '123456789'", (const uint8_t *)"123456789", 9,
@@ -51,31 +50,31 @@ static const TestCase test_cases[] = {
         "All ones (8 bytes)",
         (const uint8_t *)"\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF",
         8,
-        0x40,
+        0xC9,
     },
     {
         "Alternating pattern (0x55, 0xAA)",
         (const uint8_t *)"\x55\xAA\x55\xAA",
         4,
-        0x8C,
+        0x9C,
     },
     {
         "Binary sequence",
         (const uint8_t *)"\x00\x01\x02\x03\x04\x05\x06\x07",
         8,
-        0x7E,
+        0x0F,
     },
     {
         "Single byte (0xFF)",
         (const uint8_t *)"\xFF",
         1,
-        0x8C,
+        0x35,
     },
     {
         "Random bytes sequence",
         (const uint8_t *)"\x12\x34\x56\x78\x9A\xBC\xDE\xF0",
         8,
-        0x52,
+        0xF0,
     }};
 
 #define TOTAL_TESTS (sizeof(test_cases) / sizeof(test_cases[0]))
