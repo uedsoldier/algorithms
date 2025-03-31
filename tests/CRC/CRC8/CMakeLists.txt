@@ -52,6 +52,7 @@ function(configure_crc8_test TYPE)
         target_compile_definitions(${TEST_NAME}
             PRIVATE
                 "CRC8_USE_LOOKUP_TABLE=1"  # Add quotes to ensure proper expansion
+                "CRC_USE_IMPLEMENTATION_NAMES=1"  # Required for all CRC8 tests
             FORCE  # Force override any existing definition
         )
     elseif(TYPE MATCHES "^[A-Z0-9]+_NO_LOOKUP$")
@@ -59,6 +60,7 @@ function(configure_crc8_test TYPE)
         target_compile_definitions(${TEST_NAME}
             PRIVATE
                 "CRC8_USE_LOOKUP_TABLE=0"  # Add quotes to ensure proper expansion
+                "CRC_USE_IMPLEMENTATION_NAMES=1"  # Required for all CRC8 tests
             FORCE  # Force override any existing definition
         )
     else()

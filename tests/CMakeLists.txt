@@ -17,12 +17,6 @@ target_include_directories(test_utils
         ${CMAKE_SOURCE_DIR}/include/CRC
 )
 
-# Add compile definitions needed by test utilities
-target_compile_definitions(test_utils
-    PUBLIC  # Using PUBLIC so these definitions propagate to targets linking with test_utils
-        CRC_USE_IMPLEMENTATION_NAMES=1
-)
-
 # Link test_utils with algorithms_lib
 target_link_libraries(test_utils
     PUBLIC
