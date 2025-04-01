@@ -63,7 +63,7 @@ static void AES128_decrypt_chunk(AES128_ctx_t *ctx, uint8_t *in, uint8_t *out) {
 }
 
 AES_errcode_t AES128_ECB_encrypt(AES128_ctx_t *ctx, const void *in, void *out,
-                                 size_t input_len, uint32_t *output_len,
+                                 size_t input_len, size_t *output_len,
                                  bool use_padding) {
     // Input buffer length verification
     if (input_len <= 0) {
@@ -123,7 +123,7 @@ AES_errcode_t AES128_ECB_encrypt(AES128_ctx_t *ctx, const void *in, void *out,
 }
 
 AES_errcode_t AES128_ECB_decrypt(AES128_ctx_t *ctx, void *in, void *out,
-                                 size_t input_len, uint32_t *output_len,
+                                 size_t input_len, size_t *output_len,
                                  bool use_padding) {
     // Input buffer length verification
     if (input_len <= 0) {
@@ -182,7 +182,7 @@ AES_errcode_t AES128_ECB_decrypt(AES128_ctx_t *ctx, void *in, void *out,
 }
 
 AES_errcode_t AES128_CBC_encrypt(AES128_ctx_t *ctx, const void *in, void *out,
-                                 size_t input_len, uint32_t *output_len,
+                                 size_t input_len, size_t *output_len,
                                  bool use_padding) {
     // Input buffer length verification
     if (input_len <= 0) {
@@ -246,7 +246,7 @@ AES_errcode_t AES128_CBC_encrypt(AES128_ctx_t *ctx, const void *in, void *out,
 }
 
 AES_errcode_t AES128_CBC_decrypt(AES128_ctx_t *ctx, void *in, void *out,
-                                 size_t input_len, uint32_t *output_len,
+                                 size_t input_len, size_t *output_len,
                                  bool use_padding) {
     // Input buffer length verification
     if (input_len <= 0) {

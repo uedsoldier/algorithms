@@ -81,7 +81,7 @@ void AES128_init_ctx(AES128_ctx_t *ctx, const uint8_t *key, const uint8_t *iv);
  * @return AES_errcode_t Error code (AES_CODE_OK on success)
  */
 AES_errcode_t AES128_ECB_encrypt(AES128_ctx_t *ctx, const void *in, void *out,
-                                 size_t input_len, uint32_t *output_len,
+                                 size_t input_len, size_t *output_len,
                                  bool use_padding);
 
 /**
@@ -96,7 +96,7 @@ AES_errcode_t AES128_ECB_encrypt(AES128_ctx_t *ctx, const void *in, void *out,
  * @return AES_errcode_t Error code (AES_CODE_OK on success)
  */
 AES_errcode_t AES128_ECB_decrypt(AES128_ctx_t *ctx, void *in, void *out,
-                                 size_t input_len, uint32_t *output_len,
+                                 size_t input_len, size_t *output_len,
                                  bool use_padding);
 
 /**
@@ -111,7 +111,7 @@ AES_errcode_t AES128_ECB_decrypt(AES128_ctx_t *ctx, void *in, void *out,
  * @return AES_errcode_t Error code (AES_CODE_OK on success)
  */
 AES_errcode_t AES128_CBC_encrypt(AES128_ctx_t *ctx, const void *in, void *out,
-                                 size_t input_len, uint32_t *output_len,
+                                 size_t input_len, size_t *output_len,
                                  bool use_padding);
 
 /**
@@ -126,7 +126,7 @@ AES_errcode_t AES128_CBC_encrypt(AES128_ctx_t *ctx, const void *in, void *out,
  * @return AES_errcode_t Error code (AES_CODE_OK on success)
  */
 AES_errcode_t AES128_CBC_decrypt(AES128_ctx_t *ctx, void *in, void *out,
-                                 size_t input_len, uint32_t *output_len,
+                                 size_t input_len, size_t *output_len,
                                  bool use_padding);
 
 #ifdef __cplusplus
