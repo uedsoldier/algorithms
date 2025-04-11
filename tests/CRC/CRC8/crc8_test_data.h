@@ -114,4 +114,21 @@ static const uint8_t expected_crc8_dvb_s2_crcs[] = {
     0x84   // Random bytes
 };
 
+/**
+ * @brief Expected CRC values for CRC8-EBU
+ */
+static const uint8_t expected_crc8_ebu_crcs[] = {
+    0x,  // "Hello, World!"
+    0x,  // Empty string
+    0x,  // "A"
+    0x,  // "123456789"
+    0x,  // All zeros
+    0x,  // All ones
+    0x,  // Alternating pattern
+    0x,  // Binary sequence
+    0x,  // Single byte 0xFF
+    0x   // Random bytes
+};
+
+
 #endif /* CRC8_TEST_DATA_H */

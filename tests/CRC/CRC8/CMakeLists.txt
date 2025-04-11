@@ -14,6 +14,8 @@ set(CRC8_TEST_TYPES
     DARC_NO_LOOKUP
     DVBS2_LOOKUP
     DVBS2_NO_LOOKUP
+    EBU_LOOKUP
+    EBU_NO_LOOKUP
 )
 
 # Function to configure a CRC8 test executable
