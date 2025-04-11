@@ -98,4 +98,20 @@ static const uint8_t expected_crc8_darc_crcs[] = {
     0x4C   // Random bytes
 };
 
+/**
+ * @brief Expected CRC values for CRC8-DVB-S2
+ */
+static const uint8_t expected_crc8_dvb_s2_crcs[] = {
+    0x50,  // "Hello, World!"
+    0x00,  // Empty string
+    0x48,  // "A"
+    0xBC,  // "123456789"
+    0x00,  // All zeros
+    0xED,  // All ones
+    0x17,  // Alternating pattern
+    0x21,  // Binary sequence
+    0xF9,  // Single byte 0xFF
+    0x84   // Random bytes
+};
+
 #endif /* CRC8_TEST_DATA_H */
