@@ -22,32 +22,40 @@ bool bytes_equal(const uint8_t *s1, size_t len1, const uint8_t *s2,
     return memcmp(s1, s2, len1) == 0;
 }
 
-// void print_crc16_config(crc_t type) {
-//     printf("=== CRC16 Configuration ===\n");
+bool test_crc8(const uint8_t *data, size_t len, uint8_t expected_crc,
+               crc_t crc_type) {
+    uint8_t calculated_crc = CRC8(data, len, crc_type);
+    bool crc_matches = (calculated_crc == expected_crc);
 
-//     printf("Type:           %s\n", get_crc16_implementation(type));
-//     printf("Polynomial:     0x%04X\n", CRC16_getPoly(type));
-//     printf("Initial value:  0x%04X\n", CRC16_getSeed(type));
-//     printf("Final XOR:      0x%04X\n", CRC16_getFinalXOR(type));
-//     printf("Reflect input:  %s\n", CRC_getInputReflected(type) ? "Yes" :
-//     "No"); printf("Reflect output: %s\n", CRC_getOutputReflected(type) ?
-//     "Yes" : "No"); printf("CRC16 lookup table:    %s\n",
-//            CRC16_USE_LOOKUP_TABLE ? "Yes" : "No");
+    // Print info
+    printf("Expected CRC8: 0x%02X\n", expected_crc);
+    printf("Calculated CRC8: 0x%02X\n", calculated_crc);
 
-//     printf("====================\n\n");
-// }
+    printf("CRC8 matches: %s\n", crc_matches ? "YES" : "NO");
+    return crc_matches;
+}
 
-// void print_crc32_config(crc_t type) {
-//     printf("=== CRC32 Configuration ===\n");
+bool test_crc16(const uint8_t *data, size_t len, uint16_t expected_crc,
+                crc_t crc_type) {
+    uint16_t calculated_crc = CRC16(data, len, crc_type);
+    bool crc_matches = (calculated_crc == expected_crc);
+    // Print info
+    printf("Expected CRC16: 0x%04X\n", expected_crc);
+    printf("Calculated CRC16: 0x%04X\n", calculated_crc);
+    printf("CRC16 matches: %s\n", crc_matches ? "YES" : "NO");
 
-//     printf("Type:           %s\n", get_crc32_implementation(type));
-//     printf("Polynomial:     0x%08X\n", CRC32_getPoly(type));
-//     printf("Initial value:  0x%08X\n", CRC32_getSeed(type));
-//     printf("Final XOR:      0x%08X\n", CRC32_getFinalXOR(type));
-//     printf("Reflect input:  %s\n", CRC_getInputReflected(type) ? "Yes" :
-//     "No"); printf("Reflect output: %s\n", CRC_getOutputReflected(type) ?
-//     "Yes" : "No"); printf("CRC32 lookup table:    %s\n",
-//            CRC32_USE_LOOKUP_TABLE ? "Yes" : "No");
+    return crc_matches;
+}
 
-//     printf("====================\n\n");
-// }
+bool test_crc32(const uint8_t *data, size_t len, uint32_t expected_crc,
+                crc_t crc_type) {
+    uint32_t calculated_crc = CRC32(data, len, crc_type);
+    bool crc_matches = (calculated_crc == expected_crc);
+
+    // Print info
+    printf("Expected CRC32: 0x%08X\n", expected_crc);
+    printf("Calculated CRC32: 0x%08X\n", calculated_crc);
+    printf("CRC32 matches: %s\n", crc_matches ? "YES" : "NO");
+
+    return crc_matches;
+}
