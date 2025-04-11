@@ -96,7 +96,7 @@ int main(void) {
 
     // Print final summary
     printf("\n=== Test Summary ===\n");
-    printf("Total tests: %u\n", TOTAL_TESTS);
+    printf("Total tests: %zu\n", TOTAL_TESTS);
     printf("Final result: %s\n",
            all_tests_passed ? "ALL TESTS PASSED" : "SOME TESTS FAILED");
 

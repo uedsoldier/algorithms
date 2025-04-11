@@ -161,10 +161,10 @@ static const TestCase test_cases[] = {
  * @brief Run a single checksum test case
  */
 static bool run_single_test(const TestCase *test, size_t test_number) {
-    printf("\n--- Test %u: %s ---\n", test_number + 1, test->description);
+    printf("\n--- Test %zu: %s ---\n", test_number + 1, test->description);
 
     // Print input data
-    printf("Input length: %u bytes\n", test->input_len);
+    printf("Input length: %zu bytes\n", test->input_len);
     printf("Input hex:    ");
     print_hex(test->input, test->input_len);
 
@@ -176,7 +176,7 @@ static bool run_single_test(const TestCase *test, size_t test_number) {
     printf("Calculated checksum: 0x%02X\n", calculated_checksum);
 
     bool test_passed = (calculated_checksum == test->expected_checksum_output);
-    printf("Test %u result: %s\n", test_number + 1,
+    printf("Test %zu result: %s\n", test_number + 1,
            test_passed ? "PASSED" : "FAILED");
 
     return test_passed;
@@ -186,7 +186,7 @@ int main(void) {
     size_t total_tests = sizeof(test_cases) / sizeof(test_cases[0]);
     size_t passed_tests = 0;
 
-    printf("Running %u %s...\n", total_tests, TEST_NAME);
+    printf("Running %zu %s...\n", total_tests, TEST_NAME);
 
     // Run all tests
     for (size_t i = 0; i < total_tests; i++) {
@@ -197,8 +197,8 @@ int main(void) {
 
     // Print summary
     printf("\nTest Summary:\n");
-    printf("Passed: %u/%u\n", passed_tests, total_tests);
-    printf("Failed: %u/%u\n", total_tests - passed_tests, total_tests);
+    printf("Passed: %zu/%zu\n", passed_tests, total_tests);
+    printf("Failed: %zu/%zu\n", total_tests - passed_tests, total_tests);
 
     // Add final result line to match CMake's expected output
     printf("Final result: %s\n", (passed_tests == total_tests)

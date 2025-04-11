@@ -34,19 +34,19 @@ void print_crc8_config(crc_t type) {
  */
 static bool run_single_test(const TestInput *test, uint8_t expected_crc,
                             size_t test_number) {
-    printf("\n--- Test %u: %s ---\n", test_number + 1, test->description);
+    printf("\n--- Test %zu: %s ---\n", test_number + 1, test->description);
 
     bool test_passed = true;
     // Print input data
     printf("Input string:  '%.*s'\n", (int)test->input_len, test->input);
-    printf("Input length:  %u bytes\n", test->input_len);
+    printf("Input length:  %zu bytes\n", test->input_len);
     printf("Input hex:     ");
     print_hex(test->input, test->input_len);
 
     // Get CRC8
     test_passed = test_crc8(test->input, test->input_len, expected_crc, CRC8_CCITT);
 
-    printf("Test %u result: %s\n", test_number + 1,
+    printf("Test %zu result: %s\n", test_number + 1,
            test_passed ? "PASSED" : "FAILED");
     return test_passed;
 }
@@ -96,7 +96,7 @@ int main(void) {
 
     // Print final summary
     printf("\n=== Test Summary ===\n");
-    printf("Total tests: %u\n", TOTAL_TESTS);
+    printf("Total tests: %zu\n", TOTAL_TESTS);
     printf("Final result: %s\n",
            all_tests_passed ? "ALL TESTS PASSED" : "SOME TESTS FAILED");
 

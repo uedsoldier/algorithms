@@ -162,11 +162,11 @@ static const TestCase test_cases[] = {
  */
 static bool run_single_test(base64_converter_t *converter, const TestCase *test,
                             size_t test_number) {
-    printf("\n--- Test %u: %s ---\n", test_number + 1, test->description);
+    printf("\n--- Test %zu: %s ---\n", test_number + 1, test->description);
 
     // Print input data
     printf("Input string:  '%.*s'\n", (int)test->input_len, test->input);
-    printf("Input length:  %u bytes\n", test->input_len);
+    printf("Input length:  %zu bytes\n", test->input_len);
     printf("Input hex:     ");
     print_hex(test->input, test->input_len);
 
@@ -183,7 +183,7 @@ static bool run_single_test(base64_converter_t *converter, const TestCase *test,
     }
 
     printf("Encoded Base64: '%.*s'\n", (int)encoded_size, encoded_data);
-    printf("Encoded length: %u bytes\n", encoded_size);
+    printf("Encoded length: %zu bytes\n", encoded_size);
     printf("Encoded hex:    ");
     print_hex(encoded_data, encoded_size);
 
@@ -200,7 +200,7 @@ static bool run_single_test(base64_converter_t *converter, const TestCase *test,
     }
 
     printf("Decoded string: '%.*s'\n", (int)decoded_size, decoded_buffer);
-    printf("Decoded length: %u bytes\n", decoded_size);
+    printf("Decoded length: %zu bytes\n", decoded_size);
     printf("Decoded hex:    ");
     print_hex(decoded_buffer, decoded_size);
 
@@ -227,7 +227,7 @@ static bool run_single_test(base64_converter_t *converter, const TestCase *test,
         }
     }
 
-    printf("Test %u result: %s\n", test_number + 1,
+    printf("Test %zu result: %s\n", test_number + 1,
            test_passed ? "PASSED" : "FAILED");
     return test_passed;
 }
@@ -251,7 +251,7 @@ int main(void) {
     if (status != BASE64_SUCCESS) {
         printf("Failed to initialize converter: %s\n",
                base64_get_error_string(status));
-        printf("Buffer size provided: %u\n", sizeof(buffer));
+        printf("Buffer size provided: %zu\n", sizeof(buffer));
         printf("Required buffer size: %d\n", BASE64_MAX_ENCODED_BUFFER);
         return EXIT_FAILURE;
     }
@@ -267,7 +267,7 @@ int main(void) {
 
     // Print final summary
     printf("\n=== Test Summary ===\n");
-    printf("Total tests: %u\n", TOTAL_TESTS);
+    printf("Total tests: %zu\n", TOTAL_TESTS);
     printf("Final result: %s\n",
            all_tests_passed ? "ALL TESTS PASSED" : "SOME TESTS FAILED");
 
