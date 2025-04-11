@@ -44,16 +44,7 @@ static bool run_single_test(const TestInput *test, uint8_t expected_crc,
     print_hex(test->input, test->input_len);
 
     // Get CRC8
-    uint8_t calculated_crc = CRC8(test->input, test->input_len, CRC8_CCITT);
-
-    // Compare CRC8 with expected value
-    bool crc_matches = (calculated_crc == expected_crc);
-    test_passed = crc_matches;
-
-    // Print info
-    printf("Expected CRC8: 0x%02X\n", expected_crc);
-    printf("Calculated CRC8: 0x%02X\n", calculated_crc);
-    printf("CRC8 matches: %s\n", crc_matches ? "YES" : "NO");
+    test_passed = test_crc8(test->input, test->input_len, expected_crc, CRC8_CCITT);
 
     printf("Test %zu result: %s\n", test_number + 1,
            test_passed ? "PASSED" : "FAILED");
