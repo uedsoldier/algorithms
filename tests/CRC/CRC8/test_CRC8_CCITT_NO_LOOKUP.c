@@ -30,7 +30,7 @@ void print_crc8_config(crc_t type) {
 }
 
 /**
- * @brief Run a single Base64 test case
+ * @brief Run a single CRC8 test case
  */
 static bool run_single_test(const TestInput *test, uint8_t expected_crc,
                             size_t test_number) {
@@ -72,7 +72,7 @@ void crc8_print_macro_settings(void) {
 }
 
 /**
- * @brief Main entry point for Base64 tests
+ * @brief Main entry point for CRC8 tests
  */
 int main(void) {
     /* Runtime check for array size match */
