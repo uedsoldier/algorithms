@@ -82,7 +82,7 @@ static const char *const crc_implementations[] = {
     // CRC8 implementations
     "CRC8_CCITT", "CRC8_CDMA2000", "CRC8_DARC", "CRC8_DVB_S2", "CRC8_EBU",
     "CRC8_I_CODE", "CRC8_ITU", "CRC8_MAXIM", "CRC8_ROHC", "CRC8_WCDMA",
-    "CRC8_SAE_J1850", "CRC8_SAE_J1850_ZERO", "CRC8_8H2F",
+    "CRC8_SAE_J1850", "CRC8_SAE_J1850_ZERO", "CRC8_AUTOSAR","CRC8_BLUETOOTH",
 
     // CRC16 implementations
     "CRC16_XMODEM", "CRC16_AUG_CCITT", "CRC16_CCITT_FALSE", "CRC16_GENIBUS",
@@ -121,7 +121,7 @@ uint8_t CRC8_getPoly(crc_t crc_type) {
         case CRC8_SAE_J1850_ZERO:
             retVal = 0x1D;
             break;
-        case CRC8_8H2F:
+        case CRC8_AUTOSAR:
             retVal = 0x2F;
             break;
         case CRC8_MAXIM:
@@ -136,6 +136,9 @@ uint8_t CRC8_getPoly(crc_t crc_type) {
             break;
         case CRC8_DVB_S2:
             retVal = 0xD5;
+            break;
+        case CRC8_BLUETOOTH:
+            retVal = 0xA7;
             break;
         default:
             retVal = 0;  // Caso sin sentido
@@ -236,6 +239,7 @@ uint8_t CRC8_getSeed(crc_t crc_type) {
         case CRC8_DARC:
         case CRC8_WCDMA:
         case CRC8_DVB_S2:
+        case CRC8_BLUETOOTH:
             retVal = 0;
             break;
         case CRC8_I_CODE:
@@ -245,7 +249,7 @@ uint8_t CRC8_getSeed(crc_t crc_type) {
         case CRC8_EBU:
         case CRC8_CDMA2000:
         case CRC8_SAE_J1850:
-        case CRC8_8H2F:
+        case CRC8_AUTOSAR:
             retVal = 0xFF;
             break;
         default:
@@ -328,7 +332,7 @@ bool CRC_getInputReflected(crc_t crc_type) {
         case CRC8_DVB_S2:
         case CRC8_SAE_J1850_ZERO:
         case CRC8_SAE_J1850:
-        case CRC8_8H2F:
+        case CRC8_AUTOSAR:
         // CRC16
         case CRC16_GENIBUS:
         case CRC16_XMODEM:
@@ -369,7 +373,7 @@ bool CRC_getOutputReflected(crc_t crc_type) {
         case CRC8_DVB_S2:
         case CRC8_SAE_J1850_ZERO:
         case CRC8_SAE_J1850:
-        case CRC8_8H2F:
+        case CRC8_AUTOSAR:
         // CRC16
         case CRC16_GENIBUS:
         case CRC16_XMODEM:
@@ -405,7 +409,7 @@ uint8_t CRC8_getFinalXOR(crc_t crc_type) {
             retVal = 0x55;
             break;
         case CRC8_SAE_J1850:
-        case CRC8_8H2F:
+        case CRC8_AUTOSAR:
             retVal = 0xFF;
             break;
         default:
@@ -504,6 +508,11 @@ uint8_t CRC8(const void *data, uint16_t data_len, crc_t crc_type) {
 #ifdef CRC8_0x2F_LOOKUP_TABLE
         case 0x2F:
             p_tabla = CRC8_0x2F_table;
+            break;
+#endif
+#ifdef CRC8_0xA7_LOOKUP_TABLE
+        case 0xA7:
+            p_tabla = CRC8_0xA7_table;
             break;
 #endif
         default:
