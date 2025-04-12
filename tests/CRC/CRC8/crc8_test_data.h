@@ -118,17 +118,64 @@ static const uint8_t expected_crc8_dvb_s2_crcs[] = {
  * @brief Expected CRC values for CRC8-EBU
  */
 static const uint8_t expected_crc8_ebu_crcs[] = {
-    0x,  // "Hello, World!"
-    0x,  // Empty string
-    0x,  // "A"
-    0x,  // "123456789"
-    0x,  // All zeros
-    0x,  // All ones
-    0x,  // Alternating pattern
-    0x,  // Binary sequence
-    0x,  // Single byte 0xFF
-    0x   // Random bytes
+    0x3E,  // "Hello, World!"
+    0xFF,  // Empty string
+    0x1B,  // "A"
+    0x97,  // "123456789"
+    0x68,  // All zeros
+    0x7C,  // All ones
+    0x5A,  // Alternating pattern
+    0x33,  // Binary sequence
+    0x00,  // Single byte 0xFF
+    0xDA   // Random bytes
 };
 
+/**
+ * @brief Expected CRC values for CRC8-I-CODE
+ */
+static const uint8_t expected_crc8_i_code_crcs[] = {
+    0x5B,  // "Hello, World!"
+    0xFD,  // Empty string
+    0xF0,  // "A"
+    0x7E,  // "123456789"
+    0xA8,  // All zeros
+    0x80,  // All ones
+    0x50,  // Alternating pattern
+    0xE6,  // Binary sequence
+    0x3A,  // Single byte 0xFF
+    0x74   // Random bytes
+};
+
+/**
+ * @brief Expected CRC values for CRC8-ITU
+ */
+static const uint8_t expected_crc8_itu_crcs[] = {
+    0xD2,  // "Hello, World!"
+    0x55,  // Empty string
+    0x95,  // "A"
+    0xA1,  // "123456789"
+    0x55,  // All zeros
+    0x82,  // All ones
+    0x3A,  // Alternating pattern
+    0x8D,  // Binary sequence
+    0xA6,  // Single byte 0xFF
+    0xB2   // Random bytes
+};
+
+/**
+ * @brief Expected CRC values for CRC8-ITU
+ */
+static const uint8_t expected_crc8_bluetooth_crcs[] = {
+    0xE4,  // "Hello, World!"
+    0x00,  // Empty string
+    0xFC,  // "A"
+    0x26,  // "123456789"
+    0x00,  // All zeros
+    0x82,  // All ones
+    0x55,  // Alternating pattern
+    0x05,  // Binary sequence
+    0x9F,  // Single byte 0xFF
+    0x6A   // Random bytes
+};
 
 #endif /* CRC8_TEST_DATA_H */
