@@ -64,6 +64,58 @@
 #define CRC32_USE_LOOKUP_TABLE 0
 #endif
 
+/**
+ * @brief Controls debug message output
+ *
+ * When enabled (set to 1), debug messages will be printed to help with
+ * troubleshooting. Disable for production builds to save memory and improve
+ * performance.
+ */
+#ifndef CRC_DEBUG_ENABLE
+#define CRC_DEBUG_ENABLE 0
+#endif
+
+/**
+ * @brief Controls debug output destination
+ *
+ * Define the output function used for debug messages.
+ * Defaults to printf if not defined.
+ */
+#ifndef CRC_DEBUG_PRINTF
+#include <stdio.h>
+#define CRC_DEBUG_PRINTF printf
+#endif
+
+/**
+ * @brief Debug message macro
+ *
+ * Prints debug messages when CRC_DEBUG_ENABLE is set.
+ * No code is generated when debugging is disabled.
+ *
+ * @param format Printf-style format string
+ * @param ... Variable arguments for format string
+ */
+#if CRC_DEBUG_ENABLE
+#define CRC_DEBUG(format, ...) CRC_DEBUG_PRINTF("CRC DEBUG: " format "\n", ##__VA_ARGS__)
+#else
+#define CRC_DEBUG(format, ...) ((void)0)
+#endif
+
+/**
+ * @brief Error message macro
+ *
+ * Prints error messages when CRC_DEBUG_ENABLE is set.
+ * No code is generated when debugging is disabled.
+ *
+ * @param format Printf-style format string
+ * @param ... Variable arguments for format string
+ */
+#if CRC_DEBUG_ENABLE
+#define CRC_ERROR(format, ...) CRC_DEBUG_PRINTF("CRC ERROR: " format "\n", ##__VA_ARGS__)
+#else
+#define CRC_ERROR(format, ...) ((void)0)
+#endif
+
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -95,6 +147,8 @@ typedef enum crc_t {
     CRC8_SAE_J1850_ZERO, /**< CRC-8/SAE-J1850-ZERO - Modified J1850 */
     CRC8_AUTOSAR,   /**< CRC-8/AUTOSAR - Automotive Open System Architecture */
     CRC8_BLUETOOTH, /**< CRC-8/BLUETOOTH - Bluetooth protocol */
+    CRC8_GSM_A,     /**< CRC-8/GSM-A - GSM mobile communications */
+    CRC8_GSM_B,     /**< CRC-8/GSM-B - GSM mobile communications */
 
     // CRC16 Variants
     CRC16_XMODEM,       /**< CRC-16/XMODEM - File transfer protocol */
@@ -135,6 +189,18 @@ typedef enum crc_t {
     CRC_IMPL_COUNT /**< Total number of CRC implementations */
 } crc_t;
 
+/**
+ * @brief Error codes for CRC functions
+ */
+typedef enum {
+    CRC_SUCCESS = 0,              /**< Operation completed successfully */
+    CRC_ERROR_NULL_DATA,          /**< NULL pointer provided for data or result */
+    CRC_ERROR_ZERO_LENGTH,        /**< Data length is zero */
+    CRC_ERROR_INVALID_TYPE,       /**< Invalid CRC implementation type */
+    CRC_ERROR_INVALID_POLYNOMIAL, /**< Invalid polynomial for CRC calculation */
+    CRC_ERROR_LOOKUP_TABLE        /**< Error with lookup table */
+} crc_error_t;
+
 #if defined(CRC8_USE_LOOKUP_TABLE) && (CRC8_USE_LOOKUP_TABLE == 1)
 #define CRC8_0x07_LOOKUP_TABLE  // 0x07 --> x^8 + x^5 + x^4 + 1
 #define CRC8_0x2F_LOOKUP_TABLE  // 0x2F --> x^8 + x^5 + x^3 + x^2 + x + 1
@@ -143,7 +209,9 @@ typedef enum crc_t {
 #define CRC8_0x39_LOOKUP_TABLE  // 0x39 --> x^8 + x^5 + x^4 + x^3 + 1
 #define CRC8_0x9B_LOOKUP_TABLE  // 0x9B --> x^8 + x^7 + x^4 + x^3 + x + 1
 #define CRC8_0xD5_LOOKUP_TABLE  // 0xD5 --> x^8 + x^7 + x^6 + x^4 + x^2 + 1
-#define CRC8_0xA7_LOOKUP_TABLE  // 0xA7 --> x^8 + x^7 + x^6 + x^5 + x^4 + x^2 + x + 1
+#define CRC8_0xA7_LOOKUP_TABLE  // 0xA7 --> x^8 + x^7 + x^6 + x^5 + x^4 + x^2 +
+                                // x + 1
+#define CRC8_0x49_LOOKUP_TABLE  // 0x49 --> x^8 + x^5 + x^4 + x^3 + x^2 + 1
 #endif
 #if defined(CRC16_USE_LOOKUP_TABLE) && (CRC16_USE_LOOKUP_TABLE == 1)
 #define CRC16_0x1021_LOOKUP_TABLE  // 0x1021 --> x^16 + x^12 + x^5 + 1
@@ -410,6 +478,33 @@ static const uint8_t CRC8_0xD5_table[256] = {
     0x84, 0x51, 0xFB, 0x2E, 0x7A, 0xAF, 0x05, 0xD0, 0xAD, 0x78, 0xD2, 0x07,
     0x53, 0x86, 0x2C, 0xF9};
 #endif
+
+#ifdef CRC8_0x49_LOOKUP_TABLE
+static const uint8_t CRC8_0x49_table[256] = {
+    0x00, 0x49, 0x92, 0xDB, 0x6D, 0x24, 0xFF, 0xB6, 0xDA, 0x93, 0x48, 0x01,
+    0xB7, 0xFE, 0x25, 0x6C, 0xFD, 0xB4, 0x6F, 0x26, 0x90, 0xD9, 0x02, 0x4B,
+    0x27, 0x6E, 0xB5, 0xFC, 0x4A, 0x03, 0xD8, 0x91, 0xB3, 0xFA, 0x21, 0x68,
+    0xDE, 0x97, 0x4C, 0x05, 0x69, 0x20, 0xFB, 0xB2, 0x04, 0x4D, 0x96, 0xDF,
+    0x4E, 0x07, 0xDC, 0x95, 0x23, 0x6A, 0xB1, 0xF8, 0x94, 0xDD, 0x06, 0x4F,
+    0xF9, 0xB0, 0x6B, 0x22, 0x2F, 0x66, 0xBD, 0xF4, 0x42, 0x0B, 0xD0, 0x99,
+    0xF5, 0xBC, 0x67, 0x2E, 0x98, 0xD1, 0x0A, 0x43, 0xD2, 0x9B, 0x40, 0x09,
+    0xBF, 0xF6, 0x2D, 0x64, 0x08, 0x41, 0x9A, 0xD3, 0x65, 0x2C, 0xF7, 0xBE,
+    0x9C, 0xD5, 0x0E, 0x47, 0xF1, 0xB8, 0x63, 0x2A, 0x46, 0x0F, 0xD4, 0x9D,
+    0x2B, 0x62, 0xB9, 0xF0, 0x61, 0x28, 0xF3, 0xBA, 0x0C, 0x45, 0x9E, 0xD7,
+    0xBB, 0xF2, 0x29, 0x60, 0xD6, 0x9F, 0x44, 0x0D, 0x5E, 0x17, 0xCC, 0x85,
+    0x33, 0x7A, 0xA1, 0xE8, 0x84, 0xCD, 0x16, 0x5F, 0xE9, 0xA0, 0x7B, 0x32,
+    0xA3, 0xEA, 0x31, 0x78, 0xCE, 0x87, 0x5C, 0x15, 0x79, 0x30, 0xEB, 0xA2,
+    0x14, 0x5D, 0x86, 0xCF, 0xED, 0xA4, 0x7F, 0x36, 0x80, 0xC9, 0x12, 0x5B,
+    0x37, 0x7E, 0xA5, 0xEC, 0x5A, 0x13, 0xC8, 0x81, 0x10, 0x59, 0x82, 0xCB,
+    0x7D, 0x34, 0xEF, 0xA6, 0xCA, 0x83, 0x58, 0x11, 0xA7, 0xEE, 0x35, 0x7C,
+    0x71, 0x38, 0xE3, 0xAA, 0x1C, 0x55, 0x8E, 0xC7, 0xAB, 0xE2, 0x39, 0x70,
+    0xC6, 0x8F, 0x54, 0x1D, 0x8C, 0xC5, 0x1E, 0x57, 0xE1, 0xA8, 0x73, 0x3A,
+    0x56, 0x1F, 0xC4, 0x8D, 0x3B, 0x72, 0xA9, 0xE0, 0xC2, 0x8B, 0x50, 0x19,
+    0xAF, 0xE6, 0x3D, 0x74, 0x18, 0x51, 0x8A, 0xC3, 0x75, 0x3C, 0xE7, 0xAE,
+    0x3F, 0x76, 0xAD, 0xE4, 0x52, 0x1B, 0xC0, 0x89, 0xE5, 0xAC, 0x77, 0x3E,
+    0x88, 0xC1, 0x1A, 0x53};
+#endif
+
 #ifdef CRC16_0x1021_LOOKUP_TABLE
 /**
  * @brief Polinomio generador: 0x1021 --> x^16 + x^12 + x^5 + 1
@@ -1025,34 +1120,64 @@ uint16_t CRC16_getFinalXOR(crc_t crc_type);
 uint32_t CRC32_getFinalXOR(crc_t crc_type);
 
 /**
+ * @brief Calculate CRC8 with error handling
+ * @param data Pointer to input data
+ * @param data_len Length of input data
+ * @param crc_type Type of CRC8 implementation to use
+ * @param[out] result Pointer to store CRC result
+ * @return crc_error_t Error code indicating success or failure
+ */
+crc_error_t CRC8_Calculate(const void *data, size_t data_len, crc_t crc_type, uint8_t *result);
+
+/**
  * @brief Calculates CRC8 checksum for given data
  *
  * @param data Pointer to input data buffer
- * @param dataLength Length of input data in bytes
+ * @param data_len Length of input data in bytes
  * @param crc_type CRC algorithm variant to use
  * @return uint8_t Calculated CRC8 checksum
  */
-uint8_t CRC8(const void *data, uint16_t dataLength, crc_t crc_type);
+uint8_t CRC8(const void *data, size_t data_len, crc_t crc_type);
+
+/**
+ * @brief Calculates CRC16 checksum with error handling
+ * @param data Pointer to input data
+ * @param data_len Length of input data
+ * @param crc_type Type of CRC16 implementation to use
+ * @param[out] result Pointer to store CRC result
+ * @return crc_error_t Error code indicating success or failure
+ */
+crc_error_t CRC16_Calculate(const void *data, size_t data_len, crc_t crc_type, uint16_t *result);
 
 /**
  * @brief Calculates CRC16 checksum for given data
  *
  * @param data Pointer to input data buffer
- * @param dataLength Length of input data in bytes
+ * @param data_len Length of input data in bytes
  * @param crc_type CRC algorithm variant to use
  * @return uint16_t Calculated CRC16 checksum
  */
-uint16_t CRC16(const void *data, uint16_t dataLength, crc_t crc_type);
+uint16_t CRC16(const void *data, size_t data_len, crc_t crc_type);
+
+/**
+ * @brief Calculates CRC32 checksum with error handling
+ * @param data Pointer to input data
+ * @param data_len Length of input data
+ * @param crc_type Type of CRC32 implementation to use
+ * @param[out] result Pointer to store CRC result
+ * @return crc_error_t Error code indicating success or failure
+ */
+crc_error_t CRC32_Calculate(const void *data, size_t data_len, crc_t crc_type, uint32_t *result);
 
 /**
  * @brief Calculates CRC32 checksum for given data
  *
  * @param data Pointer to input data buffer
- * @param dataLength Length of input data in bytes
+ * @param data_len Length of input data in bytes
  * @param crc_type CRC algorithm variant to use
  * @return uint32_t Calculated CRC32 checksum
  */
-uint32_t CRC32(const void *data, uint16_t dataLength, crc_t crc_type);
+uint32_t CRC32(const void *data, size_t data_len, crc_t crc_type);
 
 #if defined(CRC_USE_IMPLEMENTATION_NAMES) && (CRC_USE_IMPLEMENTATION_NAMES == 1)
 /**

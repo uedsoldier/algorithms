@@ -178,4 +178,36 @@ static const uint8_t expected_crc8_bluetooth_crcs[] = {
     0x6A   // Random bytes
 };
 
+/**
+ * @brief Expected CRC values for CRC8-GSM-A
+ */
+static const uint8_t expected_crc8_gsm_a_crcs[] = {
+    0xCE,  // "Hello, World!"
+    0x00,  // Empty string
+    0x0E,  // "A"
+    0x37,  // "123456789"
+    0x00,  // All zeros
+    0x28,  // All ones
+    0xD1,  // Alternating pattern
+    0x4E,  // Binary sequence
+    0xC4,  // Single byte 0xFF
+    0xDC   // Random bytes
+};
+
+/**
+ * @brief Expected CRC values for CRC8-GSM-B
+ */
+static const uint8_t expected_crc8_gsm_b_crcs[] = {
+    0x4D,  // "Hello, World!"
+    0xFF,  // Empty string
+    0x99,  // "A"
+    0x94,  // "123456789"
+    0xFF,  // All zeros
+    0x2D,  // All ones
+    0x50,  // Alternating pattern
+    0x60,  // Binary sequence
+    0xAC,  // Single byte 0xFF
+    0x27   // Random bytes
+};
+
 #endif /* CRC8_TEST_DATA_H */

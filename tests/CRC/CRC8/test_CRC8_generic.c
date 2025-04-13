@@ -56,6 +56,12 @@
 #elif CRC8_VARIANT == V_BLUETOOTH
     #define CURRENT_CRC8_TYPE CRC8_BLUETOOTH
     #define CURRENT_EXPECTED_CRC_ARRAY expected_crc8_bluetooth_crcs
+#elif CRC8_VARIANT == V_GSM_A
+    #define CURRENT_CRC8_TYPE CRC8_GSM_A
+    #define CURRENT_EXPECTED_CRC_ARRAY expected_crc8_gsm_a_crcs
+#elif CRC8_VARIANT == V_GSM_B
+    #define CURRENT_CRC8_TYPE CRC8_GSM_B
+    #define CURRENT_EXPECTED_CRC_ARRAY expected_crc8_gsm_b_crcs
 #else
 #error "Unsupported CRC8_VARIANT specified"
 #endif

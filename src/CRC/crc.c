@@ -83,6 +83,7 @@ static const char *const crc_implementations[] = {
     "CRC8_CCITT", "CRC8_CDMA2000", "CRC8_DARC", "CRC8_DVB_S2", "CRC8_EBU",
     "CRC8_I_CODE", "CRC8_ITU", "CRC8_MAXIM", "CRC8_ROHC", "CRC8_WCDMA",
     "CRC8_SAE_J1850", "CRC8_SAE_J1850_ZERO", "CRC8_AUTOSAR","CRC8_BLUETOOTH",
+    "CRC8_GSM_A", "CRC8_GSM_B",
 
     // CRC16 implementations
     "CRC16_XMODEM", "CRC16_AUG_CCITT", "CRC16_CCITT_FALSE", "CRC16_GENIBUS",
@@ -119,6 +120,7 @@ uint8_t CRC8_getPoly(crc_t crc_type) {
         case CRC8_I_CODE:
         case CRC8_SAE_J1850:
         case CRC8_SAE_J1850_ZERO:
+        case CRC8_GSM_A:
             retVal = 0x1D;
             break;
         case CRC8_AUTOSAR:
@@ -139,6 +141,9 @@ uint8_t CRC8_getPoly(crc_t crc_type) {
             break;
         case CRC8_BLUETOOTH:
             retVal = 0xA7;
+            break;
+        case CRC8_GSM_B:
+            retVal = 0x49;
             break;
         default:
             retVal = 0;  // Caso sin sentido
@@ -233,15 +238,6 @@ uint32_t CRC32_getPoly(crc_t crc_type) {
 uint8_t CRC8_getSeed(crc_t crc_type) {
     uint8_t retVal;
     switch (crc_type) {
-        case CRC8_CCITT:
-        case CRC8_ITU:
-        case CRC8_MAXIM:
-        case CRC8_DARC:
-        case CRC8_WCDMA:
-        case CRC8_DVB_S2:
-        case CRC8_BLUETOOTH:
-            retVal = 0;
-            break;
         case CRC8_I_CODE:
             retVal = 0xFD;
             break;
@@ -253,8 +249,8 @@ uint8_t CRC8_getSeed(crc_t crc_type) {
             retVal = 0xFF;
             break;
         default:
-            retVal = 0;
-            break;  // Caso sin sentido
+            retVal = 0x00;
+            break;  // Rest of cases
     }
     return retVal;
 }
@@ -270,19 +266,6 @@ uint16_t CRC16_getSeed(crc_t crc_type) {
         case CRC16_MODBUS:
         case CRC16_CDMA2000:
             retVal = 0xFFFF;
-            break;
-        case CRC16_XMODEM:
-        case CRC16_DECT_R:
-        case CRC16_DECT_X:
-        case CRC16_DNP:
-        case CRC16_CCITT_KERMIT:
-        case CRC16_EN13757:
-        case CRC16_ARC:
-        case CRC16_BUYPASS:
-        case CRC16_MAXIM:
-        case CRC16_T10_DIF:
-        case CRC16_TELEDISK:
-            retVal = 0x00;
             break;
         case CRC16_AUG_CCITT:
             retVal = 0x1D0F;
@@ -300,8 +283,8 @@ uint16_t CRC16_getSeed(crc_t crc_type) {
             retVal = 0xC6C6;
             break;
         default:
-            retVal = 0;
-            break;  // Caso sin sentido
+            retVal = 0x0000;
+            break;  // Rest of cases
     }
     return retVal;
 }
@@ -333,6 +316,8 @@ bool CRC_getInputReflected(crc_t crc_type) {
         case CRC8_SAE_J1850_ZERO:
         case CRC8_SAE_J1850:
         case CRC8_AUTOSAR:
+        case CRC8_GSM_A:
+        case CRC8_GSM_B:
         // CRC16
         case CRC16_GENIBUS:
         case CRC16_XMODEM:
@@ -356,7 +341,7 @@ bool CRC_getInputReflected(crc_t crc_type) {
             break;
         default:
             retVal = true;
-            break;  // Todos los casos restantes
+            break;  // Rest of cases
     }
 
     return retVal;
@@ -374,6 +359,8 @@ bool CRC_getOutputReflected(crc_t crc_type) {
         case CRC8_SAE_J1850_ZERO:
         case CRC8_SAE_J1850:
         case CRC8_AUTOSAR:
+        case CRC8_GSM_A:
+        case CRC8_GSM_B:
         // CRC16
         case CRC16_GENIBUS:
         case CRC16_XMODEM:
@@ -397,7 +384,7 @@ bool CRC_getOutputReflected(crc_t crc_type) {
             break;
         default:
             retVal = true;
-            break;  // Todos los casos restantes
+            break;  // Rest of cases
     }
     return retVal;
 }
@@ -410,11 +397,12 @@ uint8_t CRC8_getFinalXOR(crc_t crc_type) {
             break;
         case CRC8_SAE_J1850:
         case CRC8_AUTOSAR:
+        case CRC8_GSM_B:
             retVal = 0xFF;
             break;
         default:
             retVal = 0x00;
-            break;  // Posibles casos restantes...
+            break;  // Rest of cases
     }
     return retVal;
 }
@@ -468,210 +456,306 @@ uint32_t CRC32_getFinalXOR(crc_t crc_type) {
     return retVal;
 }
 
-uint8_t CRC8(const void *data, uint16_t data_len, crc_t crc_type) {
-    uint8_t crc = CRC8_getSeed(crc_type);   // Inicialización de valor "semilla"
-    uint8_t poly = CRC8_getPoly(crc_type);  // Obtención de polinomio
+crc_error_t CRC8_Calculate(const void *data, size_t data_len, crc_t crc_type, uint8_t *result){
+    // Validate input parameters
+    if (data == NULL || result == NULL) {
+        return CRC_ERROR_NULL_DATA;
+    }
+
+    // Validate CRC type
+    if (crc_type > CRC8_GSM_B || crc_type < CRC8_CCITT) {
+        return CRC_ERROR_INVALID_TYPE;
+    }
+
+    // Get polynomial
+    uint8_t poly = CRC8_getPoly(crc_type);
+    if (poly == 0) {
+        return CRC_ERROR_INVALID_POLYNOMIAL;
+    }
+
+    uint8_t crc = CRC8_getSeed(crc_type);
 
 #if defined(CRC8_USE_LOOKUP_TABLE) && (CRC8_USE_LOOKUP_TABLE == 1)
-    const uint8_t *p_tabla;
+    const uint8_t *p_table = NULL;
+
+    // Select lookup table based on polynomial
     switch (poly) {
 #ifdef CRC8_0x07_LOOKUP_TABLE
         case 0x07:
-            p_tabla = CRC8_0x07_table;
+            p_table = CRC8_0x07_table;
             break;
 #endif
 #ifdef CRC8_0x1D_LOOKUP_TABLE
         case 0x1D:
-            p_tabla = CRC8_0x1D_table;
+            p_table = CRC8_0x1D_table;
             break;
 #endif
 #ifdef CRC8_0x31_LOOKUP_TABLE
         case 0x31:
-            p_tabla = CRC8_0x31_table;
+            p_table = CRC8_0x31_table;
             break;
 #endif
 #ifdef CRC8_0x39_LOOKUP_TABLE
         case 0x39:
-            p_tabla = CRC8_0x39_table;
+            p_table = CRC8_0x39_table;
             break;
 #endif
 #ifdef CRC8_0x9B_LOOKUP_TABLE
         case 0x9B:
-            p_tabla = CRC8_0x9B_table;
+            p_table = CRC8_0x9B_table;
             break;
 #endif
 #ifdef CRC8_0xD5_LOOKUP_TABLE
         case 0xD5:
-            p_tabla = CRC8_0xD5_table;
+            p_table = CRC8_0xD5_table;
             break;
 #endif
 #ifdef CRC8_0x2F_LOOKUP_TABLE
         case 0x2F:
-            p_tabla = CRC8_0x2F_table;
+            p_table = CRC8_0x2F_table;
             break;
 #endif
 #ifdef CRC8_0xA7_LOOKUP_TABLE
         case 0xA7:
-            p_tabla = CRC8_0xA7_table;
+            p_table = CRC8_0xA7_table;
+            break;
+#endif
+#ifdef CRC8_0x49_LOOKUP_TABLE
+        case 0x49:
+            p_table = CRC8_0x49_table;
             break;
 #endif
         default:
-            p_tabla = CRC8_0x07_table;
-            break;  // Caso sin sentido
+            return CRC_ERROR_LOOKUP_TABLE;
     }
 
-#endif
-    uint8_t *_buf = (uint8_t *)
-        data;  // Apuntador tipo uint8_t con dirección a los datos a verificar
-    bool input_reflected = CRC_getInputReflected(crc_type);
-    bool output_reflected = CRC_getOutputReflected(crc_type);
-    while (data_len-- != 0) {
-        uint8_t b = *_buf++;
-        b = input_reflected ? bit_invert_Byte(b) : b;
-#if !defined(CRC8_USE_LOOKUP_TABLE) || (CRC8_USE_LOOKUP_TABLE != 1)
-        crc = crc ^ b;
-        for (uint8_t i = 0; i != 8; i++)
-            crc = (crc & 0x80) ? (uint8_t)((crc << 1) ^ poly)
-                               : (uint8_t)(crc << 1);
-#else
-        crc = p_tabla[b ^ crc];
-        // crc = (crc << 8) ^ p_tabla[(crc >> 8) ^ b];
-        // crc = (uint32_t)((crc << 8) ^ p_tabla[(uint8_t)((crc ^ ((uint32_t)(b)
-        // << 24)) >> 24)]);
-#endif
+#if defined(CRC8_USE_LOOKUP_TABLE) && (CRC8_USE_LOOKUP_TABLE == 1)
+    if (p_table == NULL) {
+        return CRC_ERROR_LOOKUP_TABLE;
     }
-    crc = output_reflected ? bit_invert_Byte(crc) : crc;
+#endif
+#endif
+    if (data_len > 0) {
+        uint8_t *_buf = (uint8_t *)data;
+        bool input_reflected = CRC_getInputReflected(crc_type);
+        bool output_reflected = CRC_getOutputReflected(crc_type);
 
-    return crc ^ CRC8_getFinalXOR(crc_type);
+        while (data_len-- != 0) {
+            uint8_t b = *_buf++;
+            b = input_reflected ? bit_invert_Byte(b) : b;
+    #if !defined(CRC8_USE_LOOKUP_TABLE) || (CRC8_USE_LOOKUP_TABLE != 1)
+            crc = crc ^ b;
+            for (uint8_t i = 0; i != 8; i++)
+                crc = (crc & 0x80) ? (uint8_t)((crc << 1) ^ poly)
+                                : (uint8_t)(crc << 1);
+    #else
+            crc = p_table[b ^ crc];
+    #endif
+        }
+        crc = output_reflected ? bit_invert_Byte(crc) : crc;
+    }
+
+    *result = crc ^ CRC8_getFinalXOR(crc_type);
+    return CRC_SUCCESS;
 }
 
-uint16_t CRC16(const void *data, uint16_t data_len, crc_t crc_type) {
-    uint16_t crc =
-        CRC16_getSeed(crc_type);  // Inicialización de valor "semilla"
-    uint16_t poly = CRC16_getPoly(crc_type);  // Obtención de polinomio
+uint8_t CRC8(const void *data, size_t data_len, crc_t crc_type) {
+    uint8_t result = 0;
+    if (CRC8_Calculate(data, data_len, crc_type, &result) != CRC_SUCCESS) {
+        return 0; // Return 0 on error
+    }
+    return result;
+}
+
+crc_error_t CRC16_Calculate(const void *data, size_t data_len, crc_t crc_type, uint16_t *result) {
+    // Validate input parameters
+    if (data == NULL || result == NULL) {
+        return CRC_ERROR_NULL_DATA;
+    }
+
+    // Validate CRC type
+    if (crc_type > CRC16_CDMA2000 || crc_type < CRC16_XMODEM) {
+        return CRC_ERROR_INVALID_TYPE;
+    }
+
+    // Get polynomial
+    uint16_t poly = CRC16_getPoly(crc_type);
+    if (poly == 0) {
+        return CRC_ERROR_INVALID_POLYNOMIAL;
+    }
+
+    uint16_t crc = CRC16_getSeed(crc_type);
 
 #if defined(CRC16_USE_LOOKUP_TABLE) && (CRC16_USE_LOOKUP_TABLE == 1)
-    const uint16_t *p_tabla;
+    const uint16_t *p_table = NULL;
+
+    // Select lookup table based on polynomial
     switch (poly) {
 #ifdef CRC16_0x1021_LOOKUP_TABLE
         case 0x1021:
-            p_tabla = CRC16_0x1021_table;
+            p_table = CRC16_0x1021_table;
             break;
 #endif
 #ifdef CRC16_0x8005_LOOKUP_TABLE
         case 0x8005:
-            p_tabla = CRC16_0x8005_table;
+            p_table = CRC16_0x8005_table;
             break;
 #endif
 #ifdef CRC16_0x0589_LOOKUP_TABLE
         case 0x0589:
-            p_tabla = CRC16_0x0589_table;
+            p_table = CRC16_0x0589_table;
             break;
 #endif
 #ifdef CRC16_0x3D65_LOOKUP_TABLE
         case 0x3D65:
-            p_tabla = CRC16_0x3D65_table;
+            p_table = CRC16_0x3D65_table;
             break;
 #endif
 #ifdef CRC16_0x8BB7_LOOKUP_TABLE
         case 0x8BB7:
-            p_tabla = CRC16_0x8BB7_table;
+            p_table = CRC16_0x8BB7_table;
             break;
 #endif
 #ifdef CRC16_0xA097_LOOKUP_TABLE
         case 0xA097:
-            p_tabla = CRC16_0xA097_table;
+            p_table = CRC16_0xA097_table;
             break;
 #endif
 #ifdef CRC16_0xC867_LOOKUP_TABLE
         case 0xC867:
-            p_tabla = CRC16_0xC867_table;
+            p_table = CRC16_0xC867_table;
             break;
 #endif
         default:
-            p_tabla = CRC16_0x1021_table;
-            break;  // Caso sin sentido
+            return CRC_ERROR_LOOKUP_TABLE;
     }
 
-#endif
-    uint8_t *_buf = (uint8_t *)
-        data;  // Apuntador tipo uint8_t con dirección a los datos a verificar
-    bool input_reflected = CRC_getInputReflected(crc_type);
-    bool output_reflected = CRC_getOutputReflected(crc_type);
-    while (data_len-- != 0) {
-        uint8_t b = *_buf++;
-        b = input_reflected ? bit_invert_Byte(b) : b;
-#if !defined(CRC16_USE_LOOKUP_TABLE) || (CRC16_USE_LOOKUP_TABLE != 1)
-        crc = crc ^ (uint16_t)((uint16_t)b << 8);
-        for (uint8_t i = 0; i != 8; i++)
-            crc = (crc & 0x8000) ? (crc << 1) ^ poly : (crc << 1);
-#else
-        crc = (crc << 8) ^ p_tabla[(crc >> 8) ^ b];
-#endif
+#if defined(CRC16_USE_LOOKUP_TABLE) && (CRC16_USE_LOOKUP_TABLE == 1)
+    if (p_table == NULL) {
+        return CRC_ERROR_LOOKUP_TABLE;
     }
-    crc = output_reflected ? bit_invert_Int16(crc) : crc;
-    return crc ^ CRC16_getFinalXOR(crc_type);
+#endif
+#endif
+    if (data_len > 0) {
+        uint8_t *_buf = (uint8_t *)data;
+        bool input_reflected = CRC_getInputReflected(crc_type);
+        bool output_reflected = CRC_getOutputReflected(crc_type);
+
+        while (data_len-- != 0) {
+            uint8_t b = *_buf++;
+            b = input_reflected ? bit_invert_Byte(b) : b;
+    #if !defined(CRC16_USE_LOOKUP_TABLE) || (CRC16_USE_LOOKUP_TABLE != 1)
+            crc = crc ^ (uint16_t)((uint16_t)b << 8);
+            for (uint8_t i = 0; i != 8; i++) {
+                crc = (crc & 0x8000) ? (crc << 1) ^ poly : (crc << 1);
+            }
+    #else
+            crc = (crc << 8) ^ p_table[(crc >> 8) ^ b];
+    #endif
+        }
+
+        crc = output_reflected ? bit_invert_Int16(crc) : crc;
+    }
+    *result = crc ^ CRC16_getFinalXOR(crc_type);
+
+    return CRC_SUCCESS;
 }
 
-uint32_t CRC32(const void *data, uint16_t data_len, crc_t crc_type) {
-    uint32_t crc =
-        CRC32_getSeed(crc_type);  // Inicialización de valor "semilla"
-    uint32_t poly = CRC32_getPoly(crc_type);  // Obtención de polinomio
+uint16_t CRC16(const void *data, size_t data_len, crc_t crc_type) {
+    uint16_t result = 0;
+    if (CRC16_Calculate(data, data_len, crc_type, &result) != CRC_SUCCESS) {
+        return 0; // Return 0 on error
+    }
+    return result;
+}
+
+crc_error_t CRC32_Calculate(const void *data, size_t data_len, crc_t crc_type, uint32_t *result) {
+    // Validate input parameters
+    if (data == NULL || result == NULL) {
+        return CRC_ERROR_NULL_DATA;
+    }
+
+    // Validate CRC type
+    if (crc_type > CRC32_XFER || crc_type < CRC32_D) {
+        return CRC_ERROR_INVALID_TYPE;
+    }
+
+    // Get polynomial
+    uint32_t poly = CRC32_getPoly(crc_type);
+    if (poly == 0) {
+        return CRC_ERROR_INVALID_POLYNOMIAL;
+    }
+
+    uint32_t crc = CRC32_getSeed(crc_type);
 
 #if defined(CRC32_USE_LOOKUP_TABLE) && (CRC32_USE_LOOKUP_TABLE == 1)
-    const uint32_t *p_tabla;
+    const uint32_t *p_table = NULL;
 
     switch (poly) {
 #ifdef CRC32_0xA833982B_LOOKUP_TABLE
         case 0xA833982BUL:
-            p_tabla = CRC32_0xA833982B_table;
+            p_table = CRC32_0xA833982B_table;
             break;
 #endif
 #ifdef CRC32_0x814141AB_LOOKUP_TABLE
         case 0x814141ABUL:
-            p_tabla = CRC32_0x814141AB_table;
+            p_table = CRC32_0x814141AB_table;
             break;
 #endif
 #ifdef CRC32_0x1EDC6F41_LOOKUP_TABLE
         case 0x1EDC6F41UL:
-            p_tabla = CRC32_0x1EDC6F41_table;
+            p_table = CRC32_0x1EDC6F41_table;
             break;
 #endif
 #ifdef CRC32_0x04C11DB7_LOOKUP_TABLE
         case 0x04C11DB7UL:
-            p_tabla = CRC32_0x04C11DB7_table;
+            p_table = CRC32_0x04C11DB7_table;
             break;
 #endif
 #ifdef CRC32_0x000000AF_LOOKUP_TABLE
         case 0x000000AFUL:
-            p_tabla = CRC32_0x000000AF_table;
+            p_table = CRC32_0x000000AF_table;
             break;
 #endif
-            // case 0x32583499UL:   p_tabla = CRC32_0x32583499_table; break;
-            // case 0x741B8CD7UL:   p_tabla = CRC32_0x741B8CD7_table; break;
-            // default:       p_tabla = CRC32_0xA833982B_table; break; //Caso
-            // sin sentido
+        default:
+            return CRC_ERROR_LOOKUP_TABLE;
     }
 
-#endif
-    uint8_t *_buf = (uint8_t *)
-        data;  // Apuntador tipo uint8_t con dirección a los datos a verificar
-    bool input_reflected = CRC_getInputReflected(crc_type);
-    bool output_reflected = CRC_getOutputReflected(crc_type);
-    while (data_len-- != 0) {
-        uint8_t b = *_buf++;
-        b = input_reflected ? bit_invert_Byte(b) : b;
-#if !defined(CRC32_USE_LOOKUP_TABLE) || (CRC32_USE_LOOKUP_TABLE != 1)
-        crc = crc ^ (((uint32_t)(b)) << 24);
-        for (uint8_t i = 0; i != 8; i++)
-            crc = (crc & 0x80000000UL) ? (crc << 1) ^ poly : (crc << 1);
-#else
-        crc =
-            (uint32_t)((crc << 8) ^
-                       p_tabla[(uint8_t)((crc ^ ((uint32_t)(b) << 24)) >> 24)]);
-#endif
+#if defined(CRC32_USE_LOOKUP_TABLE) && (CRC32_USE_LOOKUP_TABLE == 1)
+    if (p_table == NULL) {
+        return CRC_ERROR_LOOKUP_TABLE;
     }
-    crc = output_reflected ? bit_invert_Int32(crc) : crc;
+#endif
+#endif
+    if (data_len > 0) {
+        uint8_t *_buf = (uint8_t *)data;
+        bool input_reflected = CRC_getInputReflected(crc_type);
+        bool output_reflected = CRC_getOutputReflected(crc_type);
 
-    return crc ^ CRC32_getFinalXOR(crc_type);
+        while (data_len-- != 0) {
+            uint8_t b = *_buf++;
+            b = input_reflected ? bit_invert_Byte(b) : b;
+    #if !defined(CRC32_USE_LOOKUP_TABLE) || (CRC32_USE_LOOKUP_TABLE != 1)
+            crc = crc ^ (((uint32_t)(b)) << 24);
+            for (uint8_t i = 0; i != 8; i++) {
+                crc = (crc & 0x80000000UL) ? (crc << 1) ^ poly : (crc << 1);
+            }
+    #else
+            crc = (uint32_t)((crc << 8) ^ p_table[(uint8_t)((crc ^ ((uint32_t)(b) << 24)) >> 24)]);
+    #endif
+        }
+
+        crc = output_reflected ? bit_invert_Int32(crc) : crc;
+    }
+    *result = crc ^ CRC32_getFinalXOR(crc_type);
+
+    return CRC_SUCCESS;
+}
+
+uint32_t CRC32(const void *data, size_t data_len, crc_t crc_type) {
+    uint32_t result = 0;
+    if (CRC32_Calculate(data, data_len, crc_type, &result) != CRC_SUCCESS) {
+        return 0; // Return 0 on error
+    }
+    return result;
 }

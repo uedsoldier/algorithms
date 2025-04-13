@@ -16,5 +16,7 @@
 #define V_SAE_J1850_ZERO 11
 #define V_AUTOSAR 12
 #define V_BLUETOOTH 13
+#define V_GSM_A 14
+#define V_GSM_B 15
 
 #endif /* CRC8_VARIANTS_H */
