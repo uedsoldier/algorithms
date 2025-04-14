@@ -3,7 +3,7 @@
 #include <string.h>
 #include <assert.h>
 
-#include "CRC.h"
+#include "crc.h"
 #include "crc8_test_data.h"
 #include "crc8_variants.h"
 #include "test_utils.h"
