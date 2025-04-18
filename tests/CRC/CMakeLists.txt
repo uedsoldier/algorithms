@@ -15,6 +15,9 @@ add_subdirectory(CRC8)
 # Add CRC16 tests subdirectory
 add_subdirectory(CRC16)
 
+# Add CRC32 tests subdirectory
+add_subdirectory(CRC32)
+
 # Set the list of tests in parent scope
 set(CRC_TESTS ${ADDED_TESTS} PARENT_SCOPE)
 
