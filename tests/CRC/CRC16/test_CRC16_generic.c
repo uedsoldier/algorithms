@@ -42,7 +42,7 @@ void print_crc16_config(crc_t type) {
 /**
  * @brief Run a single CRC16 test case
  */
-static bool run_single_test(const TestInput *test, uint8_t expected_crc,
+static bool run_single_test(const TestInput *test, uint16_t expected_crc,
                             size_t test_number) {
     printf("\n--- Test %zu: %s ---\n", test_number + 1, test->description);
 
