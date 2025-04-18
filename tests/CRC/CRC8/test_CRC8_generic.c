@@ -76,7 +76,7 @@
  * @brief Print CRC configuration details
  * @param type CRC type enumeration
  */
-void print_crc8_config(crc_t type) {
+void print_crc16_config(crc_t type) {
     printf("=== CRC8 Configuration ===\n");
 
     printf("Type:           %s\n", get_crc_implementation_name(type));
@@ -144,7 +144,7 @@ int main(void) {
     printf("=== CRC8 Test ===\n");
 
     crc8_print_macro_settings();
-    print_crc8_config(CURRENT_CRC8_TYPE);
+    print_crc16_config(CURRENT_CRC8_TYPE);
 
     bool all_tests_passed = true;
 

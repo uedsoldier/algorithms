@@ -12,6 +12,9 @@ message(STATUS "Found CRC implementation files: ${CRC_IMPL_FILES}")
 # Add CRC8 tests subdirectory
 add_subdirectory(CRC8)
 
+# Add CRC16 tests subdirectory
+add_subdirectory(CRC16)
+
 # Set the list of tests in parent scope
 set(CRC_TESTS ${ADDED_TESTS} PARENT_SCOPE)
 
