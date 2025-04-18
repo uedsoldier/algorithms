@@ -83,7 +83,7 @@ static const char *const crc_implementations[] = {
     "CRC8_CCITT", "CRC8_CDMA2000", "CRC8_DARC", "CRC8_DVB_S2", "CRC8_EBU",
     "CRC8_I_CODE", "CRC8_ITU", "CRC8_MAXIM", "CRC8_ROHC", "CRC8_WCDMA",
     "CRC8_SAE_J1850", "CRC8_SAE_J1850_ZERO", "CRC8_AUTOSAR","CRC8_BLUETOOTH",
-    "CRC8_GSM_A", "CRC8_GSM_B",
+    "CRC8_GSM_A", "CRC8_GSM_B", "CRC8_HITAG", "CRC8_LTE",
 
     // CRC16 implementations
     "CRC16_XMODEM", "CRC16_AUG_CCITT", "CRC16_CCITT_FALSE", "CRC16_GENIBUS",
@@ -121,6 +121,7 @@ uint8_t CRC8_getPoly(crc_t crc_type) {
         case CRC8_SAE_J1850:
         case CRC8_SAE_J1850_ZERO:
         case CRC8_GSM_A:
+        case CRC8_HITAG:
             retVal = 0x1D;
             break;
         case CRC8_AUTOSAR:
@@ -134,6 +135,7 @@ uint8_t CRC8_getPoly(crc_t crc_type) {
             break;
         case CRC8_CDMA2000:
         case CRC8_WCDMA:
+        case CRC8_LTE:
             retVal = 0x9B;
             break;
         case CRC8_DVB_S2:
@@ -246,6 +248,7 @@ uint8_t CRC8_getSeed(crc_t crc_type) {
         case CRC8_CDMA2000:
         case CRC8_SAE_J1850:
         case CRC8_AUTOSAR:
+        case CRC8_HITAG:
             retVal = 0xFF;
             break;
         default:
@@ -318,6 +321,8 @@ bool CRC_getInputReflected(crc_t crc_type) {
         case CRC8_AUTOSAR:
         case CRC8_GSM_A:
         case CRC8_GSM_B:
+        case CRC8_HITAG:
+        case CRC8_LTE:
         // CRC16
         case CRC16_GENIBUS:
         case CRC16_XMODEM:
@@ -361,6 +366,8 @@ bool CRC_getOutputReflected(crc_t crc_type) {
         case CRC8_AUTOSAR:
         case CRC8_GSM_A:
         case CRC8_GSM_B:
+        case CRC8_HITAG:
+        case CRC8_LTE:
         // CRC16
         case CRC16_GENIBUS:
         case CRC16_XMODEM:
@@ -463,7 +470,7 @@ crc_error_t CRC8_Calculate(const void *data, size_t data_len, crc_t crc_type, ui
     }
 
     // Validate CRC type
-    if (crc_type > CRC8_GSM_B || crc_type < CRC8_CCITT) {
+    if (crc_type > CRC8_LTE || crc_type < CRC8_CCITT) {
         return CRC_ERROR_INVALID_TYPE;
     }
 

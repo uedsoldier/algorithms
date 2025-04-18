@@ -62,6 +62,12 @@
 #elif CRC8_VARIANT == V_GSM_B
     #define CURRENT_CRC8_TYPE CRC8_GSM_B
     #define CURRENT_EXPECTED_CRC_ARRAY expected_crc8_gsm_b_crcs
+#elif CRC8_VARIANT == V_HITAG
+    #define CURRENT_CRC8_TYPE CRC8_HITAG
+    #define CURRENT_EXPECTED_CRC_ARRAY expected_crc8_hitag_crcs
+#elif CRC8_VARIANT == V_LTE
+    #define CURRENT_CRC8_TYPE CRC8_LTE
+    #define CURRENT_EXPECTED_CRC_ARRAY expected_crc8_lte_crcs
 #else
 #error "Unsupported CRC8_VARIANT specified"
 #endif

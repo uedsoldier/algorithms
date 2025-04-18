@@ -210,4 +210,35 @@ static const uint8_t expected_crc8_gsm_b_crcs[] = {
     0x27   // Random bytes
 };
 
+/**
+ * @brief Expected CRC values for CRC8-HITAG
+ */
+static const uint8_t expected_crc8_hitag_crcs[] = {
+    0x41,  // "Hello, World!"
+    0xFF,  // Empty string
+    0xCA,  // "A"
+    0xB4,  // "123456789"
+    0x16,  // All zeros
+    0x3E,  // All ones
+    0x77,  // Alternating pattern
+    0x58,  // Binary sequence
+    0x00,  // Single byte 0xFF
+    0xCA  // Random bytes
+};
+
+/**
+ * @brief Expected CRC values for CRC8-LTE
+ */
+static const uint8_t expected_crc8_lte_crcs[] = {
+    0xF6,  // "Hello, World!"
+    0x00,  // Empty string
+    0x53,  // "A"
+    0xEA,  // "123456789"
+    0x00,  // All zeros
+    0x5F,  // All ones
+    0x55,  // Alternating pattern
+    0xAC,  // Binary sequence
+    0x7B,  // Single byte 0xFF
+    0xED   // Random bytes
+};
 #endif /* CRC8_TEST_DATA_H */

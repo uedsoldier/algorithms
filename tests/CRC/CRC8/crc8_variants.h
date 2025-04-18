@@ -18,5 +18,7 @@
 #define V_BLUETOOTH 13
 #define V_GSM_A 14
 #define V_GSM_B 15
+#define V_HITAG 16
+#define V_LTE 17
 
 #endif /* CRC8_VARIANTS_H */

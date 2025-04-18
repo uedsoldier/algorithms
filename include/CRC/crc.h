@@ -149,6 +149,8 @@ typedef enum crc_t {
     CRC8_BLUETOOTH, /**< CRC-8/BLUETOOTH - Bluetooth protocol */
     CRC8_GSM_A,     /**< CRC-8/GSM-A - GSM mobile communications */
     CRC8_GSM_B,     /**< CRC-8/GSM-B - GSM mobile communications */
+    CRC8_HITAG,     /**< CRC-8/HITAG - RFID applications */
+    CRC8_LTE,       /**< CRC-8/LTE - Long-Term Evolution */
 
     // CRC16 Variants
     CRC16_XMODEM,       /**< CRC-16/XMODEM - File transfer protocol */

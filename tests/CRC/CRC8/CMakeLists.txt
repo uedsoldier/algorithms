@@ -19,6 +19,8 @@ set(CRC8_ENUM_AUTOSAR 12)
 set(CRC8_ENUM_BLUETOOTH 13)
 set(CRC8_ENUM_GSMA 14)
 set(CRC8_ENUM_GSMB 15)
+set(CRC8_ENUM_HITAG 16)
+set(CRC8_ENUM_LTE 17)
 
 # Define the list of CRC8 test types
 set(CRC8_TEST_TYPES
@@ -44,6 +46,10 @@ set(CRC8_TEST_TYPES
     GSMA_NO_LOOKUP
     GSMB_LOOKUP
     GSMB_NO_LOOKUP
+    HITAG_LOOKUP
+    HITAG_NO_LOOKUP
+    LTE_LOOKUP
+    LTE_NO_LOOKUP
 )
 
 # Function to configure a CRC8 test executable
