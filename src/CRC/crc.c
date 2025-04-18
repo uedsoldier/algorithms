@@ -766,3 +766,62 @@ uint32_t CRC32(const void *data, size_t data_len, crc_t crc_type) {
     }
     return result;
 }
+
+bool CRC8_ValidateAppended(const void *data, size_t data_len, crc_t crc_type) {
+    // Check if data is long enough to contain CRC
+    if (data == NULL || data_len < sizeof(uint8_t)) {
+        return false;
+    }
+
+    // Calculate CRC of data excluding the appended CRC byte
+    uint8_t calculated_crc;
+    if (CRC8_Calculate(data, data_len - sizeof(uint8_t), crc_type, &calculated_crc) != CRC_SUCCESS) {
+        return false;
+    }
+
+    // Compare with appended CRC
+    const uint8_t *data_bytes = (const uint8_t *)data;
+    return (calculated_crc == data_bytes[data_len - sizeof(uint8_t)]);
+}
+
+bool CRC16_ValidateAppended(const void *data, size_t data_len, crc_t crc_type) {
+    // Check if data is long enough to contain CRC
+    if (data == NULL || data_len < sizeof(uint16_t)) {
+        return false;
+    }
+
+    // Calculate CRC of data excluding the appended CRC bytes
+    uint16_t calculated_crc;
+    if (CRC16_Calculate(data, data_len - sizeof(uint16_t), crc_type, &calculated_crc) != CRC_SUCCESS) {
+        return false;
+    }
+
+    // Compare with appended CRC
+    const uint8_t *data_bytes = (const uint8_t *)data;
+    uint16_t appended_crc = ((uint16_t)data_bytes[data_len - sizeof(uint16_t)] << 8) |
+                            data_bytes[data_len - (sizeof(uint16_t) - 1)];
+
+    return (calculated_crc == appended_crc);
+}
+
+bool CRC32_ValidateAppended(const void *data, size_t data_len, crc_t crc_type) {
+    // Check if data is long enough to contain CRC
+    if (data == NULL || data_len < sizeof(uint32_t)) {
+        return false;
+    }
+
+    // Calculate CRC of data excluding the appended CRC bytes
+    uint32_t calculated_crc;
+    if (CRC32_Calculate(data, data_len - sizeof(uint32_t), crc_type, &calculated_crc) != CRC_SUCCESS) {
+        return false;
+    }
+
+    // Compare with appended CRC
+    const uint8_t *data_bytes = (const uint8_t *)data;
+    uint32_t appended_crc = ((uint32_t)data_bytes[data_len - (sizeof(uint32_t))] << 24) |
+                           ((uint32_t)data_bytes[data_len - (sizeof(uint32_t)-1)] << 16) |
+                           ((uint32_t)data_bytes[data_len - (sizeof(uint32_t)-2)] << 8) |
+                           data_bytes[data_len - (sizeof(uint32_t)-3)];
+
+    return (calculated_crc == appended_crc);
+}

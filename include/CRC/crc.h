@@ -1181,6 +1181,33 @@ crc_error_t CRC32_Calculate(const void *data, size_t data_len, crc_t crc_type, u
  */
 uint32_t CRC32(const void *data, size_t data_len, crc_t crc_type);
 
+/**
+ * @brief Validates data integrity using CRC8 where CRC is appended to data
+ * @param data Pointer to the data including appended CRC
+ * @param data_len Length of the data including the appended CRC byte
+ * @param crc_type Type of CRC8 algorithm to use
+ * @return true if data is valid, false otherwise
+ */
+bool CRC8_ValidateAppended(const void *data, size_t data_len, crc_t crc_type);
+
+/**
+ * @brief Validates data integrity using CRC16 where CRC is appended to data
+ * @param data Pointer to the data including appended CRC
+ * @param data_len Length of the data including the appended CRC bytes
+ * @param crc_type Type of CRC16 algorithm to use
+ * @return true if data is valid, false otherwise
+ */
+bool CRC16_ValidateAppended(const void *data, size_t data_len, crc_t crc_type);
+
+/**
+ * @brief Validates data integrity using CRC32 where CRC is appended to data
+ * @param data Pointer to the data including appended CRC
+ * @param data_len Length of the data including the appended CRC bytes
+ * @param crc_type Type of CRC32 algorithm to use
+ * @return true if data is valid, false otherwise
+ */
+bool CRC32_ValidateAppended(const void *data, size_t data_len, crc_t crc_type);
+
 #if defined(CRC_USE_IMPLEMENTATION_NAMES) && (CRC_USE_IMPLEMENTATION_NAMES == 1)
 /**
  * @brief Gets the string name of a CRC implementation
