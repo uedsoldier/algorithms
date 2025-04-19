@@ -767,33 +767,27 @@ uint32_t CRC32(const void *data, size_t data_len, crc_t crc_type) {
     return result;
 }
 
-bool CRC8_ValidateAppended(const void *data, size_t data_len, crc_t crc_type) {
-    // Check if data is long enough to contain CRC
-    if (data == NULL || data_len < sizeof(uint8_t)) {
-        return false;
-    }
+crc_error_t CRC8_ValidateAppended(const void *data, size_t data_len, crc_t crc_type) {
 
     // Calculate CRC of data excluding the appended CRC byte
     uint8_t calculated_crc;
-    if (CRC8_Calculate(data, data_len - sizeof(uint8_t), crc_type, &calculated_crc) != CRC_SUCCESS) {
-        return false;
+    crc_error_t retVal = CRC8_Calculate(data, data_len - sizeof(uint8_t), crc_type, &calculated_crc);
+    if (retVal != CRC_SUCCESS) {
+        return retVal;
     }
 
     // Compare with appended CRC
     const uint8_t *data_bytes = (const uint8_t *)data;
-    return (calculated_crc == data_bytes[data_len - sizeof(uint8_t)]);
+    return (calculated_crc == data_bytes[data_len - sizeof(uint8_t)])? CRC_SUCCESS : CRC_ERROR_CRC_MISMATCH;
 }
 
-bool CRC16_ValidateAppended(const void *data, size_t data_len, crc_t crc_type) {
-    // Check if data is long enough to contain CRC
-    if (data == NULL || data_len < sizeof(uint16_t)) {
-        return false;
-    }
-
+crc_error_t CRC16_ValidateAppended(const void *data, size_t data_len, crc_t crc_type) {
+\
     // Calculate CRC of data excluding the appended CRC bytes
     uint16_t calculated_crc;
-    if (CRC16_Calculate(data, data_len - sizeof(uint16_t), crc_type, &calculated_crc) != CRC_SUCCESS) {
-        return false;
+    crc_error_t retVal = CRC16_Calculate(data, data_len - sizeof(uint16_t), crc_type, &calculated_crc);
+    if (retVal != CRC_SUCCESS) {
+        return retVal;
     }
 
     // Compare with appended CRC
@@ -801,19 +795,16 @@ bool CRC16_ValidateAppended(const void *data, size_t data_len, crc_t crc_type) {
     uint16_t appended_crc = ((uint16_t)data_bytes[data_len - sizeof(uint16_t)] << 8) |
                             data_bytes[data_len - (sizeof(uint16_t) - 1)];
 
-    return (calculated_crc == appended_crc);
+    return (calculated_crc == appended_crc)? CRC_SUCCESS : CRC_ERROR_CRC_MISMATCH;
 }
 
-bool CRC32_ValidateAppended(const void *data, size_t data_len, crc_t crc_type) {
-    // Check if data is long enough to contain CRC
-    if (data == NULL || data_len < sizeof(uint32_t)) {
-        return false;
-    }
+crc_error_t CRC32_ValidateAppended(const void *data, size_t data_len, crc_t crc_type) {
 
     // Calculate CRC of data excluding the appended CRC bytes
     uint32_t calculated_crc;
-    if (CRC32_Calculate(data, data_len - sizeof(uint32_t), crc_type, &calculated_crc) != CRC_SUCCESS) {
-        return false;
+    crc_error_t retVal = CRC32_Calculate(data, data_len - sizeof(uint32_t), crc_type, &calculated_crc);
+    if (retVal != CRC_SUCCESS) {
+        return retVal;
     }
 
     // Compare with appended CRC
@@ -823,5 +814,5 @@ bool CRC32_ValidateAppended(const void *data, size_t data_len, crc_t crc_type) {
                            ((uint32_t)data_bytes[data_len - (sizeof(uint32_t)-2)] << 8) |
                            data_bytes[data_len - (sizeof(uint32_t)-3)];
 
-    return (calculated_crc == appended_crc);
+    return (calculated_crc == appended_crc)? CRC_SUCCESS : CRC_ERROR_CRC_MISMATCH;
 }

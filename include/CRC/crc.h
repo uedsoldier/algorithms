@@ -200,7 +200,8 @@ typedef enum {
     CRC_ERROR_ZERO_LENGTH,        /**< Data length is zero */
     CRC_ERROR_INVALID_TYPE,       /**< Invalid CRC implementation type */
     CRC_ERROR_INVALID_POLYNOMIAL, /**< Invalid polynomial for CRC calculation */
-    CRC_ERROR_LOOKUP_TABLE        /**< Error with lookup table */
+    CRC_ERROR_LOOKUP_TABLE,       /**< Error with lookup table */
+    CRC_ERROR_CRC_MISMATCH,       /**< Calculated CRC does not match expected value */
 } crc_error_t;
 
 #if defined(CRC8_USE_LOOKUP_TABLE) && (CRC8_USE_LOOKUP_TABLE == 1)
@@ -1186,27 +1187,30 @@ uint32_t CRC32(const void *data, size_t data_len, crc_t crc_type);
  * @param data Pointer to the data including appended CRC
  * @param data_len Length of the data including the appended CRC byte
  * @param crc_type Type of CRC8 algorithm to use
- * @return true if data is valid, false otherwise
+ * @return crc_error_t Error code indicating success or failure
+ * @note The CRC is expected to be the last byte of the data buffer.
  */
-bool CRC8_ValidateAppended(const void *data, size_t data_len, crc_t crc_type);
+crc_error_t CRC8_ValidateAppended(const void *data, size_t data_len, crc_t crc_type);
 
 /**
  * @brief Validates data integrity using CRC16 where CRC is appended to data
  * @param data Pointer to the data including appended CRC
  * @param data_len Length of the data including the appended CRC bytes
  * @param crc_type Type of CRC16 algorithm to use
- * @return true if data is valid, false otherwise
+ * @return crc_error_t Error code indicating success or failure
+ * @note The CRC is expected to be the last two bytes of the data buffer.
  */
-bool CRC16_ValidateAppended(const void *data, size_t data_len, crc_t crc_type);
+crc_error_t CRC16_ValidateAppended(const void *data, size_t data_len, crc_t crc_type);
 
 /**
  * @brief Validates data integrity using CRC32 where CRC is appended to data
  * @param data Pointer to the data including appended CRC
  * @param data_len Length of the data including the appended CRC bytes
  * @param crc_type Type of CRC32 algorithm to use
- * @return true if data is valid, false otherwise
+ * @return crc_error_t Error code indicating success or failure
+ * @note The CRC is expected to be the last four bytes of the data buffer.
  */
-bool CRC32_ValidateAppended(const void *data, size_t data_len, crc_t crc_type);
+crc_error_t CRC32_ValidateAppended(const void *data, size_t data_len, crc_t crc_type);
 
 #if defined(CRC_USE_IMPLEMENTATION_NAMES) && (CRC_USE_IMPLEMENTATION_NAMES == 1)
 /**
