@@ -119,4 +119,58 @@ foreach(TEST_TYPE ${CRC32_TEST_TYPES})
     configure_crc32_test(${TEST_TYPE})
 endforeach()
 
+# Add CRC32 Validation Test
+add_executable(CRC32_validation_tester
+    test_CRC32_validation.c
+    ${CRC_IMPL_FILES}
+)
+
+target_include_directories(CRC32_validation_tester
+    PRIVATE
+        ${CMAKE_SOURCE_DIR}/include
+        ${CMAKE_SOURCE_DIR}/include/CRC
+        ${CMAKE_SOURCE_DIR}/src
+        ${CMAKE_SOURCE_DIR}/src/CRC
+        ${CMAKE_CURRENT_SOURCE_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}/test_data
+)
+
+target_compile_definitions(CRC32_validation_tester
+    PRIVATE
+        "CRC_USE_IMPLEMENTATION_NAMES=1"
+        "CRC32_USE_LOOKUP_TABLE=1"  # Enable lookup tables for validation tests
+)
+
+target_link_libraries(CRC32_validation_tester
+    PRIVATE
+        algorithms_lib
+        test_utils
+)
+
+if(CMAKE_C_COMPILER_ID MATCHES "MSVC")
+    target_compile_options(CRC32_validation_tester PRIVATE /W4)
+else()
+    target_compile_options(CRC32_validation_tester PRIVATE
+        -Wall
+        -Wextra
+        -Wpedantic
+        -Wno-missing-braces
+    )
+    target_link_libraries(CRC32_validation_tester PRIVATE m)
+endif()
+
+add_test(
+    NAME CRC32_validation_test
+    COMMAND CRC32_validation_tester
+    WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+)
+
+set_tests_properties(CRC32_validation_test PROPERTIES
+    TIMEOUT 30
+    PASS_REGULAR_EXPRESSION "Final result: ALL TESTS PASSED"
+    FAIL_REGULAR_EXPRESSION "(Final result: SOME TESTS FAILED)|(Sanitizer)"
+    ENVIRONMENT "CTEST_OUTPUT_ON_FAILURE=1"
+)
+
+
 message(STATUS "=== Finished configuring CRC32 Tests ===")
