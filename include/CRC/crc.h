@@ -87,33 +87,25 @@
 #endif
 
 /**
- * @brief Debug message macro
+ * @brief Debug message macros
  *
  * Prints debug messages when CRC_DEBUG_ENABLE is set.
  * No code is generated when debugging is disabled.
  *
+ * @param msg Simple message string without formatting
  * @param format Printf-style format string
  * @param ... Variable arguments for format string
  */
 #if CRC_DEBUG_ENABLE
-#define CRC_DEBUG(format, ...) CRC_DEBUG_PRINTF("CRC DEBUG: " format "\n", ##__VA_ARGS__)
+#define CRC_DEBUG_SIMPLE(msg)    CRC_DEBUG_PRINTF("[DEBUG]%s\n", msg)
+#define CRC_DEBUG(format, ...)   CRC_DEBUG_PRINTF("[DEBUG]" format "\n", ##__VA_ARGS__)
+#define CRC_ERROR_SIMPLE(msg)    CRC_DEBUG_PRINTF("[ERROR]%s\n", msg)
+#define CRC_ERROR(format, ...)   CRC_DEBUG_PRINTF("[ERROR]" format "\n", ##__VA_ARGS__)
 #else
-#define CRC_DEBUG(format, ...) ((void)0)
-#endif
-
-/**
- * @brief Error message macro
- *
- * Prints error messages when CRC_DEBUG_ENABLE is set.
- * No code is generated when debugging is disabled.
- *
- * @param format Printf-style format string
- * @param ... Variable arguments for format string
- */
-#if CRC_DEBUG_ENABLE
-#define CRC_ERROR(format, ...) CRC_DEBUG_PRINTF("CRC ERROR: " format "\n", ##__VA_ARGS__)
-#else
-#define CRC_ERROR(format, ...) ((void)0)
+#define CRC_DEBUG_SIMPLE(msg)    ((void)0)
+#define CRC_DEBUG(format, ...)   ((void)0)
+#define CRC_ERROR_SIMPLE(msg)    ((void)0)
+#define CRC_ERROR(format, ...)   ((void)0)
 #endif
 
 #include <stdbool.h>
