@@ -567,9 +567,8 @@ crc_error_t CRC8_Calculate(const void *data, size_t data_len, crc_t crc_type, ui
             crc = crc ^ b;
             CRC_DEBUG("CRC8: After XOR with input: 0x%02X", crc);
             for (uint8_t i = 0; i != 8; i++){
-                bool msb = crc & 0x80;
                 crc = (crc & 0x80) ? (uint8_t)((crc << 1) ^ poly) : (uint8_t)(crc << 1);
-                CRC_DEBUG("CRC8: Bit %d: MSB=%d, CRC=0x%02X", i, msb ? 1 : 0, crc);
+                CRC_DEBUG("CRC8: Bit %u: MSB=%u, CRC=0x%02X", i, (crc & 0x80) ? 1 : 0, crc);
             }
     #else
         uint8_t old_crc = crc;
@@ -695,9 +694,8 @@ crc_error_t CRC16_Calculate(const void *data, size_t data_len, crc_t crc_type, u
             crc = crc ^ (uint16_t)((uint16_t)b << 8);
             CRC_DEBUG("CRC16: After XOR with input: 0x%04X", crc);
             for (uint8_t i = 0; i != 8; i++) {
-                bool msb = crc & 0x8000;
                 crc = (crc & 0x8000) ? (crc << 1) ^ poly : (crc << 1);
-                CRC_DEBUG("CRC16: Bit %d: MSB=%d, CRC=0x%04X", i, msb ? 1 : 0, crc);
+                CRC_DEBUG("CRC16: Bit %u: MSB=%u, CRC=0x%04X", i, (crc & 0x8000) ? 1 : 0, crc);
             }
     #else
         uint16_t old_crc = crc;
@@ -808,9 +806,8 @@ crc_error_t CRC32_Calculate(const void *data, size_t data_len, crc_t crc_type, u
             crc = crc ^ (((uint32_t)(b)) << 24);
             CRC_DEBUG("CRC32: After XOR with input: 0x%08X", crc);
             for (uint8_t i = 0; i != 8; i++) {
-                bool msb = crc & 0x80000000UL;
                 crc = (crc & 0x80000000UL) ? (crc << 1) ^ poly : (crc << 1);
-                CRC_DEBUG("CRC32: Bit %d: MSB=%d, CRC=0x%08X", i, msb ? 1 : 0, crc);
+                CRC_DEBUG("CRC32: Bit %u: MSB=%u, CRC=0x%08X", i, (crc & 0x80000000UL) ? 1 : 0, crc);
             }
     #else
             uint32_t old_crc = crc;
