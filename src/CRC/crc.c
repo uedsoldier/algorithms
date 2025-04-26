@@ -1,9 +1,16 @@
 /**
- * @file crc.h
- * @brief Librería de implementación de funciones de verificación de redundancia
- * cíclica (CRC o Cyclic Redundancy Check)
- * @author Ing. José Roberto Parra Trewartha
- * @version 1.0
+ * @file crc.c
+ * @author José Roberto Parra Trewartha
+ * @brief Cyclic Redundancy Check (CRC) source file
+ * @version 0.1
+ * @date 2024-01-20
+ *
+ * @copyright Copyright (c) 2024
+ *
+ * This library provides comprehensive CRC calculation functionality supporting
+ * multiple standard CRC algorithms including CRC8, CRC16, and CRC32 variants.
+ * It implements both table-driven and direct calculation methods for optimal
+ * performance and memory usage trade-offs.
  */
 
 #include "crc.h"
