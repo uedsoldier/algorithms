@@ -1,9 +1,16 @@
 /**
- * @file crc.h
- * @brief Librería de implementación de funciones de verificación de redundancia
- * cíclica (CRC o Cyclic Redundancy Check)
- * @author Ing. José Roberto Parra Trewartha
- * @version 1.0
+ * @file crc.c
+ * @author José Roberto Parra Trewartha
+ * @brief Cyclic Redundancy Check (CRC) source file
+ * @version 0.1
+ * @date 2024-01-20
+ *
+ * @copyright Copyright (c) 2024
+ *
+ * This library provides comprehensive CRC calculation functionality supporting
+ * multiple standard CRC algorithms including CRC8, CRC16, and CRC32 variants.
+ * It implements both table-driven and direct calculation methods for optimal
+ * performance and memory usage trade-offs.
  */
 
 #include "crc.h"
@@ -568,7 +575,6 @@ crc_error_t CRC8_Calculate(const void *data, size_t data_len, crc_t crc_type, ui
             crc = crc ^ b;
             CRC_TRACE("CRC8: After XOR with input: 0x%02X", crc);
             for (uint8_t i = 0; i != 8; i++){
-                bool msb = crc & 0x80;
                 crc = (crc & 0x80) ? (uint8_t)((crc << 1) ^ poly) : (uint8_t)(crc << 1);
                 CRC_TRACE("CRC8: Bit %d: MSB=%d, CRC=0x%02X", i, msb ? 1 : 0, crc);
             }
@@ -696,7 +702,6 @@ crc_error_t CRC16_Calculate(const void *data, size_t data_len, crc_t crc_type, u
             crc = crc ^ (uint16_t)((uint16_t)b << 8);
             CRC_TRACE("CRC16: After XOR with input: 0x%04X", crc);
             for (uint8_t i = 0; i != 8; i++) {
-                bool msb = crc & 0x8000;
                 crc = (crc & 0x8000) ? (crc << 1) ^ poly : (crc << 1);
                 CRC_TRACE("CRC16: Bit %d: MSB=%d, CRC=0x%04X", i, msb ? 1 : 0, crc);
             }
@@ -809,7 +814,6 @@ crc_error_t CRC32_Calculate(const void *data, size_t data_len, crc_t crc_type, u
             crc = crc ^ (((uint32_t)(b)) << 24);
             CRC_TRACE("CRC32: After XOR with input: 0x%08lX", crc);
             for (uint8_t i = 0; i != 8; i++) {
-                bool msb = crc & 0x80000000UL;
                 crc = (crc & 0x80000000UL) ? (crc << 1) ^ poly : (crc << 1);
                 CRC_TRACE("CRC32: Bit %d: MSB=%d, CRC=0x%08lX", i, msb ? 1 : 0, crc);
             }
