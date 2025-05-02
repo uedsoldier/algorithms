@@ -65,10 +65,39 @@
 #endif
 
 /**
+ * @brief Debug level definitions for CRC library
+ *
+ * Controls the verbosity of debug output:
+ * - OFF (0): No debug output
+ * - ERROR (1): Only error messages
+ * - WARN (2): Errors and warnings
+ * - INFO (3): General information plus warnings and errors
+ * - DEBUG (4): Detailed debug information
+ * - TRACE (5): Most verbose output including variable values
+ */
+#define CRC_DEBUG_LEVEL_OFF   0
+#define CRC_DEBUG_LEVEL_ERROR 1
+#define CRC_DEBUG_LEVEL_WARN  2
+#define CRC_DEBUG_LEVEL_INFO  3
+#define CRC_DEBUG_LEVEL_DEBUG 4
+#define CRC_DEBUG_LEVEL_TRACE 5
+
+/**
+ * @brief Sets the active debug level
+ *
+ * Define this to control which debug messages are compiled into the binary.
+ * Messages with a level higher than this will be excluded.
+ * Defaults to ERROR if not defined.
+ */
+#ifndef CRC_ACTIVE_DEBUG_LEVEL
+#define CRC_ACTIVE_DEBUG_LEVEL CRC_DEBUG_LEVEL_ERROR
+#endif
+
+/**
  * @brief Controls debug message output
  *
- * When enabled (set to 1), debug messages will be printed to help with
- * troubleshooting. Disable for production builds to save memory and improve
+ * When enabled (set to 1), debug messages at or below CRC_ACTIVE_DEBUG_LEVEL
+ * will be printed. Disable for production builds to save memory and improve
  * performance.
  */
 #ifndef CRC_DEBUG_ENABLE
@@ -87,25 +116,71 @@
 #endif
 
 /**
- * @brief Debug message macros
+ * @brief Debug message macros with level support
  *
- * Prints debug messages when CRC_DEBUG_ENABLE is set.
- * No code is generated when debugging is disabled.
+ * Prints debug messages when CRC_DEBUG_ENABLE is set and message level
+ * is at or below CRC_ACTIVE_DEBUG_LEVEL.
+ * No code is generated for disabled levels.
  *
  * @param msg Simple message string without formatting
  * @param format Printf-style format string
  * @param ... Variable arguments for format string
  */
 #if CRC_DEBUG_ENABLE
-#define CRC_DEBUG_SIMPLE(msg)    CRC_DEBUG_PRINTF("[DEBUG]%s\n", msg)
-#define CRC_DEBUG(format, ...)   CRC_DEBUG_PRINTF("[DEBUG]" format "\n", ##__VA_ARGS__)
-#define CRC_ERROR_SIMPLE(msg)    CRC_DEBUG_PRINTF("[ERROR]%s\n", msg)
-#define CRC_ERROR(format, ...)   CRC_DEBUG_PRINTF("[ERROR]" format "\n", ##__VA_ARGS__)
+
+#define CRC_ERROR_SIMPLE(msg) \
+    ((CRC_ACTIVE_DEBUG_LEVEL >= CRC_DEBUG_LEVEL_ERROR) ? \
+     CRC_DEBUG_PRINTF("[ERROR] %s\n", msg) : (void)0)
+
+#define CRC_ERROR(format, ...) \
+    ((CRC_ACTIVE_DEBUG_LEVEL >= CRC_DEBUG_LEVEL_ERROR) ? \
+     CRC_DEBUG_PRINTF("[ERROR] " format "\n", ##__VA_ARGS__) : (void)0)
+
+#define CRC_WARN_SIMPLE(msg) \
+    ((CRC_ACTIVE_DEBUG_LEVEL >= CRC_DEBUG_LEVEL_WARN) ? \
+     CRC_DEBUG_PRINTF("[WARN] %s\n", msg) : (void)0)
+
+#define CRC_WARN(format, ...) \
+    ((CRC_ACTIVE_DEBUG_LEVEL >= CRC_DEBUG_LEVEL_WARN) ? \
+     CRC_DEBUG_PRINTF("[WARN] " format "\n", ##__VA_ARGS__) : (void)0)
+
+#define CRC_INFO_SIMPLE(msg) \
+    ((CRC_ACTIVE_DEBUG_LEVEL >= CRC_DEBUG_LEVEL_INFO) ? \
+     CRC_DEBUG_PRINTF("[INFO] %s\n", msg) : (void)0)
+
+#define CRC_INFO(format, ...) \
+    ((CRC_ACTIVE_DEBUG_LEVEL >= CRC_DEBUG_LEVEL_INFO) ? \
+     CRC_DEBUG_PRINTF("[INFO] " format "\n", ##__VA_ARGS__) : (void)0)
+
+#define CRC_DEBUG_SIMPLE(msg) \
+    ((CRC_ACTIVE_DEBUG_LEVEL >= CRC_DEBUG_LEVEL_DEBUG) ? \
+     CRC_DEBUG_PRINTF("[DEBUG] %s\n", msg) : (void)0)
+
+#define CRC_DEBUG(format, ...) \
+    ((CRC_ACTIVE_DEBUG_LEVEL >= CRC_DEBUG_LEVEL_DEBUG) ? \
+     CRC_DEBUG_PRINTF("[DEBUG] " format "\n", ##__VA_ARGS__) : (void)0)
+
+#define CRC_TRACE_SIMPLE(msg) \
+    ((CRC_ACTIVE_DEBUG_LEVEL >= CRC_DEBUG_LEVEL_TRACE) ? \
+     CRC_DEBUG_PRINTF("[TRACE] %s\n", msg) : (void)0)
+
+#define CRC_TRACE(format, ...) \
+    ((CRC_ACTIVE_DEBUG_LEVEL >= CRC_DEBUG_LEVEL_TRACE) ? \
+     CRC_DEBUG_PRINTF("[TRACE] " format "\n", ##__VA_ARGS__) : (void)0)
+
 #else
-#define CRC_DEBUG_SIMPLE(msg)    ((void)0)
-#define CRC_DEBUG(format, ...)   ((void)0)
-#define CRC_ERROR_SIMPLE(msg)    ((void)0)
-#define CRC_ERROR(format, ...)   ((void)0)
+
+#define CRC_ERROR_SIMPLE(msg)       ((void)0)
+#define CRC_ERROR(format, ...)      ((void)0)
+#define CRC_WARN_SIMPLE(msg)        ((void)0)
+#define CRC_WARN(format, ...)       ((void)0)
+#define CRC_INFO_SIMPLE(msg)        ((void)0)
+#define CRC_INFO(format, ...)       ((void)0)
+#define CRC_DEBUG_SIMPLE(msg)       ((void)0)
+#define CRC_DEBUG(format, ...)      ((void)0)
+#define CRC_TRACE_SIMPLE(msg)       ((void)0)
+#define CRC_TRACE(format, ...)      ((void)0)
+
 #endif
 
 #include <stdbool.h>
