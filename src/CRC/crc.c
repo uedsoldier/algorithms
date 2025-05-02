@@ -556,6 +556,8 @@ crc_error_t CRC8_Calculate(const void *data, size_t data_len, crc_t crc_type, ui
         return CRC_ERROR_LOOKUP_TABLE;
     }
 #endif
+#else
+    CRC_WARN("CRC8: Using direct calculation method, lookup table not used");
 #endif
     if (data_len > 0) {
         uint8_t *_buf = (uint8_t *)data;
@@ -589,6 +591,8 @@ crc_error_t CRC8_Calculate(const void *data, size_t data_len, crc_t crc_type, ui
             crc = bit_invert_Byte(crc);
             CRC_TRACE("CRC8: After output reflection: 0x%02X -> 0x%02X", pre_reflect, crc);
         }
+    } else{
+        CRC_WARN("Input data length is zero");
     }
 
     uint8_t final_xor = CRC8_getFinalXOR(crc_type);
@@ -681,7 +685,9 @@ crc_error_t CRC16_Calculate(const void *data, size_t data_len, crc_t crc_type, u
         CRC_ERROR_SIMPLE("CRC16: Lookup table not found");
         return CRC_ERROR_LOOKUP_TABLE;
     }
-#endif
+    #else
+    CRC_WARN("CRC16: Using direct calculation method, lookup table not used");
+    #endif
 #endif
     if (data_len > 0) {
         uint8_t *_buf = (uint8_t *)data;
@@ -717,6 +723,8 @@ crc_error_t CRC16_Calculate(const void *data, size_t data_len, crc_t crc_type, u
             crc = bit_invert_Int16(crc);
             CRC_TRACE("CRC16: After output reflection: 0x%04X -> 0x%04X", pre_reflect, crc);
         }
+    } else {
+        CRC_WARN("Input data length is zero");
     }
 
     uint16_t final_xor = CRC16_getFinalXOR(crc_type);
@@ -798,6 +806,8 @@ crc_error_t CRC32_Calculate(const void *data, size_t data_len, crc_t crc_type, u
         return CRC_ERROR_LOOKUP_TABLE;
     }
 #endif
+#else
+    CRC_WARN("CRC32: Using direct calculation method, lookup table not used");
 #endif
     if (data_len > 0) {
         uint8_t *_buf = (uint8_t *)data;
@@ -829,6 +839,8 @@ crc_error_t CRC32_Calculate(const void *data, size_t data_len, crc_t crc_type, u
             crc = output_reflected ? bit_invert_Int32(crc) : crc;
             CRC_TRACE("CRC32: After output reflection: 0x%08lX -> 0x%08lX", pre_reflect, crc);
         }
+    } else {
+        CRC_WARN("Input data length is zero");
     }
 
     uint32_t final_xor = CRC32_getFinalXOR(crc_type);
